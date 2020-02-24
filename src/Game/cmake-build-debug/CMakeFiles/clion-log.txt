@@ -1,0 +1,4 @@
+"/Users/maxim/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/192.7142.39/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/maxim/Documents/HSE/zxc
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/maxim/Documents/HSE/zxc/cmake-build-debug
