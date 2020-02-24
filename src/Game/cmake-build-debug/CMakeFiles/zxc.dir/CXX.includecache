@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/maxim/Documents/HSE/zxc/Buff.h
+
+/Users/maxim/Documents/HSE/zxc/Hero.h
+vector
+-
+Unit.h
+/Users/maxim/Documents/HSE/zxc/Unit.h
+Skill.h
+/Users/maxim/Documents/HSE/zxc/Skill.h
+
+/Users/maxim/Documents/HSE/zxc/Item.h
+
+/Users/maxim/Documents/HSE/zxc/Point.h
+
+/Users/maxim/Documents/HSE/zxc/Skill.h
+
+/Users/maxim/Documents/HSE/zxc/Unit.h
+vector
+-
+Point.h
+/Users/maxim/Documents/HSE/zxc/Point.h
+Item.h
+/Users/maxim/Documents/HSE/zxc/Item.h
+Buff.h
+/Users/maxim/Documents/HSE/zxc/Buff.h
+
+/Users/maxim/Documents/HSE/zxc/main.cpp
+iostream
+-
+Hero.h
+/Users/maxim/Documents/HSE/zxc/Hero.h
+
