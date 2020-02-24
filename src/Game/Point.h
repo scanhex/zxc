@@ -1,5 +1,4 @@
-#ifndef ZXC_POINT_H
-#define ZXC_POINT_H
+#pragma once
 
 class Point final {
 public:
@@ -10,11 +9,9 @@ public:
     bool operator==(Point other) const;
     void operator+=(Point other);
 
-    bool xInRange(double left, double right) const;
+    [[nodiscard]] bool xInRange(double left, double right) const;
 
-    bool yInRange(double left, double right) const;
+    [[nodiscard]] bool yInRange(double left, double right) const;
 
-    bool inRadius(double x, double y, double r) const;
+    [[nodiscard]] bool inRadius(double x, double y, double r) const;
 };
-
-#endif //ZXC_POINT_H
