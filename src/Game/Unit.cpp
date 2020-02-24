@@ -1,10 +1,10 @@
 #include "Unit.h"
 
 Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position) :
+           int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position):
         damage_{damage}, attackRange_{attackRange}, moveSpeed_{moveSpeed},
         attackSpeed_{attackSpeed}, maxHP_{maxHP}, maxMP_{maxMP},
-        healthPoints_{maxHP}, manaPoints_{maxMP},
+        healthPoints_{static_cast<double>(maxHP)}, manaPoints_{static_cast<double>(maxMP)},
         hpRegen_{hpRegen}, mpRegen_{mpRegen}, armor_{armor},
         resist_{resist}, position_{position} {}
 
@@ -16,7 +16,7 @@ void Unit::addItem(Item item) {
 }
 
 void Unit::deleteItem(int indexToDelete) {
-    assert(indexToDelete >= 0 && indexToDelete < items_.size() && "Wrong index for deleting item!");
+    assert(indexToDelete >= 0 && indexToDelete < static_cast<int>(items_.size()) && "Wrong index for deleting item!");
 
     items_.erase(items_.begin() + indexToDelete);
 }
@@ -45,25 +45,26 @@ void Unit::changeHPRegen(int delta) { hpRegen_ += delta; }
 
 void Unit::changeMPRegen(int delta) { mpRegen_ += delta; }
 
-void Unit::heal(int amount) {
-    healthPoints_ = std::min(healthPoints_ + amount, maxHP_);
+void Unit::heal(double amount) {
+    healthPoints_ = std::min(healthPoints_ + amount, static_cast<double>(maxHP_));
 }
 
-void Unit::damage(int amount) {
-    healthPoints_ = std::max(healthPoints_ - amount, 0);
+void Unit::damage(double amount) {
+    healthPoints_ = std::max(healthPoints_ - amount, 0.0);
 }
 
-void Unit::damagePhys(int amount) {
+void Unit::damagePhys(double amount) {
     double multiplier = 1 - ((0.052 * armor_) / (0.9 + 0.048 * std::abs(armor_)));
-    damage((int) (amount * multiplier));
+    damage(amount * multiplier);
 }
 
-void Unit::damageMagic(int amount) {
-    damage((int) (amount * resist_));
+void Unit::damageMagic(double amount) {
+    damage(amount * resist_);
 }
 
 void Unit::regenMana(int amount) {
-    manaPoints_ = std::min(manaPoints_ += amount, maxMP_);
+    manaPoints_ += amount;
+    manaPoints_ = std::min(manaPoints_, static_cast<double>(maxMP_));
 }
 
 bool Unit::canSpendMana(int amount) {

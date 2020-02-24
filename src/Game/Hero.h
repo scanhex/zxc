@@ -1,5 +1,4 @@
-#ifndef ZXC_HERO_H
-#define ZXC_HERO_H
+#pragma once
 
 #include <vector>
 #include "Unit.h"
@@ -16,8 +15,8 @@ private:
 
 public:
     // make everything public or make getters or ?
-    int level_;
     int gold_;
+    int level_;
     int experience_;
 
     Hero() = delete;
@@ -33,5 +32,3 @@ public:
 
     void changeExperience(int delta);
 };
-
-#endif //ZXC_HERO_H

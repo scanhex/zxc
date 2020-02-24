@@ -1,8 +1,5 @@
-#ifndef ZXC_SKILL_H
-#define ZXC_SKILL_H
+#pragma once
 
 class Skill{
 
 };
-
-#endif //ZXC_SKILL_H

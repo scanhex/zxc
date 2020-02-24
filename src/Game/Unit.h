@@ -1,7 +1,8 @@
-#ifndef ZXC_UNIT_H
-#define ZXC_UNIT_H
+#pragma once
 
 #include <vector>
+#include <cassert>
+
 #include "Point.h"
 #include "Item.h"
 #include "Buff.h"
@@ -23,10 +24,10 @@ private:
 
     int maxHP_;
     int maxMP_;
-    int healthPoints_;
-    int manaPoints_;
-    int hpRegen_; // per sec, make double?
-    int mpRegen_; // per sec, make double?
+    double healthPoints_;
+    double manaPoints_;
+    double hpRegen_; // per sec, make double?
+    double mpRegen_; // per sec, make double?
 
     int armor_; // adjust formula(see damagePhys)?
     double resist_; // percent
@@ -36,7 +37,7 @@ private:
 public:
     Unit() = delete;
 
-    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position);
+    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position);
 
     void addItem(Item item);
     void deleteItem(int indexToDelete); // 0..MAX_ITEMS-1 in inventory
@@ -53,11 +54,11 @@ public:
     void changeHPRegen(int delta);
     void changeMPRegen(int delta);
 
-    void damage(int amount);
-    void heal(int amount);
+    void damage(double amount);
+    void heal(double amount);
 
-    void damagePhys(int amount);
-    void damageMagic(int amount);
+    void damagePhys(double amount);
+    void damageMagic(double amount);
 
     void regenMana(int amount);
     void spendMana(int amount);
@@ -71,5 +72,3 @@ public:
 
     bool isDead();
 };
-
-#endif //ZXC_UNIT_H
