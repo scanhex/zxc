@@ -2,7 +2,7 @@
 
 class Point final {
 public:
-    double x_, y_;
+    double x_, y_, z_;
 
     Point(double x, double y);
 
