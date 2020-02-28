@@ -3,12 +3,20 @@
 #include <Magnum/Math/Color.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Buffer.h>
-//#include <Magnum/ImGuiIntegration/context.hpp>
 #include <Magnum/Shaders/VertexColor.h>
+#include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
+#include <MagnumPlugins/AssimpImporter/importStaticPlugin.cpp>
+#include <MagnumPlugins/ObjImporter/ObjImporter.h>
 #include <Magnum/Timeline.h>
+#include <Magnum/Trade/MeshData2D.h>
+
+#include <iostream>
+#include <Magnum/Trade/SceneData.h>
 
 using namespace Magnum;
 using namespace Math::Literals;
+using Magnum::Trade::AssimpImporter;
+using Magnum::Trade::ObjImporter;
 
 class MyApplication: public Platform::Application {
     public:
@@ -27,15 +35,18 @@ struct TriangleVertex {
     Color3 color;
 };
 
-
-
 MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments} {
     _timeline.start();
-    setMinimalLoopPeriod(100);
+    setMinimalLoopPeriod(10);
+    Trade::AssimpImporter kek;
+//    Magnum::Trade::SceneData d({},{});
+ //   PluginManager::Manager<Trade::AbstractImporter> manager;
+//    Containers::Pointer<Trade::AbstractImporter> importer = manager.loadAndInstantiate("AnySceneImporter");
+  //  importer->openFile("C:/Users/ISM/zxc/resources/nevermore/nevermore_no_wings_bin.fbx");
 }
 
 float ticks=0;
-const int C=100;
+const int C=1000;
 
 void MyApplication::drawEvent() {
     GL::defaultFramebuffer.clear(GL::FramebufferClear::Color);
