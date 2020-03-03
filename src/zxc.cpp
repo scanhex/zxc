@@ -1,72 +1,412 @@
+#include <Corrade/Containers/Array.h>
+#include <Corrade/Containers/Optional.h>
+#include <Corrade/PluginManager/Manager.h>
+#include <Corrade/Utility/Arguments.h>
+#include <Corrade/Utility/DebugStl.h>
+#include <Magnum/ImageView.h>
+#include <Magnum/Mesh.h>
+#include <Magnum/PixelFormat.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
-#include <Magnum/Platform/Sdl2Application.h>
-#include <Magnum/Math/Color.h>
 #include <Magnum/GL/Mesh.h>
-#include <Magnum/GL/Buffer.h>
-#include <Magnum/Shaders/VertexColor.h>
+#include <Magnum/GL/Renderer.h>
+#include <Magnum/GL/Texture.h>
+#include <Magnum/GL/TextureFormat.h>
+#include <Magnum/MeshTools/Compile.h>
+#include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/SceneGraph/Camera.h>
+#include <Magnum/SceneGraph/Drawable.h>
+#include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/Shaders/Phong.h>
+#include <Magnum/Trade/AbstractImporter.h>
+#include <Magnum/Trade/ImageData.h>
+#include <Magnum/Trade/MeshData3D.h>
+#include <Magnum/Trade/MeshObjectData3D.h>
+#include <Magnum/Trade/PhongMaterialData.h>
+#include <Magnum/Trade/SceneData.h>
+#include <Magnum/Trade/TextureData.h>
 #include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
-#include <MagnumPlugins/AssimpImporter/importStaticPlugin.cpp>
-#include <MagnumPlugins/ObjImporter/ObjImporter.h>
-#include <Magnum/Timeline.h>
-#include <Magnum/Trade/MeshData2D.h>
+#include <Magnum/Magnum.h>
 
 #include <iostream>
-#include <Magnum/Trade/SceneData.h>
+#include <fstream>
+#include <cassert>
+
+#include "UnitDrawable.h"
 
 using namespace Magnum;
+
 using namespace Math::Literals;
-using Magnum::Trade::AssimpImporter;
-using Magnum::Trade::ObjImporter;
 
-class MyApplication: public Platform::Application {
-    public:
-        explicit MyApplication(const Arguments& arguments);
+typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
+typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
 
-    private:
-        void drawEvent() override;
+class ZxcApplication : public Platform::Application {
+public:
+	explicit ZxcApplication(const Arguments& arguments);
 
-    GL::Mesh _mesh;
-    Shaders::VertexColor2D _shader;
-    Timeline _timeline;
+private:
+	void drawEvent() override;
+	void viewportEvent(ViewportEvent& event) override;
+	void mousePressEvent(MouseEvent& event) override;
+	void mouseReleaseEvent(MouseEvent& event) override;
+	void mouseMoveEvent(MouseMoveEvent& event) override;
+	void mouseScrollEvent(MouseScrollEvent& event) override;
+
+    void keyPressEvent(KeyEvent &event) override;
+
+    Vector3 positionOnSphere(const Vector2i& position) const;
+
+    void addUnit(Unit &&u);
+	void initScene();
+	void loadModels();
+
+	void addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i);
+
+	Shaders::Phong _coloredShader,
+		_texturedShader;//Shaders::Phong::Flag::DiffuseTexture };
+	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
+	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
+
+    std::vector<Unit> _units;
+    std::vector<Object3D*> _unitObjects;
+
+	Scene3D _scene;
+	Object3D _manipulator, _cameraObject;
+	SceneGraph::Camera3D* _camera = nullptr;
+	SceneGraph::DrawableGroup3D _drawables;
+	Vector3 _previousPosition;
+
 };
 
-struct TriangleVertex {
-    Vector2 position;
-    Color3 color;
+class ColoredDrawable : public SceneGraph::Drawable3D {
+public:
+	explicit ColoredDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, const Color4& color, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _color{ color } {}
+
+private:
+	void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
+
+	Shaders::Phong& _shader;
+	GL::Mesh& _mesh;
+	Color4 _color;
 };
 
-MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments} {
-    _timeline.start();
-    setMinimalLoopPeriod(10);
-    Trade::AssimpImporter kek;
-//    Magnum::Trade::SceneData d({},{});
- //   PluginManager::Manager<Trade::AbstractImporter> manager;
-//    Containers::Pointer<Trade::AbstractImporter> importer = manager.loadAndInstantiate("AnySceneImporter");
-  //  importer->openFile("C:/Users/ISM/zxc/resources/nevermore/nevermore_no_wings_bin.fbx");
+class TexturedDrawable : public SceneGraph::Drawable3D {
+public:
+	explicit TexturedDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, GL::Texture2D& texture, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _texture(texture) {}
+
+private:
+	void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
+
+	Shaders::Phong& _shader;
+	GL::Mesh& _mesh;
+	GL::Texture2D& _texture;
+};
+
+void ZxcApplication::initScene() {
+	/* Every scene needs a camera */
+	/* (c) Confucius */
+	_cameraObject
+		.setParent(&_scene)
+		.translate(Vector3::zAxis(20.0f));
+	(*(_camera = new SceneGraph::Camera3D{ _cameraObject }))
+		.setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
+		.setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
+		.setViewport(GL::defaultFramebuffer.viewport().size());
+	/* Base object, parent of all (for easy manipulation) */
+	_manipulator.setParent(&_scene);
+
+	/* Setup renderer and shader defaults */
+	GL::Renderer::enable(GL::Renderer::Feature::DepthTest);
+	GL::Renderer::enable(GL::Renderer::Feature::FaceCulling);
+	_coloredShader
+		.setAmbientColor(0x111111_rgbf)
+		.setSpecularColor(0xffffff_rgbf)
+		.setShininess(8.0f);
+	_texturedShader
+		.setAmbientColor(0x111111_rgbf)
+		.setSpecularColor(0x111111_rgbf)
+		.setShininess(8.0f);
 }
 
-float ticks=0;
-const int C=1000;
+void ZxcApplication::loadModels() {
 
-void MyApplication::drawEvent() {
-    GL::defaultFramebuffer.clear(GL::FramebufferClear::Color);
-    if (ticks++==C)ticks=-C;
+	/* Load a scene importer plugin */
+	PluginManager::Manager<Trade::AbstractImporter> manager;
+	auto loadState = manager.load("AssimpImporter");
+	assert(loadState == Corrade::PluginManager::LoadState::Loaded || loadState == Corrade::PluginManager::LoadState::Static);
+	Corrade::Containers::Pointer<Trade::AbstractImporter> importer = manager.instantiate("AssimpImporter");
 
-    GL::Buffer buffer;
-    TriangleVertex data[]{
-            {{-0.5f+ticks/C, -0.5f}, 0xff0000_rgbf},    /* Left vertex, red color */
-            {{ 0.5f+ticks/C, -0.5f}, 0x00ff00_rgbf},    /* Right vertex, green color */
-            {{ 0.0f+ticks/C,  0.5f}, 0x0000ff_rgbf}     /* Top vertex, blue color */
-    };
+	std::string filename = "C:/Users/ISM/Code/zxc/resources/nevermore/nevermore_blender.fbx";
 
-    buffer.setData(data);
-    _mesh.setCount(3).addVertexBuffer(std::move(buffer), 0, Shaders::VertexColor2D::Position{}, Shaders::VertexColor2D::Color3{});
+	Debug{} << "Opening file" << filename;
 
-    _mesh.draw(_shader);
+	/* Load file */
+	if (!importer->openFile(filename))
+		std::exit(4);
 
-    swapBuffers();
-    _timeline.nextFrame();
-    redraw();
+	/* Load all textures. Textures that fail to load will be NullOpt. */
+	/**/
+	_textures = Containers::Array<Containers::Optional<GL::Texture2D>>{ importer->textureCount() };
+	for (UnsignedInt i = 0; i != importer->textureCount(); ++i) {
+		Debug{} << "Importing texture" << i << importer->textureName(i);
+
+		Containers::Optional<Trade::TextureData> textureData = importer->texture(i);
+		if (!textureData || textureData->type() != Trade::TextureData::Type::Texture2D) {
+			Warning{} << "Cannot load texture properties, skipping";
+			continue;
+		}
+
+		Debug{} << "Importing image" << textureData->image() << importer->image2DName(textureData->image());
+
+		Containers::Optional<Trade::ImageData2D> imageData = importer->image2D(textureData->image());
+		GL::TextureFormat format;
+		if (imageData && imageData->format() == PixelFormat::RGB8Unorm)
+			format = GL::TextureFormat::RGB8;
+		else if (imageData && imageData->format() == PixelFormat::RGBA8Unorm)
+			format = GL::TextureFormat::RGBA8;
+		else {
+			Warning{} << "Cannot load texture image, skipping";
+			continue;
+		}
+
+		/* Configure the texture */
+		GL::Texture2D texture;
+		texture
+			.setMagnificationFilter(textureData->magnificationFilter())
+			.setMinificationFilter(textureData->minificationFilter(), textureData->mipmapFilter())
+			.setWrapping(textureData->wrapping().xy())
+			.setStorage(Math::log2(imageData->size().max()) + 1, format, imageData->size())
+			.setSubImage(0, {}, *imageData)
+			.generateMipmap();
+
+		_textures[i] = std::move(texture);
+	}
+
+	/* Load all materials. Materials that fail to load will be NullOpt. The
+	   data will be stored directly in objects later, so save them only
+	   temporarily. */
+	Containers::Array<Containers::Optional<Trade::PhongMaterialData>> materials{ importer->materialCount() };
+	for (UnsignedInt i = 0; i != importer->materialCount(); ++i) {
+		Debug{} << "Importing material" << i << importer->materialName(i);
+
+		Containers::Pointer<Trade::AbstractMaterialData> materialData = importer->material(i);
+		if (!materialData || materialData->type() != Trade::MaterialType::Phong) {
+			Warning{} << "Cannot load material, skipping";
+			continue;
+		}
+
+		materials[i] = std::move(static_cast<Trade::PhongMaterialData&>(*materialData));
+	}
+
+	/* Load all meshes. Meshes that fail to load will be NullOpt. */
+	_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
+	for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
+		Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
+
+		Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
+		if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
+			Warning{} << "Cannot load the mesh, skipping";
+			continue;
+		}
+
+		/* Compile the mesh */
+		_meshes[i] = MeshTools::compile(*meshData);
+	}
+
+	/* Load the scene */
+	if (importer->defaultScene() != -1) {
+		Debug{} << "Adding default scene" << importer->sceneName(importer->defaultScene());
+
+		Containers::Optional<Trade::SceneData> sceneData = importer->scene(importer->defaultScene());
+		if (!sceneData) {
+			Error{} << "Cannot load scene, exiting";
+			return;
+		}
+
+		/* Recursively add all children */
+		for (UnsignedInt objectId : sceneData->children3D())
+			addObject(*importer, materials, _manipulator, objectId);
+
+		/* The format has no scene support, display just the first loaded mesh with
+		   a default material and be done with it */
+	}
+	else if (!_meshes.empty() && _meshes[0])
+		new ColoredDrawable{ _manipulator, _coloredShader, *_meshes[0], 0xffffff_rgbf, _drawables };
 }
 
-MAGNUM_APPLICATION_MAIN(MyApplication)
+ZxcApplication::ZxcApplication(const Arguments& arguments) :
+	Platform::Application{ arguments, Configuration{}
+		.setTitle("ZXC")
+		.setWindowFlags(Configuration::WindowFlag::Resizable) }
+
+{
+	setSwapInterval(1);
+	initScene();
+    addUnit(Unit(100, 100, 350, 100, 1000, 300, 2, 1, 3, 0.25, Point(100, 100)));
+//	loadModels();
+	/*
+	Utility::Arguments args;
+	args.addArgument("file").setHelp("file", "file to load")
+		.addOption("importer", "AnySceneImporter").setHelp("importer", "importer plugin to use")
+		.addSkippedPrefix("magnum", "engine-specific options")
+		.setGlobalHelp("Displays a 3D scene file provided on command line.")
+		.parse(arguments.argc, arguments.argv);
+	*/
+
+}
+
+void ZxcApplication::addUnit(Unit&& u) {
+    _units.push_back(u);
+    _unitObjects.push_back(new Object3D(&_manipulator));
+    new UnitDrawable(*_unitObjects.back(), _drawables, _units.back());
+}
+
+void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i) {
+	Debug{} << "Importing object" << i << importer.object3DName(i);
+	Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
+	if (!objectData) {
+		Error{} << "Cannot import object, skipping";
+		return;
+	}
+
+	/* Add the object to the scene and set its transformation */
+	auto* object = new Object3D{ &parent };
+	object->setTransformation(objectData->transformation());
+
+	/* Add a drawable if the object has a mesh and the mesh is loaded */
+	if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
+		Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
+		 
+		materialId = -1;
+
+		/* Material not available / not loaded, use a default material */
+		if (materialId == -1 || !materials[materialId]) {
+			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xffffff_rgbf, _drawables };
+
+			/* Textured material. If the texture failed to load, again just use a
+			   default colored material. */
+		}
+		else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
+			Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
+			std::cerr << materials[materialId]->diffuseTexture() << std::endl;
+			if (texture)
+				new TexturedDrawable{ *object, _texturedShader, *_meshes[objectData->instance()], *texture, _drawables };
+			else
+				new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xffffff_rgbf, _drawables };
+
+			/* Color-only material */
+		}
+		else {
+			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), _drawables };
+		}
+	}
+
+	/* Recursively add children */
+	for (std::size_t id : objectData->children())
+		addObject(importer, materials, *object, id);
+}
+
+void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+	_shader
+		.setDiffuseColor(_color)
+		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+		.setLightColor(Color4(255,255,255,255))
+		.setTransformationMatrix(transformationMatrix)
+		.setNormalMatrix(transformationMatrix.normalMatrix())
+		.setProjectionMatrix(camera.projectionMatrix());
+
+	_mesh.draw(_shader);
+}
+
+void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+	_shader
+		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+		.setLightColor(Color4(255, 255, 255, 255))
+		.setTransformationMatrix(transformationMatrix)
+		.setNormalMatrix(transformationMatrix.normalMatrix())
+		.setProjectionMatrix(camera.projectionMatrix())
+		.bindDiffuseTexture(_texture);
+
+	_mesh.draw(_shader);
+}
+
+void ZxcApplication::drawEvent() {
+	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
+
+	assert(_camera);
+	_camera->draw(_drawables);
+
+	swapBuffers();
+}
+
+void ZxcApplication::viewportEvent(ViewportEvent& event) {
+	GL::defaultFramebuffer.setViewport({ {}, event.framebufferSize() });
+	_camera->setViewport(event.windowSize());
+}
+
+void ZxcApplication::mousePressEvent(MouseEvent& event) {
+	if (event.button() == MouseEvent::Button::Left)
+		_previousPosition = positionOnSphere(event.position());
+}
+
+void ZxcApplication::mouseReleaseEvent(MouseEvent& event) {
+	if (event.button() == MouseEvent::Button::Left)
+		_previousPosition = Vector3();
+}
+
+void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
+	if (!event.offset().y()) return;
+
+	/* Distance to origin */
+	const Float distance = _cameraObject.transformation().translation().z();
+
+	/* Move 15% of the distance back or forward */
+	_cameraObject.translate(Vector3::zAxis(
+		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
+
+	redraw();
+}
+
+Vector3 ZxcApplication::positionOnSphere(const Vector2i& position) const {
+	const Vector2 positionNormalized = Vector2{ position } / Vector2{ _camera->viewport() } -Vector2{ 0.5f };
+	const Float length = positionNormalized.length();
+	const Vector3 result(length > 1.0f ? Vector3(positionNormalized, 0.0f) : Vector3(positionNormalized, 1.0f - length));
+	return (result * Vector3::yScale(-1.0f)).normalized();
+}
+
+void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
+	if (!(event.buttons() & MouseMoveEvent::Button::Left)) return;
+
+	const Vector3 currentPosition = positionOnSphere(event.position());
+	const Vector3 axis = Math::cross(_previousPosition, currentPosition);
+
+	if (_previousPosition.length() < 0.001f || axis.length() < 0.001f) return;
+
+	_manipulator.rotate(Math::angle(_previousPosition, currentPosition), axis.normalized());
+	_previousPosition = currentPosition;
+
+	redraw();
+}
+
+void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
+        _unitObjects[0]->translate({0,-1,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
+        _unitObjects[0]->translate({0,1,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
+        _unitObjects[0]->translate({-1,0,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
+        _unitObjects[0]->translate({1,0,0});
+        redraw();
+    }
+
+}
+
+MAGNUM_APPLICATION_MAIN(ZxcApplication)

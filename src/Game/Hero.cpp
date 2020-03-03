@@ -1,4 +1,5 @@
 #include "Hero.h"
+#include <algorithm>
 
 Hero::Hero(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
            int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position) :

@@ -1,4 +1,5 @@
 #include "Unit.h"
+#include <algorithm>
 
 Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
            int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position):

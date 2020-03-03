@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.4)
-project(MyApplication)
+project(zxc)
 
+message("${PROJECT_SOURCE_DIR}")
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules/" ${CMAKE_MODULE_PATH})
 
-set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-2.0.10 ${CMAKE_PREFIX_PATH}) # Remove this line if you have installed SDL2 globally, make sure you have this directory otherwise
+# Remove this lines if you have installed SDL2 globally, make sure you have this directory otherwise
+if (MSVC)
+    set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-MSVC ${CMAKE_PREFIX_PATH})
+else()
+    set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-2.0.10 ${CMAKE_PREFIX_PATH})
+endif()
 
-#set(BUILD_PLUGINS_STATIC ON)
+
+option(BUILD_PLUGINS_STATIC ON)
 
 
 add_subdirectory(corrade EXCLUDE_FROM_ALL)
@@ -22,6 +29,7 @@ add_library(Assimp::Assimp ALIAS assimp)
 set(WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 set(WITH_ANYIMAGEIMPORTER ON CACHE BOOL "" FORCE)
 set(WITH_ANYSCENEIMPORTER ON CACHE BOOL "" FORCE)
+set(WITH_TGAIMPORTER ON CACHE BOOL "" FORCE)
 set(WITH_OBJIMPORTER ON CACHE BOOL "" FORCE)
 add_subdirectory(magnum EXCLUDE_FROM_ALL)
 
@@ -31,6 +39,6 @@ add_subdirectory(magnum-plugins EXCLUDE_FROM_ALL)
 
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 add_subdirectory(src)
