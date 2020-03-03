@@ -2,7 +2,7 @@
 #include <algorithm>
 
 Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position):
+           int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
         damage_{damage}, attackRange_{attackRange}, moveSpeed_{moveSpeed},
         attackSpeed_{attackSpeed}, maxHP_{maxHP}, maxMP_{maxMP},
         healthPoints_{static_cast<double>(maxHP)}, manaPoints_{static_cast<double>(maxMP)},
@@ -10,19 +10,36 @@ Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxH
         resist_{resist}, position_{position} {}
 
 
-void Unit::addItem(Item item) {
-    assert(items_.size() < MAX_ITEMS && "Too much items!");
+void Unit::addItem(Item &item, int slot) {
+    if (slot == -1) {
+        for (int i = 0; i < MAX_ITEMS; i++) {
+            if (items_[i].isEmpty()) {
+                slot = i;
+                break;
+            }
+        }
+        assert(slot != -1 && "No item slots available!");
+    } else {
+        assert(slot >= 0 && slot < MAX_ITEMS && "Wrong item slot");
+        assert(items_[slot].isEmpty() && "Item slot occupied");
+    }
 
-    items_.push_back(item);
+    items_[slot] = item;
 }
 
 void Unit::deleteItem(int indexToDelete) {
-    assert(indexToDelete >= 0 && indexToDelete < static_cast<int>(items_.size()) && "Wrong index for deleting item!");
+    assert(indexToDelete >= 0 && indexToDelete < MAX_ITEMS && "Wrong index for deleting item!");
 
-    items_.erase(items_.begin() + indexToDelete);
+    items_[indexToDelete] = Item();
 }
 
-void Unit::addBuff(Buff buff) { buffs_.push_back(buff); }
+void Unit::clearItems() {
+    for (auto &item : items_) {
+        item = Item();
+    }
+}
+
+void Unit::addBuff(Buff &buff) { buffs_.push_back(buff); }
 
 void Unit::deleteBuff(int indexToDelete) {
     std::vector<Buff> newBuffs;
@@ -32,6 +49,10 @@ void Unit::deleteBuff(int indexToDelete) {
         }
     }
     std::swap(buffs_, newBuffs);
+}
+
+void Unit::clearBuffs() {
+    buffs_.clear();
 }
 
 void Unit::changeDamage(int delta) { damage_ += delta; }
@@ -82,13 +103,87 @@ void Unit::changeArmor(int delta) { armor_ += delta; }
 
 void Unit::changeResist(int delta) { resist_ += delta; }
 
-void Unit::changePosition(double deltaX, double deltaY) {
-    position_ += Point(deltaX, deltaY);
-}
-
-void Unit::changePositionTo(double x, double y) {
-    position_ = Point(x, y);
-}
+void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
 
 bool Unit::isDead() { return healthPoints_ <= 0; }
 
+
+// setters and getters
+
+int Unit::getDamage() const { return damage_; }
+
+void Unit::setDamage(int damage) { damage_ = damage; } // forbid negative damage?
+
+int Unit::getAttackRange() const { return attackRange_; }
+
+void Unit::setAttackRange(int attackRange) {
+    assert(attackRange >= 0 && "Wrong new attack range!");
+    attackRange_ = attackRange;
+}
+
+int Unit::getMoveSpeed() const { return moveSpeed_; }
+
+void Unit::setMoveSpeed(int moveSpeed) {
+    assert(moveSpeed >= 0 && "Wrong new move speed!");
+    moveSpeed_ = moveSpeed;
+}
+
+int Unit::getAttackSpeed() const { return attackSpeed_; }
+
+void Unit::setAttackSpeed(int attackSpeed) {
+    assert(attackSpeed >= 0 && "Wrong new attack speed!");
+    attackSpeed_ = attackSpeed;
+}
+
+int Unit::getMaxHp() const { return maxHP_; }
+
+void Unit::setMaxHp(int maxHp) {
+    assert(maxHp >= 0 && "Wrong new max HP!");
+    maxHP_ = maxHp;
+}
+
+int Unit::getMaxMp() const { return maxMP_; }
+
+void Unit::setMaxMp(int maxMp) {
+    assert(maxMp >= 0 && "Wrong new max MP!");
+    maxMP_ = maxMp;
+}
+
+double Unit::getHealthPoints() const { return healthPoints_; }
+
+void Unit::setHealthPoints(double healthPoints) {
+    assert(healthPoints >= 0 && healthPoints <= maxHP_ && "Wrong new health points!");
+    healthPoints_ = healthPoints;
+}
+
+double Unit::getManaPoints() const { return manaPoints_; }
+
+void Unit::setManaPoints(double manaPoints) {
+    assert(manaPoints >= 0 && manaPoints <= maxHP_ && "Wrong new mana points!");
+    manaPoints_ = manaPoints;
+}
+
+double Unit::getHpRegen() const { return hpRegen_; }
+
+void Unit::setHpRegen(double hpRegen) { hpRegen_ = hpRegen; }
+
+double Unit::getMpRegen() const { return mpRegen_; }
+
+void Unit::setMpRegen(double mpRegen) { mpRegen_ = mpRegen; }
+
+int Unit::getArmor() const { return armor_; }
+
+void Unit::setArmor(int armor) { armor_ = armor; }
+
+double Unit::getResist() const { return resist_; }
+
+void Unit::setResist(double resist) {
+    assert(resist >= 0 && resist <= 1 && "Wrong new resist!");
+    resist_ = resist;
+}
+
+const Point &Unit::getPosition() const { return position_; }
+
+void Unit::setPosition(const Point &position) { position_ = position; }
+
+void Unit::setPosition(double x, double y) { position_ = Point(x, y); }
