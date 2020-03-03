@@ -1,6 +1,6 @@
 #include "Point.h"
 
-Point::Point(double x, double y) : x_{x}, y_{y} {}
+Point::Point(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
 bool Point::operator==(Point other) const {
     return (x_ == other.x_ && y_ == other.y_);

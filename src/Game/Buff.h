@@ -1,7 +1,7 @@
 #ifndef ZXC_BUFF_H
 #define ZXC_BUFF_H
 
-class Buff{
+class Buff {
 public:
     int index;
 };

@@ -11,13 +11,13 @@ constexpr int EXP_PER_LEVEL = 1000;
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
-    std::vector<Skill> skills_; // needs to be defined in constructor?
+    std::vector<Skill> skills_;
 
-public:
-    // make everything public or make getters or ?
     int gold_;
     int level_;
     int experience_;
+
+public:
 
     Hero() = delete;
 
@@ -27,8 +27,18 @@ public:
     void changeGold(int delta);
 
     void changeLevel(int delta);
-    void changeLevelTo(int newLevel);
     void incrLevel();
-
     void changeExperience(int delta);
+
+
+    // getters and setters
+
+    [[nodiscard]] int getGold() const;
+    void setGold(int gold);
+
+    [[nodiscard]] int getLevel() const;
+    void setLevel(int level);
+
+    [[nodiscard]] int getExperience() const;
+    void setExperience(int experience);
 };

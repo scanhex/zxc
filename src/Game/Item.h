@@ -1,5 +1,12 @@
 #pragma once
 
-class Item{
+class Item {
+private:
+    int index_; // 0 <-> empty item
+public:
+    Item();
 
+    int getIndex();
+
+    bool isEmpty();
 };
