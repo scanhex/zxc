@@ -9,12 +9,10 @@
 
 constexpr int MAX_ITEMS = 6;
 
-class Unit{
+class Unit {
 private:
-    std::vector<Item> items_; // changeable
-    std::vector<Buff> buffs_; // changeable
-
-    // make everything public or make getters or ?
+    Item items_[MAX_ITEMS];
+    std::vector<Buff> buffs_;
 
     int damage_;
     int attackRange_;
@@ -26,8 +24,8 @@ private:
     int maxMP_;
     double healthPoints_;
     double manaPoints_;
-    double hpRegen_; // per sec, make double?
-    double mpRegen_; // per sec, make double?
+    double hpRegen_;
+    double mpRegen_;
 
     int armor_; // adjust formula(see damagePhys)?
     double resist_; // percent
@@ -37,26 +35,28 @@ private:
 public:
     Unit() = delete;
 
-    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position);
+    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, double hpRegen,
+         double mpRegen, int armor, double resist, Point position);
 
-    void addItem(Item item);
+    void addItem(Item &item, int slot = -1);
+
     void deleteItem(int indexToDelete); // 0..MAX_ITEMS-1 in inventory
+    void clearItems();
 
-    void addBuff(Buff buff);
+    void addBuff(Buff &buff);
+
     void deleteBuff(int indexToDelete); // deletes 1 buff matching buff.index
+    void clearBuffs();
 
     void changeDamage(int delta);
     void changeAttackRange(int delta);
-
     void changeMoveSpeed(int delta);
     void changeAttackSpeed(int delta);
-
     void changeHPRegen(int delta);
     void changeMPRegen(int delta);
 
-    void damage(double amount);
     void heal(double amount);
-
+    void damage(double amount);
     void damagePhys(double amount);
     void damageMagic(double amount);
 
@@ -66,9 +66,50 @@ public:
 
     void changeArmor(int delta);
     void changeResist(int delta);
-
     void changePosition(double deltaX, double deltaY); // coords += deltaCoords
-    void changePositionTo(double x, double y); // coords = {x, y}
 
     bool isDead();
+
+
+    // getters and setters
+
+    [[nodiscard]] int getDamage() const;
+    void setDamage(int damage);
+
+    [[nodiscard]] int getAttackRange() const;
+    void setAttackRange(int attackRange);
+
+    [[nodiscard]] int getMoveSpeed() const;
+    void setMoveSpeed(int moveSpeed);
+
+    [[nodiscard]] int getAttackSpeed() const;
+    void setAttackSpeed(int attackSpeed);
+
+    [[nodiscard]] int getMaxHp() const;
+    void setMaxHp(int maxHp);
+
+    [[nodiscard]] int getMaxMp() const;
+    void setMaxMp(int maxMp);
+
+    [[nodiscard]] double getHealthPoints() const;
+    void setHealthPoints(double healthPoints);
+
+    [[nodiscard]] double getManaPoints() const;
+    void setManaPoints(double manaPoints);
+
+    [[nodiscard]] double getHpRegen() const;
+    void setHpRegen(double hpRegen);
+
+    [[nodiscard]] double getMpRegen() const;
+    void setMpRegen(double mpRegen);
+
+    [[nodiscard]] int getArmor() const;
+    void setArmor(int armor);
+
+    [[nodiscard]] double getResist() const;
+    void setResist(double resist);
+
+    [[nodiscard]] const Point &getPosition() const;
+    void setPosition(const Point &position);
+    void setPosition(double x, double y);
 };
