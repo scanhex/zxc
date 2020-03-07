@@ -4,7 +4,7 @@ project(zxc)
 message("${PROJECT_SOURCE_DIR}")
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules/" ${CMAKE_MODULE_PATH})
 
-# Remove this lines if you have installed SDL2 globally, make sure you have this directory otherwise
+# Remove these lines if you have installed SDL2 globally, make sure you have this directory otherwise
 if (MSVC)
     set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-MSVC ${CMAKE_PREFIX_PATH})
 else()

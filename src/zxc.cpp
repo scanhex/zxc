@@ -68,6 +68,7 @@ private:
 	void loadModels();
 	Float depthAt(const Vector2i& position) const;
 	Vector3 unproject(const Vector2i& position, Float depth) const;
+    Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
 
 	void addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i);
 
@@ -325,9 +326,8 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Left)
 		_previousPosition = positionOnSphere(event.position());
 	if (event.button() == MouseEvent::Button::Right) {
-        auto newPosition = unproject(event.position(), depthAt(event.position()));
-        Debug{} << newPosition << '\n';
-        _unitObjects[0]->translate(newPosition-(_unitObjects[0]->transformation().translation()));
+        auto newPosition = intersectWithPlane(event.position(), {0,0,1});
+        _unitObjects[0]->translate(newPosition - _unitObjects[0]->absoluteTransformation().translation());
         redraw();
 	}
 }
@@ -348,6 +348,23 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
 	redraw();
+}
+
+//Assuming plane contains zero
+Vector3 ZxcApplication::intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const {
+    /* We have to take window size, not framebuffer size, since the position is
+       in window coordinates and the two can be different on HiDPI systems */
+    const Vector2i viewSize = windowSize();
+    const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
+    const Vector3 ray_nds{2*Vector2{viewPosition}/Vector2{viewSize} - Vector2{1.0f}, 1};
+    const Vector4 ray_clip{ray_nds.x(), ray_nds.y(), -1, -1};
+    Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
+    Debug{} << ray_eye << '\n';
+    ray_eye.z() = -1, ray_eye.w() = 0;
+    Vector3 ray_world = ray_eye.xyz().normalized();
+    ray_world = ray_world.normalized();
+    const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
+    return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
 }
 
 Float ZxcApplication::depthAt(const Vector2i& windowPosition) const {
