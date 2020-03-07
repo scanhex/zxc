@@ -10,20 +10,44 @@ void Hero::changeGold(int delta) { gold_ += delta; }
 
 void Hero::changeLevel(int delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
 
-void Hero::changeLevelTo(int newLevel) {
-    assert(newLevel >= 1 && newLevel <= MAX_LEVEL && "Wrong new level!");
-
-    level_ = newLevel;
-}
-
 void Hero::incrLevel() { changeLevel(1); }
 
 void Hero::changeExperience(int delta) {
     experience_ += delta;
-    if(level_ == MAX_LEVEL){
+    if (level_ == MAX_LEVEL) {
         experience_ = std::min(experience_, EXP_PER_LEVEL);
-    }else if (experience_ >= EXP_PER_LEVEL) {
+    } else if (experience_ >= EXP_PER_LEVEL) {
         experience_ -= EXP_PER_LEVEL;
         incrLevel();
     }
+}
+
+int Hero::getGold() const {
+    return gold_;
+}
+
+void Hero::setGold(int gold) {
+    assert(gold >= 0 && "Wrong new gold!");
+
+    gold_ = gold;
+}
+
+int Hero::getLevel() const {
+    return level_;
+}
+
+void Hero::setLevel(int level) {
+    assert(level >= 1 && level <= MAX_LEVEL && "Wrong new level!");
+
+    level_ = level;
+}
+
+int Hero::getExperience() const {
+    return experience_;
+}
+
+void Hero::setExperience(int experience) {
+    assert(experience >= 0 && experience <= EXP_PER_LEVEL && "Wrong new experience!");
+
+    experience_ = experience;
 }
