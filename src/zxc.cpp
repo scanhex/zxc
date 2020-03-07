@@ -4,6 +4,9 @@
 #include <Corrade/Utility/Arguments.h>
 #include <Corrade/Utility/DebugStl.h>
 #include <Magnum/ImageView.h>
+#include <Magnum/Math/Math.h>
+#include <Magnum/Math/Color.h>
+#include <Magnum/Math/FunctionsBatch.h>
 #include <Magnum/Mesh.h>
 #include <Magnum/PixelFormat.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
@@ -11,12 +14,14 @@
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/GL/Texture.h>
 #include <Magnum/GL/TextureFormat.h>
+#include <Magnum/GL/PixelFormat.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/SceneGraph/Drawable.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/Primitives/Grid.h>
 #include <Magnum/Shaders/Phong.h>
 #include <Magnum/Trade/AbstractImporter.h>
 #include <Magnum/Trade/ImageData.h>
@@ -27,12 +32,13 @@
 #include <Magnum/Trade/TextureData.h>
 #include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
 #include <Magnum/Magnum.h>
+#include <Magnum/Image.h>
 
 #include <iostream>
 #include <fstream>
 #include <cassert>
 
-#include "UnitDrawable.h"
+#include "Drawables.h"
 
 using namespace Magnum;
 
@@ -60,11 +66,14 @@ private:
     void addUnit(Unit &&u);
 	void initScene();
 	void loadModels();
+	Float depthAt(const Vector2i& position) const;
+	Vector3 unproject(const Vector2i& position, Float depth) const;
 
 	void addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i);
 
 	Shaders::Phong _coloredShader,
-		_texturedShader;//Shaders::Phong::Flag::DiffuseTexture };
+		_texturedShader{ Shaders::Phong::Flag::DiffuseTexture };
+	Shaders::Flat3D _flatShader {NoCreate};
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
@@ -74,34 +83,13 @@ private:
 	Scene3D _scene;
 	Object3D _manipulator, _cameraObject;
 	SceneGraph::Camera3D* _camera = nullptr;
+	Object3D _mapObject;
 	SceneGraph::DrawableGroup3D _drawables;
 	Vector3 _previousPosition;
 
+	GL::Mesh _grid;
 };
 
-class ColoredDrawable : public SceneGraph::Drawable3D {
-public:
-	explicit ColoredDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, const Color4& color, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _color{ color } {}
-
-private:
-	void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
-
-	Shaders::Phong& _shader;
-	GL::Mesh& _mesh;
-	Color4 _color;
-};
-
-class TexturedDrawable : public SceneGraph::Drawable3D {
-public:
-	explicit TexturedDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, GL::Texture2D& texture, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _texture(texture) {}
-
-private:
-	void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
-
-	Shaders::Phong& _shader;
-	GL::Mesh& _mesh;
-	GL::Texture2D& _texture;
-};
 
 void ZxcApplication::initScene() {
 	/* Every scene needs a camera */
@@ -127,6 +115,13 @@ void ZxcApplication::initScene() {
 		.setAmbientColor(0x111111_rgbf)
 		.setSpecularColor(0x111111_rgbf)
 		.setShininess(8.0f);
+
+	_flatShader = Shaders::Flat3D{};
+
+	_grid = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
+	auto grid = new Object3D{&_manipulator};
+    (*grid).scale(Vector3{8});
+    new FlatDrawable{*grid, _flatShader, _grid, _drawables};
 }
 
 void ZxcApplication::loadModels() {
@@ -205,6 +200,7 @@ void ZxcApplication::loadModels() {
 		Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
 
 		Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
+
 		if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
 			Warning{} << "Cannot load the mesh, skipping";
 			continue;
@@ -235,6 +231,51 @@ void ZxcApplication::loadModels() {
 		new ColoredDrawable{ _manipulator, _coloredShader, *_meshes[0], 0xffffff_rgbf, _drawables };
 }
 
+void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i) {
+    Debug{} << "Importing object" << i << importer.object3DName(i);
+    Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
+    if (!objectData) {
+        Error{} << "Cannot import object, skipping";
+        return;
+    }
+
+    /* Add the object to the scene and set its transformation */
+    auto* object = new Object3D{ &parent };
+    object->setTransformation(objectData->transformation());
+
+    /* Add a drawable if the object has a mesh and the mesh is loaded */
+    if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
+        Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
+
+        materialId = -1;
+
+        /* Material not available / not loaded, use a default material */
+        if (materialId == -1 || !materials[materialId]) {
+            new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
+
+            /* Textured material. If the texture failed to load, again just use a
+               default colored material. */
+        }
+        else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
+            Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
+            std::cerr << materials[materialId]->diffuseTexture() << std::endl;
+            if (texture)
+                new TexturedDrawable{ *object, _texturedShader, *_meshes[objectData->instance()], *texture, _drawables };
+            else
+                new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
+
+            /* Color-only material */
+        }
+        else {
+            new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), _drawables };
+        }
+    }
+
+    /* Recursively add children */
+    for (std::size_t id : objectData->children())
+        addObject(importer, materials, *object, id);
+}
+
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	Platform::Application{ arguments, Configuration{}
 		.setTitle("ZXC")
@@ -244,6 +285,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	setSwapInterval(1);
 	initScene();
     addUnit(Unit(100, 100, 350, 100, 1000, 300, 2, 1, 3, 0.25, Point(100, 100)));
+
 //	loadModels();
 	/*
 	Utility::Arguments args;
@@ -262,74 +304,8 @@ void ZxcApplication::addUnit(Unit&& u) {
     new UnitDrawable(*_unitObjects.back(), _drawables, _units.back());
 }
 
-void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i) {
-	Debug{} << "Importing object" << i << importer.object3DName(i);
-	Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
-	if (!objectData) {
-		Error{} << "Cannot import object, skipping";
-		return;
-	}
 
-	/* Add the object to the scene and set its transformation */
-	auto* object = new Object3D{ &parent };
-	object->setTransformation(objectData->transformation());
 
-	/* Add a drawable if the object has a mesh and the mesh is loaded */
-	if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
-		Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
-		 
-		materialId = -1;
-
-		/* Material not available / not loaded, use a default material */
-		if (materialId == -1 || !materials[materialId]) {
-			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xffffff_rgbf, _drawables };
-
-			/* Textured material. If the texture failed to load, again just use a
-			   default colored material. */
-		}
-		else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
-			Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
-			std::cerr << materials[materialId]->diffuseTexture() << std::endl;
-			if (texture)
-				new TexturedDrawable{ *object, _texturedShader, *_meshes[objectData->instance()], *texture, _drawables };
-			else
-				new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xffffff_rgbf, _drawables };
-
-			/* Color-only material */
-		}
-		else {
-			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), _drawables };
-		}
-	}
-
-	/* Recursively add children */
-	for (std::size_t id : objectData->children())
-		addObject(importer, materials, *object, id);
-}
-
-void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-	_shader
-		.setDiffuseColor(_color)
-		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
-		.setLightColor(Color4(255,255,255,255))
-		.setTransformationMatrix(transformationMatrix)
-		.setNormalMatrix(transformationMatrix.normalMatrix())
-		.setProjectionMatrix(camera.projectionMatrix());
-
-	_mesh.draw(_shader);
-}
-
-void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-	_shader
-		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
-		.setLightColor(Color4(255, 255, 255, 255))
-		.setTransformationMatrix(transformationMatrix)
-		.setNormalMatrix(transformationMatrix.normalMatrix())
-		.setProjectionMatrix(camera.projectionMatrix())
-		.bindDiffuseTexture(_texture);
-
-	_mesh.draw(_shader);
-}
 
 void ZxcApplication::drawEvent() {
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
@@ -348,6 +324,12 @@ void ZxcApplication::viewportEvent(ViewportEvent& event) {
 void ZxcApplication::mousePressEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Left)
 		_previousPosition = positionOnSphere(event.position());
+	if (event.button() == MouseEvent::Button::Right) {
+        auto newPosition = unproject(event.position(), depthAt(event.position()));
+        Debug{} << newPosition << '\n';
+        _unitObjects[0]->translate(newPosition-(_unitObjects[0]->transformation().translation()));
+        redraw();
+	}
 }
 
 void ZxcApplication::mouseReleaseEvent(MouseEvent& event) {
@@ -366,6 +348,36 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
 	redraw();
+}
+
+Float ZxcApplication::depthAt(const Vector2i& windowPosition) const {
+    /* First scale the position from being relative to window size to being
+       relative to framebuffer size as those two can be different on HiDPI
+       systems */
+    const Vector2i position = windowPosition*Vector2{framebufferSize()}/Vector2{windowSize()};
+    const Vector2i fbPosition{position.x(), GL::defaultFramebuffer.viewport().sizeY() - position.y() - 1};
+
+    GL::defaultFramebuffer.mapForRead(GL::DefaultFramebuffer::ReadAttachment::Front);
+    Image2D data = GL::defaultFramebuffer.read(
+            Range2Di::fromSize(fbPosition, Vector2i{1}).padded(Vector2i{2}),
+            {GL::PixelFormat::DepthComponent, GL::PixelType::Float});
+
+    return Math::min<Float>(Containers::arrayCast<const Float>(data.data()));
+}
+
+Vector3 ZxcApplication::unproject(const Vector2i& windowPosition, Float depth) const {
+    /* We have to take window size, not framebuffer size, since the position is
+       in window coordinates and the two can be different on HiDPI systems */
+    const Vector2i viewSize = windowSize();
+    const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
+    const Vector3 in{2*Vector2{viewPosition}/Vector2{viewSize} - Vector2{1.0f}, depth*2.0f - 1.0f};
+
+
+      return (_cameraObject.absoluteTransformationMatrix()*_camera->projectionMatrix().inverted()).transformPoint(in);
+      /*
+    Use the following to get the camera-relative coordinates instead of global:
+//    return _camera->projectionMatrix().inverted().transformPoint(in);
+       */
 }
 
 Vector3 ZxcApplication::positionOnSphere(const Vector2i& position) const {
