@@ -15,7 +15,7 @@ set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 add_subdirectory(Game)
 
-add_executable(zxc zxc.cpp UnitDrawable.cpp Game/Buff.cpp Game/Hero.cpp Game/Item.cpp Game/Point.cpp Game/Skill.cpp Game/Unit.cpp)
+add_executable(zxc zxc.cpp Drawables.cpp Game/Buff.cpp Game/Hero.cpp Game/Item.cpp Game/Point.cpp Game/Skill.cpp Game/Unit.cpp)
 target_link_libraries(zxc PRIVATE
     Magnum::Application
     Magnum::GL
