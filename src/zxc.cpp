@@ -327,7 +327,7 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 		_previousPosition = positionOnSphere(event.position());
 	if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0,0,1});
-        _unitObjects[0]->translate(newPosition - _unitObjects[0]->absoluteTransformation().translation());
+        _unitObjects[0]->translate(newPosition - _unitObjects[0]->transformation().translation());
         redraw();
 	}
 }
@@ -357,12 +357,11 @@ Vector3 ZxcApplication::intersectWithPlane(const Vector2i& windowPosition, const
     const Vector2i viewSize = windowSize();
     const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
     const Vector3 ray_nds{2*Vector2{viewPosition}/Vector2{viewSize} - Vector2{1.0f}, 1};
-    const Vector4 ray_clip{ray_nds.x(), ray_nds.y(), -1, -1};
+    const Vector4 ray_clip{ray_nds.x(), ray_nds.y(), -1, 1};
     Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
-    Debug{} << ray_eye << '\n';
     ray_eye.z() = -1, ray_eye.w() = 0;
-    Vector3 ray_world = ray_eye.xyz().normalized();
-    ray_world = ray_world.normalized();
+    Matrix4 viewMatrix = Matrix4::translation(_cameraObject.absoluteTransformation().translation());
+    Vector3 ray_world = (viewMatrix.inverted() * ray_eye).xyz().normalized();
     const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
     return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
 }
