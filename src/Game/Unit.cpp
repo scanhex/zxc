@@ -1,8 +1,8 @@
 #include "Unit.h"
 #include <algorithm>
 
-Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
+Unit::Unit(int damage, unsigned attackRange, unsigned moveSpeed, unsigned attackSpeed, unsigned maxHP,
+           unsigned maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
         damage_{damage}, attackRange_{attackRange}, moveSpeed_{moveSpeed},
         attackSpeed_{attackSpeed}, maxHP_{maxHP}, maxMP_{maxMP},
         healthPoints_{static_cast<double>(maxHP)}, manaPoints_{static_cast<double>(maxMP)},
@@ -84,16 +84,16 @@ void Unit::damageMagic(double amount) {
     damage(amount * resist_);
 }
 
-void Unit::regenMana(int amount) {
+void Unit::regenMana(unsigned amount) {
     manaPoints_ += amount;
     manaPoints_ = std::min(manaPoints_, static_cast<double>(maxMP_));
 }
 
-bool Unit::canSpendMana(int amount) {
+bool Unit::canSpendMana(unsigned amount) {
     return amount >= manaPoints_;
 }
 
-void Unit::spendMana(int amount) {
+void Unit::spendMana(unsigned amount) {
     assert(amount >= manaPoints_ && "Not enough mana points to spend!");
 
     manaPoints_ -= amount;
@@ -114,38 +114,33 @@ int Unit::getDamage() const { return damage_; }
 
 void Unit::setDamage(int damage) { damage_ = damage; } // forbid negative damage?
 
-int Unit::getAttackRange() const { return attackRange_; }
+unsigned Unit::getAttackRange() const { return attackRange_; }
 
-void Unit::setAttackRange(int attackRange) {
-    assert(attackRange >= 0 && "Wrong new attack range!");
+void Unit::setAttackRange(unsigned attackRange) {
     attackRange_ = attackRange;
 }
 
-int Unit::getMoveSpeed() const { return moveSpeed_; }
+unsigned Unit::getMoveSpeed() const { return moveSpeed_; }
 
-void Unit::setMoveSpeed(int moveSpeed) {
-    assert(moveSpeed >= 0 && "Wrong new move speed!");
+void Unit::setMoveSpeed(unsigned moveSpeed) {
     moveSpeed_ = moveSpeed;
 }
 
-int Unit::getAttackSpeed() const { return attackSpeed_; }
+unsigned Unit::getAttackSpeed() const { return attackSpeed_; }
 
-void Unit::setAttackSpeed(int attackSpeed) {
-    assert(attackSpeed >= 0 && "Wrong new attack speed!");
+void Unit::setAttackSpeed(unsigned attackSpeed) {
     attackSpeed_ = attackSpeed;
 }
 
-int Unit::getMaxHp() const { return maxHP_; }
+unsigned Unit::getMaxHp() const { return maxHP_; }
 
-void Unit::setMaxHp(int maxHp) {
-    assert(maxHp >= 0 && "Wrong new max HP!");
+void Unit::setMaxHp(unsigned maxHp) {
     maxHP_ = maxHp;
 }
 
-int Unit::getMaxMp() const { return maxMP_; }
+unsigned Unit::getMaxMp() const { return maxMP_; }
 
-void Unit::setMaxMp(int maxMp) {
-    assert(maxMp >= 0 && "Wrong new max MP!");
+void Unit::setMaxMp(unsigned maxMp) {
     maxMP_ = maxMp;
 }
 
