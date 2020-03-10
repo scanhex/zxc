@@ -10,7 +10,7 @@ void Hero::changeGold(int delta) { gold_ += delta; }
 
 void Hero::levelUp(unsigned delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
 
-void Hero::incrLevel() { levelUp(1); }
+void Hero::incrementLevel() { levelUp(1); }
 
 void Hero::getExperience(unsigned delta) {
     experience_ += delta;
@@ -18,7 +18,7 @@ void Hero::getExperience(unsigned delta) {
         experience_ = std::min(experience_, EXP_PER_LEVEL);
     } else if (experience_ >= EXP_PER_LEVEL) {
         experience_ -= EXP_PER_LEVEL;
-        incrLevel();
+        incrementLevel();
     }
 }
 
