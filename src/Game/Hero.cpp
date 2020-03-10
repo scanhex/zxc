@@ -1,18 +1,18 @@
 #include "Hero.h"
 #include <algorithm>
 
-Hero::Hero(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position) :
+Hero::Hero(int damage, unsigned attackRange, unsigned moveSpeed, unsigned attackSpeed, unsigned maxHP,
+           unsigned maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
         Unit(damage, attackRange, moveSpeed, attackSpeed, maxHP, maxMP, hpRegen, mpRegen, armor, resist, position),
         gold_{START_GOLD}, level_{1}, experience_{0} {}
 
 void Hero::changeGold(int delta) { gold_ += delta; }
 
-void Hero::changeLevel(int delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
+void Hero::levelUp(unsigned delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
 
-void Hero::incrLevel() { changeLevel(1); }
+void Hero::incrLevel() { levelUp(1); }
 
-void Hero::changeExperience(int delta) {
+void Hero::getExperience(unsigned delta) {
     experience_ += delta;
     if (level_ == MAX_LEVEL) {
         experience_ = std::min(experience_, EXP_PER_LEVEL);
@@ -22,32 +22,30 @@ void Hero::changeExperience(int delta) {
     }
 }
 
-int Hero::getGold() const {
+unsigned Hero::getGold() const {
     return gold_;
 }
 
-void Hero::setGold(int gold) {
-    assert(gold >= 0 && "Wrong new gold!");
-
+void Hero::setGold(unsigned gold) {
     gold_ = gold;
 }
 
-int Hero::getLevel() const {
+unsigned Hero::getLevel() const {
     return level_;
 }
 
-void Hero::setLevel(int level) {
+void Hero::setLevel(unsigned level) {
     assert(level >= 1 && level <= MAX_LEVEL && "Wrong new level!");
 
     level_ = level;
 }
 
-int Hero::getExperience() const {
+unsigned Hero::getExperience() const {
     return experience_;
 }
 
-void Hero::setExperience(int experience) {
-    assert(experience >= 0 && experience <= EXP_PER_LEVEL && "Wrong new experience!");
+void Hero::setExperience(unsigned experience) {
+    assert(experience >= 0 && experience < EXP_PER_LEVEL && "Wrong new experience!");
 
     experience_ = experience;
 }

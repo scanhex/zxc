@@ -7,7 +7,7 @@
 #include "Item.h"
 #include "Buff.h"
 
-constexpr int MAX_ITEMS = 6;
+constexpr size_t MAX_ITEMS = 6;
 
 class Unit {
 private:
@@ -15,13 +15,13 @@ private:
     std::vector<Buff> buffs_;
 
     int damage_;
-    int attackRange_;
+    unsigned attackRange_;
 
-    int moveSpeed_;
-    int attackSpeed_;
+    unsigned moveSpeed_;
+    unsigned attackSpeed_;
 
-    int maxHP_;
-    int maxMP_;
+    unsigned maxHP_;
+    unsigned maxMP_;
     double healthPoints_;
     double manaPoints_;
     double hpRegen_;
@@ -35,8 +35,8 @@ private:
 public:
     Unit() = delete;
 
-    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, double hpRegen,
-         double mpRegen, int armor, double resist, Point position);
+    Unit(int damage, unsigned attackRange, unsigned moveSpeed, unsigned attackSpeed, unsigned maxHP,
+         unsigned maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position);
 
     void addItem(Item &item, int slot = -1);
 
@@ -60,9 +60,9 @@ public:
     void damagePhys(double amount);
     void damageMagic(double amount);
 
-    void regenMana(int amount);
-    void spendMana(int amount);
-    bool canSpendMana(int amount);
+    void regenMana(unsigned amount);
+    void spendMana(unsigned amount);
+    bool canSpendMana(unsigned amount);
 
     void changeArmor(int delta);
     void changeResist(int delta);
@@ -76,20 +76,20 @@ public:
     [[nodiscard]] int getDamage() const;
     void setDamage(int damage);
 
-    [[nodiscard]] int getAttackRange() const;
-    void setAttackRange(int attackRange);
+    [[nodiscard]] unsigned getAttackRange() const;
+    void setAttackRange(unsigned attackRange);
 
-    [[nodiscard]] int getMoveSpeed() const;
-    void setMoveSpeed(int moveSpeed);
+    [[nodiscard]] unsigned getMoveSpeed() const;
+    void setMoveSpeed(unsigned moveSpeed);
 
-    [[nodiscard]] int getAttackSpeed() const;
-    void setAttackSpeed(int attackSpeed);
+    [[nodiscard]] unsigned getAttackSpeed() const;
+    void setAttackSpeed(unsigned attackSpeed);
 
-    [[nodiscard]] int getMaxHp() const;
-    void setMaxHp(int maxHp);
+    [[nodiscard]] unsigned getMaxHp() const;
+    void setMaxHp(unsigned maxHp);
 
-    [[nodiscard]] int getMaxMp() const;
-    void setMaxMp(int maxMp);
+    [[nodiscard]] unsigned getMaxMp() const;
+    void setMaxMp(unsigned maxMp);
 
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
