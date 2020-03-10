@@ -27,7 +27,7 @@ public:
     void changeGold(int delta);
 
     void levelUp(unsigned delta);
-    void incrLevel();
+    void incrementLevel();
     void getExperience(unsigned delta);
 
 
