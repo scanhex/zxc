@@ -23,7 +23,7 @@ if(Boost_FOUND)
 endif()
 
 
-add_executable(Server main.cpp)
+add_executable(Server main.cpp Server.cpp Server.h)
 
 if(Boost_FOUND)
     message(STATUS "Linking boost libraries")
