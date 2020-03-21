@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include <boost/asio.hpp>
 
 static constexpr int MAX_MSG = 1024;
