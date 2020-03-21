@@ -12,6 +12,7 @@ int ConnectionToClient::running_connections_ = 0;
 
 io_service service;
 ip::tcp::acceptor acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), 8001));
+std::mutex g_lock;
 
 
 ConnectionToClient::ConnectionToClient() : sock_(service),
@@ -56,7 +57,9 @@ void ConnectionToClient::handleReadFromSocket(const boost::system::error_code &e
         return;
     }
     if (!running_connections_) return;
+    g_lock.lock();
     updateGSbyPlayer();
+    g_lock.unlock();
     if (running)
         readFromSocket();
 }
@@ -90,7 +93,9 @@ void ConnectionToClient::handleWriteToSocket(const boost::system::error_code &er
 }
 
 void ConnectionToClient::writeToSocket() {
+    g_lock.lock();
     writeGStoBuffer();
+    g_lock.unlock();
     sock_.async_write_some(buffer(write_buffer_, MSG_FROM_SERVER_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
@@ -155,7 +160,9 @@ void updateGS() {
 
 void runGameStateCycle() {
     while (running) {
+        g_lock.lock();
         updateGS();
+        g_lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(TICK_TIME_GS_UPDATE));
     }
 }
