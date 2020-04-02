@@ -7,15 +7,15 @@ public:
     StatsBuilder() = default;
     Stats create();
 
-    StatsBuilder &setDamage(int damage);
-    StatsBuilder &setAttackRange(unsigned attackRange);
-    StatsBuilder &setMoveSpeed(unsigned moveSpeed);
-    StatsBuilder &setAttackSpeed(unsigned attackSpeed);
-    StatsBuilder &setMaxHp(unsigned maxHp);
-    StatsBuilder &setMaxMp(unsigned maxMp);
+    StatsBuilder &setDamage(int32_t damage);
+    StatsBuilder &setAttackRange(uint32_t  attackRange);
+    StatsBuilder &setMoveSpeed(uint32_t  moveSpeed);
+    StatsBuilder &setAttackSpeed(uint32_t  attackSpeed);
+    StatsBuilder &setMaxHp(uint32_t  maxHp);
+    StatsBuilder &setMaxMp(uint32_t  maxMp);
     StatsBuilder &setHpRegen(double hpRegen);
     StatsBuilder &setMpRegen(double mpRegen);
-    StatsBuilder &setArmor(int armor);
+    StatsBuilder &setArmor(int32_t armor);
     StatsBuilder &setResist(double resist);
 private:
     Stats stats_;

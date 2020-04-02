@@ -7,9 +7,9 @@ Unit::Unit(Stats stats, Point position) : stats_{stats},
 }
 
 
-void Unit::addItem(Item &item, int slot) {
+void Unit::addItem(Item &item, size_t slot) {
     if (slot == -1) {
-        for (int i = 0; i < MAX_ITEMS; i++) {
+        for (size_t i = 0; i < MAX_ITEMS; i++) {
             if (items_[i].isEmpty()) {
                 slot = i;
                 break;
@@ -24,7 +24,7 @@ void Unit::addItem(Item &item, int slot) {
     items_[slot] = item;
 }
 
-void Unit::deleteItem(int indexToDelete) {
+void Unit::deleteItem(size_t indexToDelete) {
     assert(indexToDelete >= 0 && indexToDelete < MAX_ITEMS && "Wrong index for deleting item!");
 
     items_[indexToDelete] = Item();
@@ -38,7 +38,7 @@ void Unit::clearItems() {
 
 void Unit::addBuff(Buff &buff) { buffs_.push_back(buff); }
 
-void Unit::deleteBuff(int indexToDelete) {
+void Unit::deleteBuff(size_t indexToDelete) {
     std::vector<Buff> newBuffs;
     for (Buff &buff : buffs_) {
         if (buff.index != indexToDelete) {
@@ -52,12 +52,12 @@ void Unit::clearBuffs() {
     buffs_.clear();
 }
 
-void Unit::changeDamage(int delta) { stats_.changeDamage(delta); }
-void Unit::changeAttackRange(int delta) { stats_.changeAttackRange(delta); }
-void Unit::changeMoveSpeed(int delta) { stats_.changeMoveSpeed(delta); }
-void Unit::changeAttackSpeed(int delta) { stats_.changeAttackSpeed(delta); }
-void Unit::changeMaxHP(int delta) { stats_.changeMaxHP(delta); }
-void Unit::changeMaxMP(int delta) { stats_.changeMaxMP(delta); }
+void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
+void Unit::changeAttackRange(int32_t delta) { stats_.changeAttackRange(delta); }
+void Unit::changeMoveSpeed(int32_t delta) { stats_.changeMoveSpeed(delta); }
+void Unit::changeAttackSpeed(int32_t delta) { stats_.changeAttackSpeed(delta); }
+void Unit::changeMaxHP(int32_t delta) { stats_.changeMaxHP(delta); }
+void Unit::changeMaxMP(int32_t delta) { stats_.changeMaxMP(delta); }
 void Unit::changeHPRegen(double delta) { stats_.changeHPRegen(delta); }
 void Unit::changeMPRegen(double delta) { stats_.changeMPRegen(delta); }
 
@@ -70,7 +70,7 @@ void Unit::damage(double amount) {
 }
 
 void Unit::damagePhys(double amount) {
-    int armor = stats_.getArmor();
+    int32_t armor = stats_.getArmor();
     double multiplier = 1 - ((0.052 * armor) / (0.9 + 0.048 * std::abs(armor)));
     damage(amount * multiplier);
 }
@@ -92,7 +92,7 @@ void Unit::spendMana(double amount) {
     stats_.changeMP(-amount);
 }
 
-void Unit::changeArmor(int delta) { stats_.changeArmor(delta); }
+void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
 
@@ -101,23 +101,23 @@ bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 
 // setters and getters
 
-int Unit::getDamage() const { return stats_.getDamage(); }
-void Unit::setDamage(int damage) { stats_.setDamage(damage); }
+int32_t Unit::getDamage() const { return stats_.getDamage(); }
+void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
 
-unsigned Unit::getAttackRange() const { return stats_.getAttackRange();; }
-void Unit::setAttackRange(unsigned attackRange) { stats_.setAttackRange(attackRange); }
+uint32_tUnit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(uint32_tattackRange) { stats_.setAttackRange(attackRange); }
 
-unsigned Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
-void Unit::setMoveSpeed(unsigned moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
+uint32_tUnit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
+void Unit::setMoveSpeed(uint32_tmoveSpeed) { stats_.setMoveSpeed(moveSpeed); }
 
-unsigned Unit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
-void Unit::setAttackSpeed(unsigned attackSpeed) { stats_.setAttackSpeed(attackSpeed); }
+uint32_tUnit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
+void Unit::setAttackSpeed(uint32_tattackSpeed) { stats_.setAttackSpeed(attackSpeed); }
 
-unsigned Unit::getMaxHp() const { return stats_.getMaxHp(); }
-void Unit::setMaxHp(unsigned maxHp) { stats_.setMaxHp(maxHp); }
+uint32_tUnit::getMaxHp() const { return stats_.getMaxHp(); }
+void Unit::setMaxHp(uint32_tmaxHp) { stats_.setMaxHp(maxHp); }
 
-unsigned Unit::getMaxMp() const { return stats_.getMaxMp(); }
-void Unit::setMaxMp(unsigned maxMp) { stats_.setMaxMp(maxMp); }
+uint32_tUnit::getMaxMp() const { return stats_.getMaxMp(); }
+void Unit::setMaxMp(uint32_tmaxMp) { stats_.setMaxMp(maxMp); }
 
 double Unit::getHealthPoints() const { return stats_.getHealthPoints();; }
 void Unit::setHealthPoints(double healthPoints) { stats_.setManaPoints(healthPoints); }
@@ -131,8 +131,8 @@ void Unit::setHpRegen(double hpRegen) { stats_.setMpRegen(hpRegen); }
 double Unit::getMpRegen() const { return stats_.getMpRegen(); }
 void Unit::setMpRegen(double mpRegen) { stats_.setMpRegen(mpRegen); }
 
-int Unit::getArmor() const { return stats_.getArmor(); }
-void Unit::setArmor(int armor) { stats_.setArmor(armor); }
+int32_t Unit::getArmor() const { return stats_.getArmor(); }
+void Unit::setArmor(int32_t armor) { stats_.setArmor(armor); }
 
 double Unit::getResist() const { return stats_.getResist(); }
 void Unit::setResist(double resist) { stats_.setResist(resist); }
