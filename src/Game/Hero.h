@@ -20,15 +20,15 @@ private:
 public:
 
     Hero() = delete;
+    Hero(Stats stats, Point position);
 
-    Hero(int damage, unsigned attackRange, unsigned moveSpeed, unsigned attackSpeed, unsigned maxHP,
-         unsigned maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position);
-
-    void changeGold(int delta);
+    bool canSpendGold(unsigned amount);
+    void addGold(unsigned amount);
+    void spendGold(unsigned amount);
 
     void levelUp(unsigned delta);
     void incrementLevel();
-    void getExperience(unsigned delta);
+    void changeExperience(unsigned delta);
 
 
     // getters and setters
