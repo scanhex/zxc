@@ -4,7 +4,7 @@ class Point final {
 public:
     double x_, y_, z_;
 
-    Point(double x, double y);
+    Point(double x, double y, double z = 0);
 
     bool operator==(Point other) const;
     void operator+=(Point other);
