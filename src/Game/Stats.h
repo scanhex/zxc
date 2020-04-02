@@ -1,60 +1,62 @@
 #pragma once
 
+#include <cstdint>
+
 class Stats {
 private:
-    int damage_;
-    unsigned attackRange_;
+    int32_t damage_;
+    uint32_t attackRange_;
 
-    unsigned moveSpeed_;
-    unsigned attackSpeed_;
+    uint32_t moveSpeed_;
+    uint32_t attackSpeed_;
 
-    unsigned maxHP_;
-    unsigned maxMP_;
+    uint32_t maxHP_;
+    uint32_t maxMP_;
     double healthPoints_;
     double manaPoints_;
     double hpRegen_;
     double mpRegen_;
 
-    int armor_; // adjust formula(see damagePhys)?
+    int32_t armor_; // adjust formula(see damagePhys)?
     double resist_; // percent
 public:
     Stats() = default;
     Stats(const Stats &) = default;
 
-    void changeDamage(int delta);
-    void changeAttackRange(int delta);
-    void changeMoveSpeed(int delta);
-    void changeAttackSpeed(int delta);
-    void changeMaxHP(int delta);
-    void changeMaxMP(int delta);
+    void changeDamage(int32_t delta);
+    void changeAttackRange(int32_t delta);
+    void changeMoveSpeed(int32_t delta);
+    void changeAttackSpeed(int32_t delta);
+    void changeMaxHP(int32_t delta);
+    void changeMaxMP(int32_t delta);
     void changeHP(double delta);
     void changeMP(double delta);
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
-    void changeArmor(int delta);
+    void changeArmor(int32_t delta);
     void changeResist(double delta);
 
     void refreshStats();
 
     // getters and setters
 
-    [[nodiscard]] int getDamage() const;
-    void setDamage(int damage);
+    [[nodiscard]] int32_t getDamage() const;
+    void setDamage(int32_t damage);
 
-    [[nodiscard]] unsigned getAttackRange() const;
-    void setAttackRange(unsigned attackRange);
+    [[nodiscard]] uint32_t getAttackRange() const;
+    void setAttackRange(uint32_t attackRange);
 
-    [[nodiscard]] unsigned getMoveSpeed() const;
-    void setMoveSpeed(unsigned moveSpeed);
+    [[nodiscard]] uint32_t getMoveSpeed() const;
+    void setMoveSpeed(uint32_t moveSpeed);
 
-    [[nodiscard]] unsigned getAttackSpeed() const;
-    void setAttackSpeed(unsigned attackSpeed);
+    [[nodiscard]] uint32_t getAttackSpeed() const;
+    void setAttackSpeed(uint32_t attackSpeed);
 
-    [[nodiscard]] unsigned getMaxHp() const;
-    void setMaxHp(unsigned maxHp);
+    [[nodiscard]] uint32_t getMaxHp() const;
+    void setMaxHp(uint32_t maxHp);
 
-    [[nodiscard]] unsigned getMaxMp() const;
-    void setMaxMp(unsigned maxMp);
+    [[nodiscard]] uint32_t getMaxMp() const;
+    void setMaxMp(uint32_t maxMp);
 
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
@@ -68,8 +70,8 @@ public:
     [[nodiscard]] double getMpRegen() const;
     void setMpRegen(double mpRegen);
 
-    [[nodiscard]] int getArmor() const;
-    void setArmor(int armor);
+    [[nodiscard]] int32_t getArmor() const;
+    void setArmor(int32_t armor);
 
     [[nodiscard]] double getResist() const;
     void setResist(double resist);
