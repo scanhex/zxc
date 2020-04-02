@@ -4,32 +4,32 @@ Stats StatsBuilder::create() {
     return stats_;
 }
 
-StatsBuilder &StatsBuilder::setDamage(int damage) {
+StatsBuilder &StatsBuilder::setDamage(int32_t damage) {
     stats_.setDamage(damage);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setAttackRange(unsigned attackRange) {
+StatsBuilder &StatsBuilder::setAttackRange(uint32_t  attackRange) {
     stats_.setAttackRange(attackRange);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMoveSpeed(unsigned moveSpeed) {
+StatsBuilder &StatsBuilder::setMoveSpeed(uint32_t  moveSpeed) {
     stats_.setMoveSpeed(moveSpeed);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setAttackSpeed(unsigned attackSpeed) {
+StatsBuilder &StatsBuilder::setAttackSpeed(uint32_t  attackSpeed) {
     stats_.setAttackSpeed(attackSpeed);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMaxHp(unsigned maxHp) {
+StatsBuilder &StatsBuilder::setMaxHp(uint32_t  maxHp) {
     stats_.setMaxHp(maxHp);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMaxMp(unsigned maxMp) {
+StatsBuilder &StatsBuilder::setMaxMp(uint32_t  maxMp) {
     stats_.setMaxMp(maxMp);
     return *this;
 }
@@ -44,7 +44,7 @@ StatsBuilder &StatsBuilder::setMpRegen(double mpRegen) {
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setArmor(int armor) {
+StatsBuilder &StatsBuilder::setArmor(int32_t armor) {
     stats_.setArmor(armor);
     return *this;
 }
