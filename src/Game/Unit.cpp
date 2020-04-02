@@ -31,7 +31,7 @@ void Unit::deleteItem(int indexToDelete) {
 }
 
 void Unit::clearItems() {
-    for (auto &item : items_) {
+    for (Item &item : items_) {
         item = Item();
     }
 }
