@@ -1,37 +1,25 @@
 #pragma once
 
-#include <vector>
-#include <cassert>
-
-#include "Stats.h"
-#include "Point.h"
-#include "Item.h"
-#include "Buff.h"
-
-constexpr size_t MAX_ITEMS = 6;
-
-class Unit {
+class Stats {
 private:
-    Item items_[MAX_ITEMS];
-    std::vector<Buff> buffs_;
+    int damage_;
+    unsigned attackRange_;
 
-    Stats stats_;
+    unsigned moveSpeed_;
+    unsigned attackSpeed_;
 
-    Point position_; // ??
+    unsigned maxHP_;
+    unsigned maxMP_;
+    double healthPoints_;
+    double manaPoints_;
+    double hpRegen_;
+    double mpRegen_;
 
+    int armor_; // adjust formula(see damagePhys)?
+    double resist_; // percent
 public:
-    Unit() = delete;
-    Unit(Stats stats, Point position);
-
-    void addItem(Item &item, int slot = -1);
-
-    void deleteItem(int indexToDelete); // 0..MAX_ITEMS-1 in inventory
-    void clearItems();
-
-    void addBuff(Buff &buff);
-
-    void deleteBuff(int indexToDelete); // deletes 1 buff matching buff.index
-    void clearBuffs();
+    Stats() = default;
+    Stats(const Stats &) = default;
 
     void changeDamage(int delta);
     void changeAttackRange(int delta);
@@ -39,24 +27,14 @@ public:
     void changeAttackSpeed(int delta);
     void changeMaxHP(int delta);
     void changeMaxMP(int delta);
+    void changeHP(double delta);
+    void changeMP(double delta);
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
-
-    void heal(double amount);
-    void damage(double amount);
-    void damagePhys(double amount);
-    void damageMagic(double amount);
-
-    void regenMana(double amount);
-    void spendMana(double amount);
-    [[nodiscard]] bool canSpendMana(double amount) const;
-
     void changeArmor(int delta);
     void changeResist(double delta);
-    void changePosition(double deltaX, double deltaY); // coords += deltaCoords
 
-    bool isDead();
-
+    void refreshStats();
 
     // getters and setters
 
@@ -95,8 +73,4 @@ public:
 
     [[nodiscard]] double getResist() const;
     void setResist(double resist);
-
-    [[nodiscard]] const Point &getPosition() const;
-    void setPosition(const Point &position);
-    void setPosition(double x, double y);
 };
