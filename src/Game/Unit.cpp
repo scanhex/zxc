@@ -1,13 +1,10 @@
 #include "Unit.h"
 #include <algorithm>
 
-Unit::Unit(int damage, unsigned attackRange, unsigned moveSpeed, unsigned attackSpeed, unsigned maxHP,
-           unsigned maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
-        damage_{damage}, attackRange_{attackRange}, moveSpeed_{moveSpeed},
-        attackSpeed_{attackSpeed}, maxHP_{maxHP}, maxMP_{maxMP},
-        healthPoints_{static_cast<double>(maxHP)}, manaPoints_{static_cast<double>(maxMP)},
-        hpRegen_{hpRegen}, mpRegen_{mpRegen}, armor_{armor},
-        resist_{resist}, position_{position} {}
+Unit::Unit(Stats stats, Point position) : stats_{stats},
+                                          position_{position} {
+    stats_.refreshStats();
+}
 
 
 void Unit::addItem(Item &item, int slot) {
@@ -55,130 +52,91 @@ void Unit::clearBuffs() {
     buffs_.clear();
 }
 
-void Unit::changeDamage(int delta) { damage_ += delta; }
-
-void Unit::changeAttackRange(int delta) { attackRange_ += delta; }
-
-void Unit::changeMoveSpeed(int delta) { moveSpeed_ += delta; }
-
-void Unit::changeAttackSpeed(int delta) { attackSpeed_ += delta; }
-
-void Unit::changeHPRegen(int delta) { hpRegen_ += delta; }
-
-void Unit::changeMPRegen(int delta) { mpRegen_ += delta; }
+void Unit::changeDamage(int delta) { stats_.changeDamage(delta); }
+void Unit::changeAttackRange(int delta) { stats_.changeAttackRange(delta); }
+void Unit::changeMoveSpeed(int delta) { stats_.changeMoveSpeed(delta); }
+void Unit::changeAttackSpeed(int delta) { stats_.changeAttackSpeed(delta); }
+void Unit::changeMaxHP(int delta) { stats_.changeMaxHP(delta); }
+void Unit::changeMaxMP(int delta) { stats_.changeMaxMP(delta); }
+void Unit::changeHPRegen(double delta) { stats_.changeHPRegen(delta); }
+void Unit::changeMPRegen(double delta) { stats_.changeMPRegen(delta); }
 
 void Unit::heal(double amount) {
-    healthPoints_ = std::min(healthPoints_ + amount, static_cast<double>(maxHP_));
+    stats_.changeHP(amount);
 }
 
 void Unit::damage(double amount) {
-    healthPoints_ = std::max(healthPoints_ - amount, 0.0);
+    stats_.changeHP(-amount);
 }
 
 void Unit::damagePhys(double amount) {
-    double multiplier = 1 - ((0.052 * armor_) / (0.9 + 0.048 * std::abs(armor_)));
+    int armor = stats_.getArmor();
+    double multiplier = 1 - ((0.052 * armor) / (0.9 + 0.048 * std::abs(armor)));
     damage(amount * multiplier);
 }
 
 void Unit::damageMagic(double amount) {
-    damage(amount * resist_);
+    damage(amount * stats_.getResist());
 }
 
-void Unit::regenMana(unsigned amount) {
-    manaPoints_ += amount;
-    manaPoints_ = std::min(manaPoints_, static_cast<double>(maxMP_));
+void Unit::regenMana(double amount) {
+    stats_.changeMP(amount);
 }
 
-bool Unit::canSpendMana(unsigned amount) {
-    return amount >= manaPoints_;
+bool Unit::canSpendMana(double amount) const {
+    return amount >= stats_.getManaPoints();
 }
 
-void Unit::spendMana(unsigned amount) {
-    assert(amount >= manaPoints_ && "Not enough mana points to spend!");
-
-    manaPoints_ -= amount;
+void Unit::spendMana(double amount) {
+    assert(canSpendMana(amount) && "Not enough mana points to spend!");
+    stats_.changeMP(-amount);
 }
 
-void Unit::changeArmor(int delta) { armor_ += delta; }
-
-void Unit::changeResist(int delta) { resist_ += delta; }
-
+void Unit::changeArmor(int delta) { stats_.changeArmor(delta); }
+void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
 
-bool Unit::isDead() { return healthPoints_ <= 0; }
+bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 
 
 // setters and getters
 
-int Unit::getDamage() const { return damage_; }
+int Unit::getDamage() const { return stats_.getDamage(); }
+void Unit::setDamage(int damage) { stats_.setDamage(damage); }
 
-void Unit::setDamage(int damage) { damage_ = damage; } // forbid negative damage?
+unsigned Unit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(unsigned attackRange) { stats_.setAttackRange(attackRange); }
 
-unsigned Unit::getAttackRange() const { return attackRange_; }
+unsigned Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
+void Unit::setMoveSpeed(unsigned moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
 
-void Unit::setAttackRange(unsigned attackRange) {
-    attackRange_ = attackRange;
-}
+unsigned Unit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
+void Unit::setAttackSpeed(unsigned attackSpeed) { stats_.setAttackSpeed(attackSpeed); }
 
-unsigned Unit::getMoveSpeed() const { return moveSpeed_; }
+unsigned Unit::getMaxHp() const { return stats_.getMaxHp(); }
+void Unit::setMaxHp(unsigned maxHp) { stats_.setMaxHp(maxHp); }
 
-void Unit::setMoveSpeed(unsigned moveSpeed) {
-    moveSpeed_ = moveSpeed;
-}
+unsigned Unit::getMaxMp() const { return stats_.getMaxMp(); }
+void Unit::setMaxMp(unsigned maxMp) { stats_.setMaxMp(maxMp); }
 
-unsigned Unit::getAttackSpeed() const { return attackSpeed_; }
+double Unit::getHealthPoints() const { return stats_.getHealthPoints();; }
+void Unit::setHealthPoints(double healthPoints) { stats_.setManaPoints(healthPoints); }
 
-void Unit::setAttackSpeed(unsigned attackSpeed) {
-    attackSpeed_ = attackSpeed;
-}
+double Unit::getManaPoints() const { return stats_.getManaPoints(); }
+void Unit::setManaPoints(double manaPoints) { stats_.setManaPoints(manaPoints); }
 
-unsigned Unit::getMaxHp() const { return maxHP_; }
+double Unit::getHpRegen() const { return stats_.getHpRegen(); }
+void Unit::setHpRegen(double hpRegen) { stats_.setMpRegen(hpRegen); }
 
-void Unit::setMaxHp(unsigned maxHp) {
-    maxHP_ = maxHp;
-}
+double Unit::getMpRegen() const { return stats_.getMpRegen(); }
+void Unit::setMpRegen(double mpRegen) { stats_.setMpRegen(mpRegen); }
 
-unsigned Unit::getMaxMp() const { return maxMP_; }
+int Unit::getArmor() const { return stats_.getArmor(); }
+void Unit::setArmor(int armor) { stats_.setArmor(armor); }
 
-void Unit::setMaxMp(unsigned maxMp) {
-    maxMP_ = maxMp;
-}
-
-double Unit::getHealthPoints() const { return healthPoints_; }
-
-void Unit::setHealthPoints(double healthPoints) {
-    assert(healthPoints >= 0 && healthPoints <= maxHP_ && "Wrong new health points!");
-    healthPoints_ = healthPoints;
-}
-
-double Unit::getManaPoints() const { return manaPoints_; }
-
-void Unit::setManaPoints(double manaPoints) {
-    assert(manaPoints >= 0 && manaPoints <= maxHP_ && "Wrong new mana points!");
-    manaPoints_ = manaPoints;
-}
-
-double Unit::getHpRegen() const { return hpRegen_; }
-
-void Unit::setHpRegen(double hpRegen) { hpRegen_ = hpRegen; }
-
-double Unit::getMpRegen() const { return mpRegen_; }
-
-void Unit::setMpRegen(double mpRegen) { mpRegen_ = mpRegen; }
-
-int Unit::getArmor() const { return armor_; }
-
-void Unit::setArmor(int armor) { armor_ = armor; }
-
-double Unit::getResist() const { return resist_; }
-
-void Unit::setResist(double resist) {
-    assert(resist >= 0 && resist <= 1 && "Wrong new resist!");
-    resist_ = resist;
-}
+double Unit::getResist() const { return stats_.getResist(); }
+void Unit::setResist(double resist) { stats_.setResist(resist); }
 
 const Point &Unit::getPosition() const { return position_; }
-
 void Unit::setPosition(const Point &position) { position_ = position; }
-
 void Unit::setPosition(double x, double y) { position_ = Point(x, y); }
