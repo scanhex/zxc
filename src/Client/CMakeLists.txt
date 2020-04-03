@@ -23,7 +23,17 @@ if(Boost_FOUND)
 endif()
 
 
-add_executable(Client main.cpp Client.cpp Client.h ../Game/Hero.cpp ../Game/Hero.h ../Game/Skill.cpp ../Game/Skill.h ../Game/Item.cpp ../Game/Item.h ../Game/Buff.cpp ../Game/Buff.h ../Game/Unit.cpp ../Game/Unit.h ../Game/Point.cpp ../Game/Point.h ../Game/Stats.cpp ../Game/Stats.h ../Game/StatsBuilder.cpp ../Game/StatsBuilder.h ../Game/Event.h)
+add_executable(Client main.cpp Client.cpp Client.h
+        ../Game/Hero.cpp ../Game/Hero.h
+        ../Game/Skill.cpp ../Game/Skill.h
+        ../Game/Item.cpp ../Game/Item.h
+        ../Game/Buff.cpp ../Game/Buff.h
+        ../Game/Unit.cpp ../Game/Unit.h
+        ../Game/Point.cpp ../Game/Point.h
+        ../Game/Stats.cpp ../Game/Stats.h
+        ../Game/StatsBuilder.cpp ../Game/StatsBuilder.h
+        ../Game/GameState.cpp ../Game/GameState.h
+        ../Game/Event.h)
 
 if(Boost_FOUND)
     message(STATUS "Linking boost libraries")
