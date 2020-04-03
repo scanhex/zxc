@@ -1,12 +1,10 @@
 #include "Server.h"
-#include <cmath>
+#include "../Game/GameStateServer.h"
 
-//global Game State example
-int max_hp = 1000;
-int hp1 = max_hp;
-int hp2 = max_hp;
-int regen = 1;
+//global Game State
+GameStateServer gameState(1.0 * TICK_TIME_GS_UPDATE / 1000);
 bool running = false;
+boost::posix_time::ptime last_tick, now;
 
 int ConnectionToClient::running_connections_ = 0;
 
@@ -86,7 +84,7 @@ void ConnectionToClient::handleWriteToSocket(const boost::system::error_code &er
         return;
     }
     if (!running_connections_) return;
-    if (hp1 == 0 || hp2 == 0) stopConnection(); //if game is finished
+    if (gameState.gameIsFinished()) stopConnection(); //if game is finished
 
     timer_.expires_from_now(boost::posix_time::millisec(TICK_TIME_SEND_GS));
     timer_.async_wait(BIND_FN(writeToSocket));
@@ -115,28 +113,58 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 }
 
 void ConnectionToClient::updateGSbyPlayer() {
-    int dmg = read_buffer_[0];
-    if (player_id_ == 0 && hp1 > 0) {
-        hp2 = std::max(0, hp2 - dmg);
-    } else {
-        if (hp2 > 0)
-            hp1 = std::max(0, hp1 - dmg);
-    }
+    double dmg = readDouble(0);
+    if (player_id_ == 0)
+        gameState.applyDamage(dmg, Player::Second);
+    else
+        gameState.applyDamage(dmg, Player::First);
 }
 
 void ConnectionToClient::writeGStoBuffer() {
     if (player_id_ == 0) {
-        write_buffer_[0] = hp1 / 128;
-        write_buffer_[1] = hp1 % 128;
-        write_buffer_[2] = hp2 / 128;
-        write_buffer_[3] = hp2 % 128;
-
+        writeDouble(gameState.getHealthPoints(Player::First), 0);
+        writeDouble(gameState.getHealthPoints(Player::Second), 8);
     } else {
-        write_buffer_[0] = hp2 / 128;
-        write_buffer_[1] = hp2 % 128;
-        write_buffer_[2] = hp1 / 128;
-        write_buffer_[3] = hp1 % 128;
+        writeDouble(gameState.getHealthPoints(Player::Second), 0);
+        writeDouble(gameState.getHealthPoints(Player::First), 8);
     }
+}
+
+void ConnectionToClient::writeDouble(double d, int start_idx) {
+    binaryDouble u;
+    u.dValue = d;
+    writeInt64(u.iValue, start_idx);
+}
+
+void ConnectionToClient::writeInt32(int32_t d, int start_idx) {
+    for (int i = 0; i < 4; i++)
+        write_buffer_[start_idx + 3 - i] = (d >> (i * 8));
+}
+
+void ConnectionToClient::writeInt64(int64_t d, int start_idx) {
+    for (int i = 0; i < 8; i++)
+        write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
+}
+
+
+double ConnectionToClient::readDouble(int start_idx) {
+    binaryDouble u;
+    u.iValue = readInt64(start_idx);
+    return u.dValue;
+}
+
+int32_t ConnectionToClient::readInt32(int start_idx) {
+    int32_t result = 0;
+    for (int i = 0; i < 4; i++)
+        result = (result << 8) + read_buffer_[start_idx + i];
+    return result;
+}
+
+int64_t ConnectionToClient::readInt64(int start_idx) {
+    int64_t result = 0;
+    for (int i = 0; i < 8; i++)
+        result = (result << 8) + read_buffer_[start_idx + i];
+    return result;
 }
 
 
@@ -152,24 +180,31 @@ void handleNewConnection(ConnectionToClient::ptr client, const boost::system::er
 }
 
 void updateGS() {
-    if (hp1 > 0 && hp2 > 0)
-        hp1 = std::min(max_hp, hp1 + regen);
-    if (hp2 > 0 && hp1 > 0)
-        hp2 = std::min(max_hp, hp2 + regen);
+    // Максим -- просто шедевр, убейте его
+    gameState.update();
 }
 
 void runGameStateCycle() {
     while (running) {
+        now = boost::posix_time::microsec_clock::local_time();
+        while ((now - last_tick).total_milliseconds() < TICK_TIME_GS_UPDATE) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            now = boost::posix_time::microsec_clock::local_time();
+            boost::posix_time::time_duration diff = now - last_tick;
+        }
+        //TODO may cause some problems in WINDOWS
+        last_tick = now;
         g_lock.lock();
         updateGS();
         g_lock.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(TICK_TIME_GS_UPDATE));
     }
 }
 
 
 void runServer() {
+    last_tick = boost::posix_time::microsec_clock::local_time();
     ConnectionToClient::ptr client = ConnectionToClient::newClient();
+    std::this_thread::sleep_for(std::chrono::milliseconds(TICK_TIME_GS_UPDATE));
     acceptor.async_accept(client->sock(), std::bind(handleNewConnection, client, std::placeholders::_1));
     running = true;
     std::thread gs_cycle(runGameStateCycle);
