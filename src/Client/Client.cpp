@@ -1,13 +1,15 @@
 #include "Client.h"
-
+#include "../Game/GameState.h"
 #include <utility>
 
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
 
 //local Game State example
-int hp1;
-int hp2;
+GameState gameState;
+
+//temporary counter for cout
+int cnt = 0;
 
 ConnectionToServer::ConnectionToServer(std::string username) : sock_(service),
                                                                username_(std::move(username)),
@@ -64,12 +66,13 @@ void ConnectionToServer::writeToSocket() {
 
 void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
     parseGSFromBuffer();
+    if (cnt == 0)
+        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
+                  << gameState.getHealthPoints(Player::Second) << std::endl;
+    cnt = (cnt + 1) % 50;
+    if (gameState.gameIsFinished()) {
 
-    std::cout << "my hp is " << hp1 << ", enemy hp is " << hp2 << std::endl;
-
-    if (hp1 == 0 || hp2 == 0) {// if game is finished
-
-        if (hp1 == 0)
+        if (gameState.getHealthPoints(Player::First) == 0)
             std::cout << username_ << ": I lost :(" << std::endl; //just some game result handling
         else
             std::cout << username_ << ": I won :)" << std::endl;
@@ -96,14 +99,53 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
 }
 
 void ConnectionToServer::parseGSFromBuffer() {
-    hp1 = read_buffer_[0] * 128 + read_buffer_[1];
-    hp2 = read_buffer_[2] * 128 + read_buffer_[3];
+    double hp = readDouble(0);
+    gameState.setHealthPoints(hp, Player::First);
+    hp = readDouble(8);
+    gameState.setHealthPoints(hp, Player::Second);
 }
 
 void ConnectionToServer::writeActionToBuffer() {
-    char val = rand() % 128;
-    //std::cout << username_ << " damaged " << (int) val << std::endl;
-    write_buffer_[0] = val;
+    double dmg = 100;
+  //  std::cout << " damaged " << dmg << std::endl;
+    writeDouble(dmg, 0);
+}
+
+void ConnectionToServer::writeDouble(double d, int start_idx) {
+    binaryDouble u;
+    u.dValue = d;
+    writeInt64(u.iValue, start_idx);
+}
+
+void ConnectionToServer::writeInt32(int32_t d, int start_idx) {
+    for (int i = 0; i < 4; i++)
+        write_buffer_[start_idx + 3 - i] = (d >> (i * 8));
+}
+
+void ConnectionToServer::writeInt64(int64_t d, int start_idx) {
+    for (int i = 0; i < 8; i++)
+        write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
+}
+
+
+double ConnectionToServer::readDouble(int start_idx) {
+    binaryDouble u;
+    u.iValue = readInt64(start_idx);
+    return u.dValue;
+}
+
+int32_t ConnectionToServer::readInt32(int start_idx) {
+    int32_t result = 0;
+    for (int i = 0; i < 4; i++)
+        result = (result << 8) + read_buffer_[start_idx + i];
+    return result;
+}
+
+int64_t ConnectionToServer::readInt64(int start_idx) {
+    int64_t result = 0;
+    for (int i = 0; i < 8; i++)
+        result = (result << 8) + read_buffer_[start_idx + i];
+    return result;
 }
 
 void runClient() {
