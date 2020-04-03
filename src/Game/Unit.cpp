@@ -104,20 +104,20 @@ bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
 
-uint32_tUnit::getAttackRange() const { return stats_.getAttackRange();; }
-void Unit::setAttackRange(uint32_tattackRange) { stats_.setAttackRange(attackRange); }
+uint32_t Unit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(uint32_t attackRange) { stats_.setAttackRange(attackRange); }
 
-uint32_tUnit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
-void Unit::setMoveSpeed(uint32_tmoveSpeed) { stats_.setMoveSpeed(moveSpeed); }
+uint32_t Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
+void Unit::setMoveSpeed(uint32_t moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
 
-uint32_tUnit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
-void Unit::setAttackSpeed(uint32_tattackSpeed) { stats_.setAttackSpeed(attackSpeed); }
+uint32_t Unit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
+void Unit::setAttackSpeed(uint32_t attackSpeed) { stats_.setAttackSpeed(attackSpeed); }
 
-uint32_tUnit::getMaxHp() const { return stats_.getMaxHp(); }
-void Unit::setMaxHp(uint32_tmaxHp) { stats_.setMaxHp(maxHp); }
+uint32_t Unit::getMaxHp() const { return stats_.getMaxHp(); }
+void Unit::setMaxHp(uint32_t maxHp) { stats_.setMaxHp(maxHp); }
 
-uint32_tUnit::getMaxMp() const { return stats_.getMaxMp(); }
-void Unit::setMaxMp(uint32_tmaxMp) { stats_.setMaxMp(maxMp); }
+uint32_t Unit::getMaxMp() const { return stats_.getMaxMp(); }
+void Unit::setMaxMp(uint32_t maxMp) { stats_.setMaxMp(maxMp); }
 
 double Unit::getHealthPoints() const { return stats_.getHealthPoints();; }
 void Unit::setHealthPoints(double healthPoints) { stats_.setManaPoints(healthPoints); }
