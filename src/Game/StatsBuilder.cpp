@@ -9,27 +9,27 @@ StatsBuilder &StatsBuilder::setDamage(int32_t damage) {
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setAttackRange(uint32_t  attackRange) {
+StatsBuilder &StatsBuilder::setAttackRange(uint32_t attackRange) {
     stats_.setAttackRange(attackRange);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMoveSpeed(uint32_t  moveSpeed) {
+StatsBuilder &StatsBuilder::setMoveSpeed(uint32_t moveSpeed) {
     stats_.setMoveSpeed(moveSpeed);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setAttackSpeed(uint32_t  attackSpeed) {
+StatsBuilder &StatsBuilder::setAttackSpeed(uint32_t attackSpeed) {
     stats_.setAttackSpeed(attackSpeed);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMaxHp(uint32_t  maxHp) {
+StatsBuilder &StatsBuilder::setMaxHp(uint32_t maxHp) {
     stats_.setMaxHp(maxHp);
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setMaxMp(uint32_t  maxMp) {
+StatsBuilder &StatsBuilder::setMaxMp(uint32_t maxMp) {
     stats_.setMaxMp(maxMp);
     return *this;
 }
