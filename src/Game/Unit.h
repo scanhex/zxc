@@ -41,10 +41,10 @@ public:
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
 
-    void heal(double amount);
-    void damage(double amount);
-    void damagePhys(double amount);
-    void damageMagic(double amount);
+    void applyHeal(double amount);
+    void applyDamage(double amount);
+    void applyDamagePhys(double amount);
+    void applyDamageMagic(double amount);
 
     void regenMana(double amount);
     void spendMana(double amount);

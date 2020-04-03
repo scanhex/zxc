@@ -17,7 +17,7 @@ private:
     double hpRegen_;
     double mpRegen_;
 
-    int32_t armor_; // adjust formula(see damagePhys)?
+    int32_t armor_; // adjust formula(see applyDamagePhys)?
     double resist_; // percent
 public:
     Stats() = default;

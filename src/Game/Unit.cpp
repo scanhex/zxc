@@ -61,22 +61,22 @@ void Unit::changeMaxMP(int32_t delta) { stats_.changeMaxMP(delta); }
 void Unit::changeHPRegen(double delta) { stats_.changeHPRegen(delta); }
 void Unit::changeMPRegen(double delta) { stats_.changeMPRegen(delta); }
 
-void Unit::heal(double amount) {
+void Unit::applyHeal(double amount) {
     stats_.changeHP(amount);
 }
 
-void Unit::damage(double amount) {
+void Unit::applyDamage(double amount) {
     stats_.changeHP(-amount);
 }
 
-void Unit::damagePhys(double amount) {
+void Unit::applyDamagePhys(double amount) {
     int32_t armor = stats_.getArmor();
     double multiplier = 1 - ((0.052 * armor) / (0.9 + 0.048 * std::abs(armor)));
-    damage(amount * multiplier);
+    applyDamage(amount * multiplier);
 }
 
-void Unit::damageMagic(double amount) {
-    damage(amount * stats_.getResist());
+void Unit::applyDamageMagic(double amount) {
+    applyDamage(amount * stats_.getResist());
 }
 
 void Unit::regenMana(double amount) {
