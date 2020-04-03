@@ -119,14 +119,14 @@ void Unit::setMaxHp(uint32_t maxHp) { stats_.setMaxHp(maxHp); }
 uint32_t Unit::getMaxMp() const { return stats_.getMaxMp(); }
 void Unit::setMaxMp(uint32_t maxMp) { stats_.setMaxMp(maxMp); }
 
-double Unit::getHealthPoints() const { return stats_.getHealthPoints();; }
-void Unit::setHealthPoints(double healthPoints) { stats_.setManaPoints(healthPoints); }
+double Unit::getHealthPoints() const { return stats_.getHealthPoints(); }
+void Unit::setHealthPoints(double healthPoints) { stats_.setHealthPoints(healthPoints); }
 
 double Unit::getManaPoints() const { return stats_.getManaPoints(); }
 void Unit::setManaPoints(double manaPoints) { stats_.setManaPoints(manaPoints); }
 
 double Unit::getHpRegen() const { return stats_.getHpRegen(); }
-void Unit::setHpRegen(double hpRegen) { stats_.setMpRegen(hpRegen); }
+void Unit::setHpRegen(double hpRegen) { stats_.setHpRegen(hpRegen); }
 
 double Unit::getMpRegen() const { return stats_.getMpRegen(); }
 void Unit::setMpRegen(double mpRegen) { stats_.setMpRegen(mpRegen); }
