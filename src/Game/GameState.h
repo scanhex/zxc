@@ -17,6 +17,8 @@ public:
     void setHealthPoints(double amount, Player player);
     double getHealthPoints(Player player);
 
+    bool gameIsFinished();
+
 protected:
     Hero *firstHero;
     Hero *secondHero;

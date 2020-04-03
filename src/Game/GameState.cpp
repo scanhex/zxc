@@ -38,6 +38,10 @@ void GameState::setHealthPoints(double amount, Player player) {
     }
 }
 
+bool GameState::gameIsFinished() {
+    return firstHero->isDead() || secondHero->isDead();
+}
+
 
 GameStateServer::GameStateServer(double gameTick) : GameState(), gameTick_{gameTick} {}
 
