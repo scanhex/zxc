@@ -33,7 +33,7 @@ void Stats::refreshStats() {
 // setters and getters
 
 int32_t Stats::getDamage() const { return damage_; }
-void Stats::setDamage(int32_t damage) { damage_ = damage; } // forbid negative damage?
+void Stats::setDamage(int32_t damage) { damage_ = damage; } // forbid negative applyDamage?
 
 uint32_t Stats::getAttackRange() const { return attackRange_; }
 void Stats::setAttackRange(uint32_t attackRange) { attackRange_ = attackRange; }

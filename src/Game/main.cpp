@@ -1,11 +1,13 @@
-#include <iostream>
 #include <cassert>
-#include "GameState.h"
-#include "Hero.h"
-#include "StatsBuilder.h"
-
+#include "GameStateServer.h"
 
 int main() {
-    GameState();
-    // test
+    GameStateServer game(1.0 / 30);
+    while (!game.gameIsFinished()) {
+        game.applyDamage(100, Player::First);
+        game.applyDamagePhys(100, Player::Second);
+    }
+    assert(game.isDead(Player::First));
+    assert(!game.isDead(Player::Second));
+    return 0;
 }
