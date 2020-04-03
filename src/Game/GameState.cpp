@@ -1,6 +1,6 @@
 #include "GameState.h"
 
-GameState::GameState(double gameTick) : gameTick_{gameTick} {
+GameState::GameState() {
     StatsBuilder heroStatsBuilder = StatsBuilder().
             setDamage(100).
             setAttackRange(100).
@@ -16,7 +16,32 @@ GameState::GameState(double gameTick) : gameTick_{gameTick} {
     secondHero = new Hero(heroStatsBuilder.create(), Point(100, 100));
 }
 
-void GameState::update() {
+double GameState::getHealthPoints(Player player) {
+    switch (player) {
+        case Player::First:
+            return firstHero->getHealthPoints();
+        case Player::Second:
+            return secondHero->getHealthPoints();
+        default:
+            assert(false);
+    }
+}
+
+void GameState::setHealthPoints(double amount, Player player) {
+    switch (player) {
+        case Player::First:
+            firstHero->setHealthPoints(amount);
+        case Player::Second:
+            secondHero->setHealthPoints(amount);
+        default:
+            assert(false);
+    }
+}
+
+
+GameStateServer::GameStateServer(double gameTick) : GameState(), gameTick_{gameTick} {}
+
+void GameStateServer::update() {
     // only hp regen for now
     double healPerTick = firstHero->getHpRegen() * gameTick_;
     firstHero->heal(healPerTick);
@@ -25,25 +50,14 @@ void GameState::update() {
     secondHero->heal(healPerTick);
 }
 
-void GameState::damage(double amount, Player player) {
-    switch(player){
+void GameStateServer::damage(double amount, Player player) {
+    switch (player) {
         case Player::First:
             firstHero->damage(amount);
             break;
         case Player::Second:
             secondHero->damage(amount);
             break;
-        default:
-            assert(false);
-    }
-}
-
-double GameState::getHealthPoints(Player player) {
-    switch(player){
-        case Player::First:
-            return firstHero->getHealthPoints();
-        case Player::Second:
-            return secondHero->getHealthPoints();
         default:
             assert(false);
     }
