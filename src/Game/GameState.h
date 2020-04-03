@@ -3,26 +3,35 @@
 #include "Hero.h"
 #include "StatsBuilder.h"
 
-enum class Player{
+enum class Player {
     First,
     Second
 };
 
 
-class GameState{
+class GameState {
     // simple for now
 public:
-    GameState() = delete;
-    explicit GameState(double gameTick);
+    GameState();
+
+    void setHealthPoints(double amount, Player player);
+    double getHealthPoints(Player player);
+
+protected:
+    Hero *firstHero;
+    Hero *secondHero;
+};
+
+
+class GameStateServer : public GameState {
+public:
+    GameStateServer() = delete;
+    explicit GameStateServer(double gameTick);
 
     void update();
 
     void damage(double amount, Player player);
 
-    double getHealthPoints(Player player);
-
 private:
     double gameTick_;
-    Hero* firstHero;
-    Hero* secondHero;
 };
