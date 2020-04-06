@@ -66,6 +66,39 @@ void GameStateServer::update() {
     secondHero->regenMana(manaPerTick);
 }
 
+void GameStateServer::applySkill(Player player, SkillNum skillNum) {
+    // FOR NOW JUST DAMAGES OTHER PLAYER
+    double damage = 0;
+    switch (skillNum) {
+        case SkillNum::First:
+            damage = 10;
+            break;
+        case SkillNum::Second:
+            damage = 20;
+            break;
+        case SkillNum::Third:
+            damage = 30;
+            break;
+        default:
+            assert(false);
+    }
+    switch (player) {
+        case Player::First:
+            secondHero->applyDamage(damage);
+            break;
+        case Player::Second:
+            firstHero->applyDamage(damage);
+            break;
+        default:
+            assert(false);
+    }
+}
+
+void GameStateServer::applyMove(Player player, int32_t x, int32_t y) {
+    // ----
+}
+
+
 void GameStateServer::applyDamage(double amount, Player player) {
     switch (player) {
         case Player::First:
