@@ -16,7 +16,7 @@ static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
 static constexpr int MSG_FROM_SERVER_SIZE = 16;//size of default message to client
-static constexpr int MSG_FROM_CLIENT_SIZE = 8;
+static constexpr int MSG_FROM_CLIENT_SIZE = 1; //TODO change when add move action
 
 using namespace boost::asio;
 
@@ -24,7 +24,6 @@ using namespace boost::asio;
 #define BIND_FN1(x, y)      std::bind(&self_type::x, shared_from_this(),y)
 #define BIND_FN2(x, y, z)    std::bind(&self_type::x, shared_from_this(),y,z)
 #define BIND_FN3(x, y, z, w)  std::bind(&self_type::x, shared_from_this(),y,z,w)
-
 
 
 class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
@@ -68,17 +67,27 @@ private:
     void updateGSbyPlayer();
 
     void writeGStoBuffer();
+
 private:
     /*
      *  Functions to parse args to bytes and back
      */
-    void writeDouble(double d,int start_idx);
-    void writeInt32(int32_t d,int start_idx);
-    void writeInt64(int64_t d,int start_idx);
+    void writeUChar(unsigned char d, int start_idx);
+
+    void writeDouble(double d, int start_idx);
+
+    void writeInt32(int32_t d, int start_idx);
+
+    void writeInt64(int64_t d, int start_idx);
+
+    unsigned char readUChar(int start_idx);
 
     double readDouble(int start_idx);
+
     int32_t readInt32(int start_idx);
+
     int64_t readInt64(int start_idx);
+
     union binaryDouble {
         double dValue;
         uint64_t iValue;
