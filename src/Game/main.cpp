@@ -1,18 +1,13 @@
-#include <iostream>
-#include "Hero.h"
-
+#include <cassert>
+#include "GameStateServer.h"
 
 int main() {
-    Hero chel(100, 100, 350, 100, 1000, 300, 2, 1, 3, 0.25, Point(100, 100));
-    while (chel.getLevel() < MAX_LEVEL || chel.getExperience() < EXP_PER_LEVEL) {
-        chel.changeExperience(220);
-        std::cout << chel.getLevel() << ' ' << chel.getExperience() << '\n';
+    GameStateServer game(1.0 / 30);
+    while (!game.gameIsFinished()) {
+        game.applyDamage(100, Player::First);
+        game.applyDamagePhys(100, Player::Second);
     }
-    std::cout << '\n';
-    chel.damagePhys(999);
-    std::cout << chel.isDead() << '\n';
-    chel.damage(50);
-    std::cout << chel.isDead() << '\n';
-    chel.damage(150);
-    std::cout << chel.isDead() << '\n';
+    assert(game.isDead(Player::First));
+    assert(!game.isDead(Player::Second));
+    return 0;
 }

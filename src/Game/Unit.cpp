@@ -1,18 +1,15 @@
 #include "Unit.h"
 #include <algorithm>
 
-Unit::Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, double hpRegen, double mpRegen, int armor, double resist, Point position) :
-        damage_{damage}, attackRange_{attackRange}, moveSpeed_{moveSpeed},
-        attackSpeed_{attackSpeed}, maxHP_{maxHP}, maxMP_{maxMP},
-        healthPoints_{static_cast<double>(maxHP)}, manaPoints_{static_cast<double>(maxMP)},
-        hpRegen_{hpRegen}, mpRegen_{mpRegen}, armor_{armor},
-        resist_{resist}, position_{position} {}
+Unit::Unit(Stats stats, Point position) : stats_{stats},
+                                          position_{position} {
+    stats_.refreshStats();
+}
 
 
-void Unit::addItem(Item &item, int slot) {
+void Unit::addItem(Item &item, size_t slot) {
     if (slot == -1) {
-        for (int i = 0; i < MAX_ITEMS; i++) {
+        for (size_t i = 0; i < MAX_ITEMS; i++) {
             if (items_[i].isEmpty()) {
                 slot = i;
                 break;
@@ -27,21 +24,21 @@ void Unit::addItem(Item &item, int slot) {
     items_[slot] = item;
 }
 
-void Unit::deleteItem(int indexToDelete) {
+void Unit::deleteItem(size_t indexToDelete) {
     assert(indexToDelete >= 0 && indexToDelete < MAX_ITEMS && "Wrong index for deleting item!");
 
     items_[indexToDelete] = Item();
 }
 
 void Unit::clearItems() {
-    for (auto &item : items_) {
+    for (Item &item : items_) {
         item = Item();
     }
 }
 
 void Unit::addBuff(Buff &buff) { buffs_.push_back(buff); }
 
-void Unit::deleteBuff(int indexToDelete) {
+void Unit::deleteBuff(size_t indexToDelete) {
     std::vector<Buff> newBuffs;
     for (Buff &buff : buffs_) {
         if (buff.index != indexToDelete) {
@@ -55,135 +52,91 @@ void Unit::clearBuffs() {
     buffs_.clear();
 }
 
-void Unit::changeDamage(int delta) { damage_ += delta; }
+void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
+void Unit::changeAttackRange(int32_t delta) { stats_.changeAttackRange(delta); }
+void Unit::changeMoveSpeed(int32_t delta) { stats_.changeMoveSpeed(delta); }
+void Unit::changeAttackSpeed(int32_t delta) { stats_.changeAttackSpeed(delta); }
+void Unit::changeMaxHP(int32_t delta) { stats_.changeMaxHP(delta); }
+void Unit::changeMaxMP(int32_t delta) { stats_.changeMaxMP(delta); }
+void Unit::changeHPRegen(double delta) { stats_.changeHPRegen(delta); }
+void Unit::changeMPRegen(double delta) { stats_.changeMPRegen(delta); }
 
-void Unit::changeAttackRange(int delta) { attackRange_ += delta; }
-
-void Unit::changeMoveSpeed(int delta) { moveSpeed_ += delta; }
-
-void Unit::changeAttackSpeed(int delta) { attackSpeed_ += delta; }
-
-void Unit::changeHPRegen(int delta) { hpRegen_ += delta; }
-
-void Unit::changeMPRegen(int delta) { mpRegen_ += delta; }
-
-void Unit::heal(double amount) {
-    healthPoints_ = std::min(healthPoints_ + amount, static_cast<double>(maxHP_));
+void Unit::applyHeal(double amount) {
+    stats_.changeHP(amount);
 }
 
-void Unit::damage(double amount) {
-    healthPoints_ = std::max(healthPoints_ - amount, 0.0);
+void Unit::applyDamage(double amount) {
+    stats_.changeHP(-amount);
 }
 
-void Unit::damagePhys(double amount) {
-    double multiplier = 1 - ((0.052 * armor_) / (0.9 + 0.048 * std::abs(armor_)));
-    damage(amount * multiplier);
+void Unit::applyDamagePhys(double amount) {
+    int32_t armor = stats_.getArmor();
+    double multiplier = 1 - ((0.052 * armor) / (0.9 + 0.048 * std::abs(armor)));
+    applyDamage(amount * multiplier);
 }
 
-void Unit::damageMagic(double amount) {
-    damage(amount * resist_);
+void Unit::applyDamageMagic(double amount) {
+    applyDamage(amount * stats_.getResist());
 }
 
-void Unit::regenMana(int amount) {
-    manaPoints_ += amount;
-    manaPoints_ = std::min(manaPoints_, static_cast<double>(maxMP_));
+void Unit::regenMana(double amount) {
+    stats_.changeMP(amount);
 }
 
-bool Unit::canSpendMana(int amount) {
-    return amount >= manaPoints_;
+bool Unit::canSpendMana(double amount) const {
+    return amount >= stats_.getManaPoints();
 }
 
-void Unit::spendMana(int amount) {
-    assert(amount >= manaPoints_ && "Not enough mana points to spend!");
-
-    manaPoints_ -= amount;
+void Unit::spendMana(double amount) {
+    assert(canSpendMana(amount) && "Not enough mana points to spend!");
+    stats_.changeMP(-amount);
 }
 
-void Unit::changeArmor(int delta) { armor_ += delta; }
-
-void Unit::changeResist(int delta) { resist_ += delta; }
-
+void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
+void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
 
-bool Unit::isDead() { return healthPoints_ <= 0; }
+bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 
 
 // setters and getters
 
-int Unit::getDamage() const { return damage_; }
+int32_t Unit::getDamage() const { return stats_.getDamage(); }
+void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
 
-void Unit::setDamage(int damage) { damage_ = damage; } // forbid negative damage?
+uint32_t Unit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(uint32_t attackRange) { stats_.setAttackRange(attackRange); }
 
-int Unit::getAttackRange() const { return attackRange_; }
+uint32_t Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
+void Unit::setMoveSpeed(uint32_t moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
 
-void Unit::setAttackRange(int attackRange) {
-    assert(attackRange >= 0 && "Wrong new attack range!");
-    attackRange_ = attackRange;
-}
+uint32_t Unit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
+void Unit::setAttackSpeed(uint32_t attackSpeed) { stats_.setAttackSpeed(attackSpeed); }
 
-int Unit::getMoveSpeed() const { return moveSpeed_; }
+uint32_t Unit::getMaxHp() const { return stats_.getMaxHp(); }
+void Unit::setMaxHp(uint32_t maxHp) { stats_.setMaxHp(maxHp); }
 
-void Unit::setMoveSpeed(int moveSpeed) {
-    assert(moveSpeed >= 0 && "Wrong new move speed!");
-    moveSpeed_ = moveSpeed;
-}
+uint32_t Unit::getMaxMp() const { return stats_.getMaxMp(); }
+void Unit::setMaxMp(uint32_t maxMp) { stats_.setMaxMp(maxMp); }
 
-int Unit::getAttackSpeed() const { return attackSpeed_; }
+double Unit::getHealthPoints() const { return stats_.getHealthPoints(); }
+void Unit::setHealthPoints(double healthPoints) { stats_.setHealthPoints(healthPoints); }
 
-void Unit::setAttackSpeed(int attackSpeed) {
-    assert(attackSpeed >= 0 && "Wrong new attack speed!");
-    attackSpeed_ = attackSpeed;
-}
+double Unit::getManaPoints() const { return stats_.getManaPoints(); }
+void Unit::setManaPoints(double manaPoints) { stats_.setManaPoints(manaPoints); }
 
-int Unit::getMaxHp() const { return maxHP_; }
+double Unit::getHpRegen() const { return stats_.getHpRegen(); }
+void Unit::setHpRegen(double hpRegen) { stats_.setHpRegen(hpRegen); }
 
-void Unit::setMaxHp(int maxHp) {
-    assert(maxHp >= 0 && "Wrong new max HP!");
-    maxHP_ = maxHp;
-}
+double Unit::getMpRegen() const { return stats_.getMpRegen(); }
+void Unit::setMpRegen(double mpRegen) { stats_.setMpRegen(mpRegen); }
 
-int Unit::getMaxMp() const { return maxMP_; }
+int32_t Unit::getArmor() const { return stats_.getArmor(); }
+void Unit::setArmor(int32_t armor) { stats_.setArmor(armor); }
 
-void Unit::setMaxMp(int maxMp) {
-    assert(maxMp >= 0 && "Wrong new max MP!");
-    maxMP_ = maxMp;
-}
-
-double Unit::getHealthPoints() const { return healthPoints_; }
-
-void Unit::setHealthPoints(double healthPoints) {
-    assert(healthPoints >= 0 && healthPoints <= maxHP_ && "Wrong new health points!");
-    healthPoints_ = healthPoints;
-}
-
-double Unit::getManaPoints() const { return manaPoints_; }
-
-void Unit::setManaPoints(double manaPoints) {
-    assert(manaPoints >= 0 && manaPoints <= maxHP_ && "Wrong new mana points!");
-    manaPoints_ = manaPoints;
-}
-
-double Unit::getHpRegen() const { return hpRegen_; }
-
-void Unit::setHpRegen(double hpRegen) { hpRegen_ = hpRegen; }
-
-double Unit::getMpRegen() const { return mpRegen_; }
-
-void Unit::setMpRegen(double mpRegen) { mpRegen_ = mpRegen; }
-
-int Unit::getArmor() const { return armor_; }
-
-void Unit::setArmor(int armor) { armor_ = armor; }
-
-double Unit::getResist() const { return resist_; }
-
-void Unit::setResist(double resist) {
-    assert(resist >= 0 && resist <= 1 && "Wrong new resist!");
-    resist_ = resist;
-}
+double Unit::getResist() const { return stats_.getResist(); }
+void Unit::setResist(double resist) { stats_.setResist(resist); }
 
 const Point &Unit::getPosition() const { return position_; }
-
 void Unit::setPosition(const Point &position) { position_ = position; }
-
 void Unit::setPosition(double x, double y) { position_ = Point(x, y); }

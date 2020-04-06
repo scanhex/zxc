@@ -3,69 +3,55 @@
 #include <vector>
 #include <cassert>
 
+#include "Stats.h"
 #include "Point.h"
 #include "Item.h"
 #include "Buff.h"
 
-constexpr int MAX_ITEMS = 6;
+constexpr size_t MAX_ITEMS = 6;
 
 class Unit {
 private:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
 
-    int damage_;
-    int attackRange_;
-
-    int moveSpeed_;
-    int attackSpeed_;
-
-    int maxHP_;
-    int maxMP_;
-    double healthPoints_;
-    double manaPoints_;
-    double hpRegen_;
-    double mpRegen_;
-
-    int armor_; // adjust formula(see damagePhys)?
-    double resist_; // percent
+    Stats stats_;
 
     Point position_; // ??
 
 public:
-    Unit() = delete;
+    Unit(Stats stats, Point position);
 
-    Unit(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP, int maxMP, double hpRegen,
-         double mpRegen, int armor, double resist, Point position);
+    void addItem(Item &item, size_t slot = -1);
 
-    void addItem(Item &item, int slot = -1);
-
-    void deleteItem(int indexToDelete); // 0..MAX_ITEMS-1 in inventory
+    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory
     void clearItems();
 
     void addBuff(Buff &buff);
 
-    void deleteBuff(int indexToDelete); // deletes 1 buff matching buff.index
+    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index
     void clearBuffs();
 
-    void changeDamage(int delta);
-    void changeAttackRange(int delta);
-    void changeMoveSpeed(int delta);
-    void changeAttackSpeed(int delta);
-    void changeHPRegen(int delta);
-    void changeMPRegen(int delta);
+    void changeDamage(int32_t delta);
+    void changeAttackRange(int32_t delta);
+    void changeMoveSpeed(int32_t delta);
+    void changeAttackSpeed(int32_t delta);
+    void changeMaxHP(int32_t delta);
+    void changeMaxMP(int32_t delta);
+    void changeHPRegen(double delta);
+    void changeMPRegen(double delta);
 
-    void heal(double amount);
-    void damage(double amount);
-    void damagePhys(double amount);
-    void damageMagic(double amount);
+    void applyHeal(double amount);
+    void applyDamage(double amount);
+    void applyDamagePhys(double amount);
+    void applyDamageMagic(double amount);
 
-    void regenMana(int amount);
-    void spendMana(int amount);
-    bool canSpendMana(int amount);
+    void regenMana(double amount);
+    void spendMana(double amount);
+    [[nodiscard]] bool canSpendMana(double amount) const;
 
-    void changeArmor(int delta);
-    void changeResist(int delta);
+    void changeArmor(int32_t delta);
+    void changeResist(double delta);
     void changePosition(double deltaX, double deltaY); // coords += deltaCoords
 
     bool isDead();
@@ -73,23 +59,23 @@ public:
 
     // getters and setters
 
-    [[nodiscard]] int getDamage() const;
-    void setDamage(int damage);
+    [[nodiscard]] int32_t getDamage() const;
+    void setDamage(int32_t damage);
 
-    [[nodiscard]] int getAttackRange() const;
-    void setAttackRange(int attackRange);
+    [[nodiscard]] uint32_t getAttackRange() const;
+    void setAttackRange(uint32_t attackRange);
 
-    [[nodiscard]] int getMoveSpeed() const;
-    void setMoveSpeed(int moveSpeed);
+    [[nodiscard]] uint32_t getMoveSpeed() const;
+    void setMoveSpeed(uint32_t moveSpeed);
 
-    [[nodiscard]] int getAttackSpeed() const;
-    void setAttackSpeed(int attackSpeed);
+    [[nodiscard]] uint32_t getAttackSpeed() const;
+    void setAttackSpeed(uint32_t attackSpeed);
 
-    [[nodiscard]] int getMaxHp() const;
-    void setMaxHp(int maxHp);
+    [[nodiscard]] uint32_t getMaxHp() const;
+    void setMaxHp(uint32_t maxHp);
 
-    [[nodiscard]] int getMaxMp() const;
-    void setMaxMp(int maxMp);
+    [[nodiscard]] uint32_t getMaxMp() const;
+    void setMaxMp(uint32_t maxMp);
 
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
@@ -103,8 +89,8 @@ public:
     [[nodiscard]] double getMpRegen() const;
     void setMpRegen(double mpRegen);
 
-    [[nodiscard]] int getArmor() const;
-    void setArmor(int armor);
+    [[nodiscard]] int32_t getArmor() const;
+    void setArmor(int32_t armor);
 
     [[nodiscard]] double getResist() const;
     void setResist(double resist);
