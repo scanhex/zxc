@@ -1,53 +1,52 @@
 #include "Hero.h"
 #include <algorithm>
 
-Hero::Hero(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-           int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position) :
-        Unit(damage, attackRange, moveSpeed, attackSpeed, maxHP, maxMP, hpRegen, mpRegen, armor, resist, position),
-        gold_{START_GOLD}, level_{1}, experience_{0} {}
+Hero::Hero(Stats stats, Point position) : Unit(stats, position),
+                                          gold_{START_GOLD},
+                                          level_{1},
+                                          experience_{0} {}
 
-void Hero::changeGold(int delta) { gold_ += delta; }
+bool Hero::canSpendGold(uint32_t amount) {
+    return gold_ >= amount;
+}
 
-void Hero::changeLevel(int delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
+void Hero::addGold(uint32_t amount) {
+    gold_ += amount;
+}
 
-void Hero::incrLevel() { changeLevel(1); }
+void Hero::spendGold(uint32_t amount) {
+    assert(canSpendGold(amount) && "Not enough gold to spend!");
+    gold_ -= amount;
+}
 
-void Hero::changeExperience(int delta) {
+void Hero::levelUp(uint32_t delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
+
+void Hero::incrementLevel() { levelUp(1); }
+
+void Hero::changeExperience(uint32_t delta) {
     experience_ += delta;
     if (level_ == MAX_LEVEL) {
         experience_ = std::min(experience_, EXP_PER_LEVEL);
     } else if (experience_ >= EXP_PER_LEVEL) {
         experience_ -= EXP_PER_LEVEL;
-        incrLevel();
+        incrementLevel();
     }
 }
 
-int Hero::getGold() const {
-    return gold_;
-}
 
-void Hero::setGold(int gold) {
-    assert(gold >= 0 && "Wrong new gold!");
+// setters and getters
 
-    gold_ = gold;
-}
+uint32_t Hero::getGold() const { return gold_; }
+void Hero::setGold(uint32_t gold) { gold_ = gold; }
 
-int Hero::getLevel() const {
-    return level_;
-}
-
-void Hero::setLevel(int level) {
+uint32_t Hero::getLevel() const { return level_; }
+void Hero::setLevel(uint32_t level) {
     assert(level >= 1 && level <= MAX_LEVEL && "Wrong new level!");
-
     level_ = level;
 }
 
-int Hero::getExperience() const {
-    return experience_;
-}
-
-void Hero::setExperience(int experience) {
-    assert(experience >= 0 && experience <= EXP_PER_LEVEL && "Wrong new experience!");
-
+uint32_t Hero::getExperience() const { return experience_; }
+void Hero::setExperience(uint32_t experience) {
+    assert(experience < EXP_PER_LEVEL && "Wrong new experience!");
     experience_ = experience;
 }

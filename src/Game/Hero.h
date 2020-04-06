@@ -4,41 +4,39 @@
 #include "Unit.h"
 #include "Skill.h"
 
-constexpr int START_GOLD = 239;
-constexpr int MAX_LEVEL = 25;
-constexpr int EXP_PER_LEVEL = 1000;
+constexpr uint32_t START_GOLD = 239;
+constexpr uint32_t MAX_LEVEL = 25;
+constexpr uint32_t EXP_PER_LEVEL = 1000;
 
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
     std::vector<Skill> skills_;
 
-    int gold_;
-    int level_;
-    int experience_;
+    uint32_t gold_;
+    uint32_t level_;
+    uint32_t experience_;
 
 public:
+    Hero(Stats stats, Point position);
 
-    Hero() = delete;
+    bool canSpendGold(uint32_t amount);
+    void addGold(uint32_t amount);
+    void spendGold(uint32_t amount);
 
-    Hero(int damage, int attackRange, int moveSpeed, int attackSpeed, int maxHP,
-         int maxMP, int hpRegen, int mpRegen, int armor, double resist, Point position);
-
-    void changeGold(int delta);
-
-    void changeLevel(int delta);
-    void incrLevel();
-    void changeExperience(int delta);
+    void levelUp(uint32_t delta);
+    void incrementLevel();
+    void changeExperience(uint32_t delta);
 
 
     // getters and setters
 
-    [[nodiscard]] int getGold() const;
-    void setGold(int gold);
+    [[nodiscard]] uint32_t getGold() const;
+    void setGold(uint32_t gold);
 
-    [[nodiscard]] int getLevel() const;
-    void setLevel(int level);
+    [[nodiscard]] uint32_t getLevel() const;
+    void setLevel(uint32_t level);
 
-    [[nodiscard]] int getExperience() const;
-    void setExperience(int experience);
+    [[nodiscard]] uint32_t getExperience() const;
+    void setExperience(uint32_t experience);
 };
