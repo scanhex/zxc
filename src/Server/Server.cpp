@@ -113,11 +113,21 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 }
 
 void ConnectionToClient::updateGSbyPlayer() {
-    double dmg = readDouble(0);
-    if (player_id_ == 0)
-        gameState.applyDamage(dmg, Player::Second);
-    else
-        gameState.applyDamage(dmg, Player::First);
+    unsigned char action_idx = readUChar(0);
+    Player player = player_id_ == 0 ? Player::First : Player::Second;
+    switch (action_idx) {
+        case 1:
+            gameState.applySkill(player, SkillNum::First);
+            break;
+        case 2:
+            gameState.applySkill(player, SkillNum::Second);
+            break;
+        case 3:
+            gameState.applySkill(player, SkillNum::Third);
+            break;
+        default:
+            assert(false); //wrong action
+    }
 }
 
 void ConnectionToClient::writeGStoBuffer() {
@@ -128,6 +138,10 @@ void ConnectionToClient::writeGStoBuffer() {
         writeDouble(gameState.getHealthPoints(Player::Second), 0);
         writeDouble(gameState.getHealthPoints(Player::First), 8);
     }
+}
+
+void ConnectionToClient::writeUChar(unsigned char d, int start_idx) {
+    write_buffer_[start_idx] = d;
 }
 
 void ConnectionToClient::writeDouble(double d, int start_idx) {
@@ -146,6 +160,10 @@ void ConnectionToClient::writeInt64(int64_t d, int start_idx) {
         write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
 }
 
+
+unsigned char ConnectionToClient::readUChar(int start_idx) {
+    return read_buffer_[start_idx];
+}
 
 double ConnectionToClient::readDouble(int start_idx) {
     binaryDouble u;
