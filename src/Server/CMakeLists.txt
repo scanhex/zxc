@@ -17,12 +17,11 @@ if(Boost_FOUND)
     message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
     message(STATUS "Boost_VERSION: ${Boost_VERSION}")
-
     include_directories(${Boost_INCLUDE_DIRS})
-
 endif()
 
 add_executable(Server main.cpp Server.cpp Server.h
+        ../Utils/BufferIO.cpp ../Utils/BufferIO.h
         ../Game/Hero.cpp ../Game/Hero.h
         ../Game/Skill.cpp ../Game/Skill.h
         ../Game/Item.cpp ../Game/Item.h

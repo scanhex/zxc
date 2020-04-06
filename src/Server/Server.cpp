@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "../Utils/BufferIO.h"
 #include "../Game/GameStateServer.h"
 
 //global Game State
@@ -6,7 +7,7 @@ GameStateServer gameState(1.0 * TICK_TIME_GS_UPDATE / 1000);
 bool running = false;
 boost::posix_time::ptime last_tick, now;
 
-int ConnectionToClient::running_connections_ = 0;
+int32_t ConnectionToClient::running_connections_ = 0;
 
 io_service service;
 ip::tcp::acceptor acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), 8001));
@@ -113,7 +114,7 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 }
 
 void ConnectionToClient::updateGSbyPlayer() {
-    unsigned char action_idx = readUChar(0);
+    uint8_t action_idx = BufferIO::readUInt8(0, read_buffer_);
     Player player = player_id_ == 0 ? Player::First : Player::Second;
     switch (action_idx) {
         case 1:
@@ -132,57 +133,12 @@ void ConnectionToClient::updateGSbyPlayer() {
 
 void ConnectionToClient::writeGStoBuffer() {
     if (player_id_ == 0) {
-        writeDouble(gameState.getHealthPoints(Player::First), 0);
-        writeDouble(gameState.getHealthPoints(Player::Second), 8);
+        BufferIO::writeDouble(gameState.getHealthPoints(Player::First), 0, write_buffer_);
+        BufferIO::writeDouble(gameState.getHealthPoints(Player::Second), 8, write_buffer_);
     } else {
-        writeDouble(gameState.getHealthPoints(Player::Second), 0);
-        writeDouble(gameState.getHealthPoints(Player::First), 8);
+        BufferIO::writeDouble(gameState.getHealthPoints(Player::Second), 0, write_buffer_);
+        BufferIO::writeDouble(gameState.getHealthPoints(Player::First), 8, write_buffer_);
     }
-}
-
-void ConnectionToClient::writeUChar(unsigned char d, int start_idx) {
-    write_buffer_[start_idx] = d;
-}
-
-void ConnectionToClient::writeDouble(double d, int start_idx) {
-    binaryDouble u;
-    u.dValue = d;
-    writeInt64(u.iValue, start_idx);
-}
-
-void ConnectionToClient::writeInt32(int32_t d, int start_idx) {
-    for (int i = 0; i < 4; i++)
-        write_buffer_[start_idx + 3 - i] = (d >> (i * 8));
-}
-
-void ConnectionToClient::writeInt64(int64_t d, int start_idx) {
-    for (int i = 0; i < 8; i++)
-        write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
-}
-
-
-unsigned char ConnectionToClient::readUChar(int start_idx) {
-    return read_buffer_[start_idx];
-}
-
-double ConnectionToClient::readDouble(int start_idx) {
-    binaryDouble u;
-    u.iValue = readInt64(start_idx);
-    return u.dValue;
-}
-
-int32_t ConnectionToClient::readInt32(int start_idx) {
-    int32_t result = 0;
-    for (int i = 0; i < 4; i++)
-        result = (result << 8) + read_buffer_[start_idx + i];
-    return result;
-}
-
-int64_t ConnectionToClient::readInt64(int start_idx) {
-    int64_t result = 0;
-    for (int i = 0; i < 8; i++)
-        result = (result << 8) + read_buffer_[start_idx + i];
-    return result;
 }
 
 
