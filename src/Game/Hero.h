@@ -4,6 +4,8 @@
 #include "Unit.h"
 #include "Skill.h"
 
+
+constexpr uint32_t SKILLS_COUNT = 3;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
@@ -11,7 +13,7 @@ constexpr uint32_t EXP_PER_LEVEL = 1000;
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
-    std::vector<Skill> skills_;
+    Skill skills_[SKILLS_COUNT];
 
     uint32_t gold_;
     uint32_t level_;

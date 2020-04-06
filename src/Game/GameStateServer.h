@@ -2,12 +2,22 @@
 
 #include "GameState.h"
 
+enum class SkillNum {
+    First,  // Z
+    Second, // X
+    Third   // C
+};
+
+
 class GameStateServer : public GameState {
 public:
     GameStateServer() = delete;
     explicit GameStateServer(double gameTick);
 
     void update();
+
+    void applySkill(Player player, SkillNum skillNum);
+    void applyMove(Player player, int32_t x, int32_t y);
 
     void applyDamage(double amount, Player player);
     void applyDamagePhys(double amount, Player player);
