@@ -39,6 +39,7 @@
 #include <cassert>
 
 #include "Drawables.h"
+#include "Game/StatsBuilder.h"
 
 using namespace Magnum;
 
@@ -285,7 +286,18 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 {
 	setSwapInterval(1);
 	initScene();
-    addUnit(Unit(100, 100, 350, 100, 1000, 300, 2, 1, 3, 0.25, Point(100, 100)));
+	StatsBuilder heroStatsBuilder = StatsBuilder().
+		setDamage(100).
+		setAttackRange(100).
+		setMoveSpeed(350).
+		setAttackSpeed(100).
+		setMaxHp(1000).
+		setMaxMp(300).
+		setHpRegen(2).
+		setMpRegen(1).
+		setArmor(3).
+		setResist(0.25);
+//	addUnit(new Hero(heroStatsBuilder.create(), Point(0, 0)));
 
 	loadModels();
 	/*
