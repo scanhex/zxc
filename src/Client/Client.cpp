@@ -1,5 +1,6 @@
 #include "Client.h"
 #include "../Game/GameState.h"
+#include "../Utils/BufferIO.h"
 #include <utility>
 
 io_service service;
@@ -9,7 +10,7 @@ ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
 GameState gameState;
 
 //temporary counter for cout
-int cnt = 0;
+int32_t cnt = 0;
 
 ConnectionToServer::ConnectionToServer(std::string username) : sock_(service),
                                                                username_(std::move(username)),
@@ -51,7 +52,7 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    int millis = rand() % 1000; //waiting for some action from player
+    int32_t millis = rand() % 1000; //waiting for some action from player
     timer_.expires_from_now(boost::posix_time::millisec(millis));
 
     timer_.async_wait(BIND_FN(writeToSocket));
@@ -102,60 +103,15 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
 }
 
 void ConnectionToServer::parseGSFromBuffer() {
-    double hp = readDouble(0);
+    double hp = BufferIO::readDouble(0,read_buffer_);
     gameState.setHealthPoints(hp, Player::First);
-    hp = readDouble(8);
+    hp = BufferIO::readDouble(8,read_buffer_);
     gameState.setHealthPoints(hp, Player::Second);
 }
 
 void ConnectionToServer::writeActionToBuffer() {
-    unsigned char action = 1 + rand() % 3;//use random skill
-    writeUChar(action, 0);
-}
-
-void ConnectionToServer::writeUChar(unsigned char d, int start_idx) {
-    write_buffer_[start_idx] = d;
-}
-
-void ConnectionToServer::writeDouble(double d, int start_idx) {
-    binaryDouble u;
-    u.dValue = d;
-    writeInt64(u.iValue, start_idx);
-}
-
-void ConnectionToServer::writeInt32(int32_t d, int start_idx) {
-    for (int i = 0; i < 4; i++)
-        write_buffer_[start_idx + 3 - i] = (d >> (i * 8));
-}
-
-void ConnectionToServer::writeInt64(int64_t d, int start_idx) {
-    for (int i = 0; i < 8; i++)
-        write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
-}
-
-
-unsigned char ConnectionToServer::readUChar(int start_idx) {
-    return read_buffer_[start_idx];
-}
-
-double ConnectionToServer::readDouble(int start_idx) {
-    binaryDouble u;
-    u.iValue = readInt64(start_idx);
-    return u.dValue;
-}
-
-int32_t ConnectionToServer::readInt32(int start_idx) {
-    int32_t result = 0;
-    for (int i = 0; i < 4; i++)
-        result = (result << 8) + read_buffer_[start_idx + i];
-    return result;
-}
-
-int64_t ConnectionToServer::readInt64(int start_idx) {
-    int64_t result = 0;
-    for (int i = 0; i < 8; i++)
-        result = (result << 8) + read_buffer_[start_idx + i];
-    return result;
+    uint8_t action = 1 + rand() % 3;//use random skill
+    BufferIO::writeUInt8(action, 0,write_buffer_);
 }
 
 void runClient() {

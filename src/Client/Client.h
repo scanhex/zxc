@@ -57,34 +57,9 @@ private:
     void writeActionToBuffer();
 
 private:
-    /*
-     *  Functions to parse args to bytes and back
-     */
-    void writeUChar(unsigned char d, int start_idx);
-
-    void writeDouble(double d, int start_idx);
-
-    void writeInt32(int32_t d, int start_idx);
-
-    void writeInt64(int64_t d, int start_idx);
-
-    unsigned char readUChar(int start_idx);
-
-    double readDouble(int start_idx);
-
-    int32_t readInt32(int start_idx);
-
-    int64_t readInt64(int start_idx);
-
-    union binaryDouble {
-        double dValue;
-        uint64_t iValue;
-    };
-
-private:
     ip::tcp::socket sock_;
-    unsigned char read_buffer_[MAX_MSG];
-    unsigned char write_buffer_[MAX_MSG];
+    uint8_t read_buffer_[MAX_MSG];
+    uint8_t write_buffer_[MAX_MSG];
     bool connected_;
     std::string username_;
     deadline_timer timer_;

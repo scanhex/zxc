@@ -24,6 +24,7 @@ endif()
 
 
 add_executable(Client main.cpp Client.cpp Client.h
+        ../Utils/BufferIO.cpp ../Utils/BufferIO.h
         ../Game/Hero.cpp ../Game/Hero.h
         ../Game/Skill.cpp ../Game/Skill.h
         ../Game/Item.cpp ../Game/Item.h
