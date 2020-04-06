@@ -287,7 +287,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	initScene();
     addUnit(Unit(100, 100, 350, 100, 1000, 300, 2, 1, 3, 0.25, Point(100, 100)));
 
-//	loadModels();
+	loadModels();
 	/*
 	Utility::Arguments args;
 	args.addArgument("file").setHelp("file", "file to load")
@@ -360,8 +360,7 @@ Vector3 ZxcApplication::intersectWithPlane(const Vector2i& windowPosition, const
     const Vector4 ray_clip{ray_nds.x(), ray_nds.y(), -1, 1};
     Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
     ray_eye.z() = -1, ray_eye.w() = 0;
-    Matrix4 viewMatrix = Matrix4::translation(_cameraObject.absoluteTransformation().translation());
-    Vector3 ray_world = (viewMatrix.inverted() * ray_eye).xyz().normalized();
+    Vector3 ray_world = (_camera->cameraMatrix().inverted() * ray_eye).xyz().normalized();
     const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
     return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
 }
@@ -411,7 +410,7 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 
 	if (_previousPosition.length() < 0.001f || axis.length() < 0.001f) return;
 
-	_manipulator.rotate(Math::angle(_previousPosition, currentPosition), axis.normalized());
+	_cameraObject.rotate(Math::angle(_previousPosition, currentPosition), axis.normalized());
 	_previousPosition = currentPosition;
 
 	redraw();

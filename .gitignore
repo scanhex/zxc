@@ -1,3 +1,10 @@
 build*/
 *.kdev4
 *~
+/cmake-build-debug
+/.idea
+/SDL2-2.0.10
+/SDL2-MSVC
+/resources/nevermore/materials
+/assimp-vc142-mt.dll
+/.gitattributes
