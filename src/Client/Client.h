@@ -8,7 +8,7 @@
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 16;
-static constexpr int MSG_FROM_CLIENT_SIZE = 8;
+static constexpr int MSG_FROM_CLIENT_SIZE = 1;//TODO change when add move
 
 using namespace boost::asio;
 
@@ -60,13 +60,22 @@ private:
     /*
      *  Functions to parse args to bytes and back
      */
-    void writeDouble(double d,int start_idx);
-    void writeInt32(int32_t d,int start_idx);
-    void writeInt64(int64_t d,int start_idx);
+    void writeUChar(unsigned char d, int start_idx);
+
+    void writeDouble(double d, int start_idx);
+
+    void writeInt32(int32_t d, int start_idx);
+
+    void writeInt64(int64_t d, int start_idx);
+
+    unsigned char readUChar(int start_idx);
 
     double readDouble(int start_idx);
+
     int32_t readInt32(int start_idx);
+
     int64_t readInt64(int start_idx);
+
     union binaryDouble {
         double dValue;
         uint64_t iValue;

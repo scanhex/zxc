@@ -72,6 +72,9 @@ void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &e
     cnt = (cnt + 1) % 50;
     if (gameState.gameIsFinished()) {
 
+        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
+                  << gameState.getHealthPoints(Player::Second) << std::endl;
+
         if (gameState.getHealthPoints(Player::First) == 0)
             std::cout << username_ << ": I lost :(" << std::endl; //just some game result handling
         else
@@ -106,9 +109,12 @@ void ConnectionToServer::parseGSFromBuffer() {
 }
 
 void ConnectionToServer::writeActionToBuffer() {
-    double dmg = 100;
-  //  std::cout << " damaged " << dmg << std::endl;
-    writeDouble(dmg, 0);
+    unsigned char action = 1 + rand() % 3;//use random skill
+    writeUChar(action, 0);
+}
+
+void ConnectionToServer::writeUChar(unsigned char d, int start_idx) {
+    write_buffer_[start_idx] = d;
 }
 
 void ConnectionToServer::writeDouble(double d, int start_idx) {
@@ -127,6 +133,10 @@ void ConnectionToServer::writeInt64(int64_t d, int start_idx) {
         write_buffer_[start_idx + 7 - i] = (d >> (i * 8));
 }
 
+
+unsigned char ConnectionToServer::readUChar(int start_idx) {
+    return read_buffer_[start_idx];
+}
 
 double ConnectionToServer::readDouble(int start_idx) {
     binaryDouble u;
