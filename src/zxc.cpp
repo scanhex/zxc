@@ -297,7 +297,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 		setMpRegen(1).
 		setArmor(3).
 		setResist(0.25);
-//	addUnit(new Hero(heroStatsBuilder.create(), Point(0, 0)));
+    addUnit(static_cast<Unit&&>(Hero(heroStatsBuilder.create(), Point(0, 0))));
 
 	loadModels();
 	/*
