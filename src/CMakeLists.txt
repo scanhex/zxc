@@ -31,6 +31,11 @@ file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "*.cpp" "*.h")
 
 add_executable(zxc ${zxc_cpps})
 
+add_dependencies(zxc
+		MagnumPlugins::AssimpImporter
+		Magnum::AnyImageImporter
+		Magnum::AnySceneImporter) # AnyScene is useless now btw but i will leave it here anyway
+
 target_link_libraries(zxc PRIVATE
     ${Boost_LIBRARIES}
     Magnum::Application
