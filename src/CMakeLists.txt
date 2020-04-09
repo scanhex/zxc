@@ -31,6 +31,11 @@ file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "*.cpp" "*.h")
 
 add_executable(zxc ${zxc_cpps})
 
+add_dependencies(zxc
+		MagnumPlugins::AssimpImporter
+		Magnum::AnyImageImporter
+		Magnum::AnySceneImporter) # AnyScene is useless now btw but i will leave it here anyway
+
 target_link_libraries(zxc PRIVATE
     ${Boost_LIBRARIES}
     Magnum::Application
@@ -40,11 +45,11 @@ target_link_libraries(zxc PRIVATE
     Magnum::SceneGraph
     Magnum::Shaders
     Magnum::Trade
-    Magnum::AnySceneImporter
-    Magnum::ObjImporter
-    Magnum::TgaImporter
+    #Magnum::AnySceneImporter
+    #Magnum::ObjImporter
+    #Magnum::TgaImporter
     Magnum::Primitives
-    MagnumPlugins::AssimpImporter
+    #MagnumPlugins::AssimpImporter
         )
 
 # Make the executable a default target to build & run in Visual Studio
