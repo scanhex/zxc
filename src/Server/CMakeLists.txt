@@ -10,7 +10,7 @@ set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 
 
-find_package(Boost 1.65.0 COMPONENTS system thread REQUIRED)
+find_package(Boost COMPONENTS system thread REQUIRED)
 
 if(Boost_FOUND)
     message(STATUS "Boost found")
