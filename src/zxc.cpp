@@ -30,7 +30,7 @@
 #include <Magnum/Trade/PhongMaterialData.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/Trade/TextureData.h>
-#include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
+//#include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
