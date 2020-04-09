@@ -40,11 +40,12 @@ target_link_libraries(zxc PRIVATE
     Magnum::SceneGraph
     Magnum::Shaders
     Magnum::Trade
-    Magnum::AnySceneImporter
-    Magnum::ObjImporter
-    Magnum::TgaImporter
+    #Magnum::AnySceneImporter
+    #Magnum::ObjImporter
+    #Magnum::AnyImageImporter
+    #Magnum::TgaImporter
     Magnum::Primitives
-    MagnumPlugins::AssimpImporter
+    #MagnumPlugins::AssimpImporter
         )
 
 # Make the executable a default target to build & run in Visual Studio
