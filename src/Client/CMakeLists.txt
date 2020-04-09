@@ -10,16 +10,14 @@ set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 
 
-find_package(Boost 1.65.0 COMPONENTS system REQUIRED)
+find_package(Boost COMPONENTS system REQUIRED)
 
 if(Boost_FOUND)
     message(STATUS "Boost found")
     message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
     message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
     message(STATUS "Boost_VERSION: ${Boost_VERSION}")
-
     include_directories(${Boost_INCLUDE_DIRS})
-
 endif()
 
 
