@@ -32,6 +32,7 @@ file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "*.cpp" "*.h")
 add_executable(zxc ${zxc_cpps})
 
 target_link_libraries(zxc PRIVATE
+    ${Boost_LIBRARIES}
     Magnum::Application
     Magnum::GL
     Magnum::Magnum
@@ -41,8 +42,8 @@ target_link_libraries(zxc PRIVATE
     Magnum::Trade
     Magnum::AnySceneImporter
     Magnum::ObjImporter
-	Magnum::TgaImporter
-	Magnum::Primitives
+    Magnum::TgaImporter
+    Magnum::Primitives
     MagnumPlugins::AssimpImporter
         )
 
