@@ -5,32 +5,17 @@ find_package(Magnum REQUIRED
         Trade
         AnySceneImporter
         ObjImporter
-		TgaImporter
+    TgaImporter
         Primitives
         MeshTools)
 find_package(Assimp)
 find_package(MagnumPlugins REQUIRED AssimpImporter)
 
-set(Boost_USE_STATIC_LIBS        ON)
-set(Boost_USE_MULTITHREADED      ON)
-
-find_package(Boost 1.65.0 COMPONENTS system thread REQUIRED)
-
-if(Boost_FOUND)
-	message(STATUS "Boost found")
-	message(STATUS "Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
-	message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-	message(STATUS "Boost_VERSION: ${Boost_VERSION}")
-	include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
+#add_subdirectory(Game)
 
-file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "*.cpp" "*.h")
-
-add_executable(zxc ${zxc_cpps})
-
+add_executable(zxc zxc.cpp Drawables.cpp Game/Buff.cpp Game/Hero.cpp Game/Item.cpp Game/Point.cpp Game/Skill.cpp Game/Unit.cpp Game/Stats.cpp)
 target_link_libraries(zxc PRIVATE
     Magnum::Application
     Magnum::GL
@@ -41,8 +26,8 @@ target_link_libraries(zxc PRIVATE
     Magnum::Trade
     Magnum::AnySceneImporter
     Magnum::ObjImporter
-	Magnum::TgaImporter
-	Magnum::Primitives
+  Magnum::TgaImporter
+  Magnum::Primitives
     MagnumPlugins::AssimpImporter
         )
 
