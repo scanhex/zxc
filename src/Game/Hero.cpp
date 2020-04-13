@@ -1,10 +1,15 @@
 #include "Hero.h"
 #include <algorithm>
 
-Hero::Hero(Stats stats, Point position) : Unit(stats, position),
-                                          gold_{START_GOLD},
-                                          level_{1},
-                                          experience_{0} {}
+Hero::Hero(Stats stats, Point position, Player player) : Unit(stats, position),
+                                                         player_{player},
+                                                         gold_{START_GOLD},
+                                                         level_{1},
+                                                         experience_{0} {
+    skills_.emplace_back(player_, SkillNum::first);
+    skills_.emplace_back(player_, SkillNum::second);
+    skills_.emplace_back(player_, SkillNum::third);
+}
 
 bool Hero::canSpendGold(uint32_t amount) {
     return gold_ >= amount;
@@ -30,6 +35,22 @@ void Hero::changeExperience(uint32_t delta) {
     } else if (experience_ >= EXP_PER_LEVEL) {
         experience_ -= EXP_PER_LEVEL;
         incrementLevel();
+    }
+}
+
+void Hero::useSkill(SkillNum skillNum, GameState &gameState) {
+    switch (skillNum){
+        case SkillNum::first:
+            skills_[0].handleEvent(gameState);
+            break;
+        case SkillNum::second:
+            skills_[1].handleEvent(gameState);
+            break;
+        case SkillNum::third:
+            skills_[2].handleEvent(gameState);
+            break;
+        default:
+            assert(false);
     }
 }
 

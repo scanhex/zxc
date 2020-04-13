@@ -1,5 +1,18 @@
 #pragma once
 
-class Skill {
+#include "Event.h"
 
+enum class SkillNum {
+    first,  // Z
+    second, // X
+    third   // C
+};
+
+class Skill : public Event {
+public:
+    Skill(Player player, SkillNum type);
+
+    void handleEvent(GameState &gs) override;
+private:
+    SkillNum type_;
 };
