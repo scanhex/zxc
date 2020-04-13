@@ -11,8 +11,8 @@ enum class SkillNum {
 
 class GameStateServer : public GameState {
 public:
-    GameStateServer() = delete;
-    explicit GameStateServer(double gameTick);
+    GameStateServer(Hero& firstHero_, Hero& secondHero_) = delete;
+    explicit GameStateServer(Hero& firstHero_, Hero& secondHero_, double gameTick);
 
     void update();
 

@@ -53,6 +53,7 @@ public:
 	explicit ZxcApplication(const Arguments& arguments);
 
 private:
+
 	void drawEvent() override;
 	void viewportEvent(ViewportEvent& event) override;
 	void mousePressEvent(MouseEvent& event) override;
@@ -64,8 +65,9 @@ private:
 
     Vector3 positionOnSphere(const Vector2i& position) const;
 
-    void addUnit(Unit &&u);
+    void addUnit(Unit &u);
 	void initScene();
+	void initUnits();
 	void loadModels();
 	Float depthAt(const Vector2i& position) const;
 	Vector3 unproject(const Vector2i& position, Float depth) const;
@@ -278,6 +280,25 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
         addObject(importer, materials, *object, id);
 }
 
+void ZxcApplication::initUnits(){
+    StatsBuilder heroStatsBuilder = StatsBuilder().
+            setDamage(100).
+            setAttackRange(100).
+            setMoveSpeed(350).
+            setAttackSpeed(100).
+            setMaxHp(1000).
+            setMaxMp(300).
+            setHpRegen(2).
+            setMpRegen(1).
+            setArmor(3).
+            setResist(0.25);
+    Hero firstHero = Hero(heroStatsBuilder.create(), Point(0, 0));
+    Hero secondHero = Hero(heroStatsBuilder.create(), Point(0, 0));
+    addUnit(firstHero);
+    addUnit(secondHero);
+
+}
+
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	Platform::Application{ arguments, Configuration{}
 		.setTitle("ZXC")
@@ -286,20 +307,9 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 {
 	setSwapInterval(1);
 	initScene();
-	StatsBuilder heroStatsBuilder = StatsBuilder().
-		setDamage(100).
-		setAttackRange(100).
-		setMoveSpeed(350).
-		setAttackSpeed(100).
-		setMaxHp(1000).
-		setMaxMp(300).
-		setHpRegen(2).
-		setMpRegen(1).
-		setArmor(3).
-		setResist(0.25);
-    addUnit(static_cast<Unit&&>(Hero(heroStatsBuilder.create(), Point(0, 0))));
+	initUnits();
 
-	loadModels();
+	//loadModels();
 	/*
 	Utility::Arguments args;
 	args.addArgument("file").setHelp("file", "file to load")
@@ -311,7 +321,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 
 }
 
-void ZxcApplication::addUnit(Unit&& u) {
+void ZxcApplication::addUnit(Unit& u) {
     _units.push_back(u);
     _unitObjects.push_back(new Object3D(&_manipulator));
     new UnitDrawable(*_unitObjects.back(), _drawables, _units.back());
