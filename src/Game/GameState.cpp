@@ -1,7 +1,8 @@
 #include "GameState.h"
-#include "GameStateServer.h"
 
-GameState::GameState(Hero &firstHero_, Hero &secondHero_) : firstHero{firstHero_}, secondHero{secondHero_} {}
+GameState::GameState(Hero &firstHero_, Hero &secondHero_, double gameTick) : gameTick_{gameTick},
+                                                                             firstHero{firstHero_},
+                                                                             secondHero{secondHero_} {}
 
 double GameState::getHealthPoints(Player player) {
     switch (player) {
@@ -31,12 +32,7 @@ bool GameState::gameIsFinished() {
     return firstHero.isDead() || secondHero.isDead();
 }
 
-
-GameStateServer::GameStateServer(Hero &firstHero_, Hero &secondHero_, double gameTick) : GameState(firstHero_,
-                                                                                                   secondHero_),
-                                                                                         gameTick_{gameTick} {}
-
-void GameStateServer::update() {
+void GameState::update() {
     // only regen for now
     double healPerTick = firstHero.getHpRegen() * gameTick_;
     double manaPerTick = firstHero.getMpRegen() * gameTick_;
@@ -49,40 +45,30 @@ void GameStateServer::update() {
     secondHero.regenMana(manaPerTick);
 }
 
-void GameStateServer::applySkill(Player player, SkillNum skillNum) {
-    // FOR NOW JUST DAMAGES OTHER PLAYER
-    double damage = 0;
-    switch (skillNum) {
-        case SkillNum::First:
-            damage = 10;
-            break;
-        case SkillNum::Second:
-            damage = 20;
-            break;
-        case SkillNum::Third:
-            damage = 30;
-            break;
-        default:
-            assert(false);
-    }
-    switch (player) {
-        case Player::First:
-            secondHero.applyDamage(damage);
-            break;
-        case Player::Second:
-            firstHero.applyDamage(damage);
-            break;
-        default:
-            assert(false);
-    }
-}
-
-void GameStateServer::applyMove(Player player, int32_t x, int32_t y) {
+void GameState::applyMove(Player player, int32_t x, int32_t y) {
     // ----
 }
 
+void GameState::applyEvent(Player player, EventName eventName) {
+    Hero &hero = firstHero;
+    if(player == Player::Second) hero = secondHero;
 
-void GameStateServer::applyDamage(double amount, Player player) {
+    switch (eventName) {
+        case EventName::firstSkill:
+            hero.useSkill(SkillNum::first, *this);
+            break;
+        case EventName::secondSkill:
+            hero.useSkill(SkillNum::second, *this);
+            break;
+        case EventName::thirdSkill:
+            hero.useSkill(SkillNum::third, *this);
+            break;
+        default:
+            assert(false);
+    }
+}
+
+void GameState::applyDamage(double amount, Player player) {
     switch (player) {
         case Player::First:
             firstHero.applyDamage(amount);
@@ -95,7 +81,7 @@ void GameStateServer::applyDamage(double amount, Player player) {
     }
 }
 
-void GameStateServer::applyDamagePhys(double amount, Player player) {
+void GameState::applyDamagePhys(double amount, Player player) {
     switch (player) {
         case Player::First:
             firstHero.applyDamagePhys(amount);
@@ -108,7 +94,7 @@ void GameStateServer::applyDamagePhys(double amount, Player player) {
     }
 }
 
-void GameStateServer::applyDamageMagic(double amount, Player player) {
+void GameState::applyDamageMagic(double amount, Player player) {
     switch (player) {
         case Player::First:
             firstHero.applyDamageMagic(amount);
@@ -121,7 +107,7 @@ void GameStateServer::applyDamageMagic(double amount, Player player) {
     }
 }
 
-void GameStateServer::regenMana(double amount, Player player) {
+void GameState::regenMana(double amount, Player player) {
     switch (player) {
         case Player::First:
             firstHero.regenMana(amount);
@@ -134,7 +120,7 @@ void GameStateServer::regenMana(double amount, Player player) {
     }
 }
 
-void GameStateServer::spendMana(double amount, Player player) {
+void GameState::spendMana(double amount, Player player) {
     switch (player) {
         case Player::First:
             firstHero.spendMana(amount);
@@ -147,7 +133,7 @@ void GameStateServer::spendMana(double amount, Player player) {
     }
 }
 
-bool GameStateServer::canSpendMana(double amount, Player player) const {
+bool GameState::canSpendMana(double amount, Player player) const {
     switch (player) {
         case Player::First:
             return firstHero.canSpendMana(amount);
@@ -158,7 +144,7 @@ bool GameStateServer::canSpendMana(double amount, Player player) const {
     }
 }
 
-bool GameStateServer::isDead(Player player) const {
+bool GameState::isDead(Player player) const {
     switch (player) {
         case Player::First:
             return firstHero.isDead();

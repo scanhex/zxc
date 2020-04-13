@@ -4,8 +4,6 @@
 #include "Unit.h"
 #include "Skill.h"
 
-
-constexpr uint32_t SKILLS_COUNT = 3;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
@@ -13,14 +11,16 @@ constexpr uint32_t EXP_PER_LEVEL = 1000;
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
-    Skill skills_[SKILLS_COUNT];
+    Player player_;
+
+    std::vector<Skill> skills_;
 
     uint32_t gold_;
     uint32_t level_;
     uint32_t experience_;
 
 public:
-    Hero(Stats stats, Point position);
+    Hero(Stats stats, Point position, Player player);
 
     bool canSpendGold(uint32_t amount);
     void addGold(uint32_t amount);
@@ -30,6 +30,7 @@ public:
     void incrementLevel();
     void changeExperience(uint32_t delta);
 
+    void useSkill(SkillNum skillNum, GameState &gameState);
 
     // getters and setters
 

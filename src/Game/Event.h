@@ -1,10 +1,21 @@
 #pragma once
 
-enum class Player{
-    First,
-    Second
+#include "GameState.h"
+
+enum class EventName{
+    firstSkill,
+    secondSkill,
+    thirdSkill
 };
 
-void damage(unsigned amount, Player player){
-    
-}
+class Event {
+public:
+    Event() = delete;
+    explicit Event(Player player);
+
+    virtual void handleEvent(GameState &gs) = 0;
+protected:
+    Player player_;
+};
+
+Event::Event(Player player) : player_{player} {}
