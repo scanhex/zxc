@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include "Hero.h"
 #include "StatsBuilder.h"
 
@@ -14,8 +15,7 @@ enum class Player {
 
 class GameState {
 public:
-    GameState(Hero &firstHero_, Hero &secondHero_) = delete;
-    GameState(Hero &firstHero_, Hero &secondHero_, double gameTick);
+    GameState(Hero &firstHero_, Hero &secondHero_);
     explicit GameState(double gameTick);
 
     bool gameIsFinished();
@@ -40,7 +40,7 @@ public:
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
 private:
-    double gameTick_;
+    std::optional<double> gameTick_;
     Hero* firstHero_;
     Hero* secondHero_;
 };

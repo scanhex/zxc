@@ -1,8 +1,7 @@
 #include "GameState.h"
 
-GameState::GameState(Hero &firstHero, Hero &secondHero, double gameTick) : gameTick_{gameTick},
-                                                                             firstHero_{&firstHero},
-                                                                             secondHero_{&secondHero} {}
+GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
+secondHero_{&secondHero} {}
 
 GameState::GameState(double gameTick): gameTick_{gameTick} {
     StatsBuilder heroStatsBuilder = StatsBuilder().

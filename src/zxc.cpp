@@ -40,7 +40,7 @@
 
 #include "Client/Client.h"
 #include "Drawables.h"
-#include "Game/StatsBuilder.h"
+#include "Game/GameState.h"
 
 using namespace Magnum;
 
@@ -82,6 +82,7 @@ private:
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
+	std::optional<GameState> gameState;
     std::vector<Unit> _units;
     std::vector<Object3D*> _unitObjects;
 
@@ -295,6 +296,9 @@ void ZxcApplication::initUnits(){
             setResist(0.25);
     Hero firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
     Hero secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+
+    gameState = GameState(firstHero, secondHero);
+
     addUnit(firstHero);
     addUnit(secondHero);
 }
@@ -306,6 +310,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 
 {
     std::thread gs_cycle(runClient);
+    gs_cycle.detach();
 
 	setSwapInterval(1);
 	initScene();
@@ -457,8 +462,19 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         _unitObjects[0]->translate({1,0,0});
         redraw();
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
 
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+        gameState->applyEvent(Player::First, EventName::firstSkill);
+        // draw skill use
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
+        gameState->applyEvent(Player::First, EventName::secondSkill);
+        // draw skill use
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
+        gameState->applyEvent(Player::First, EventName::thirdSkill);
         // draw skill use
         redraw();
     }
