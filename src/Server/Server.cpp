@@ -3,7 +3,8 @@
 #include "../Game/GameState.h"
 
 //global Game State
-GameState gameState(1.0 * TICK_TIME_GS_UPDATE / 1000);
+
+GameState gameState;
 bool running = false;
 boost::posix_time::ptime last_tick, now;
 
@@ -155,7 +156,7 @@ void handleNewConnection(ConnectionToClient::ptr client, const boost::system::er
 
 void updateGS() {
     // Максим -- просто шедевр, убейте его
-    gameState.update();
+    gameState.update(1.0 / 100); // TODO: PASS ELAPSED TIME HERE
 }
 
 void runGameStateCycle() {

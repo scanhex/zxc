@@ -1,9 +1,9 @@
 #include "GameState.h"
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
-secondHero_{&secondHero} {}
+                                                          secondHero_{&secondHero} {}
 
-GameState::GameState(double gameTick): gameTick_{gameTick} {
+GameState::GameState() {
     StatsBuilder heroStatsBuilder = StatsBuilder().
             setDamage(100).
             setAttackRange(100).
@@ -47,15 +47,15 @@ bool GameState::gameIsFinished() {
     return firstHero_->isDead() || secondHero_->isDead();
 }
 
-void GameState::update() {
+void GameState::update(double elapsedTime) {
     // only regen for now
-    double healPerTick = firstHero_->getHpRegen() * gameTick_;
-    double manaPerTick = firstHero_->getMpRegen() * gameTick_;
+    double healPerTick = firstHero_->getHpRegen() * elapsedTime;
+    double manaPerTick = firstHero_->getMpRegen() * elapsedTime;
     firstHero_->applyHeal(healPerTick);
     firstHero_->regenMana(manaPerTick);
 
-    healPerTick = secondHero_->getHpRegen() * gameTick_;
-    manaPerTick = secondHero_->getMpRegen() * gameTick_;
+    healPerTick = secondHero_->getHpRegen() * elapsedTime;
+    manaPerTick = secondHero_->getMpRegen() * elapsedTime;
     secondHero_->applyHeal(healPerTick);
     secondHero_->regenMana(manaPerTick);
 }

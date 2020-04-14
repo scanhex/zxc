@@ -1,4 +1,7 @@
 #include "Skill.h"
+#include <cassert>
+
+#include "GameState.h"
 
 Skill::Skill(Player player, SkillNum type) : Event{player}, type_{type} {}
 

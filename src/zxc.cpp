@@ -83,6 +83,11 @@ private:
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
 	std::optional<GameState> gameState;
+	std::optional<Hero> firstHero;
+	std::optional<Hero> secondHero;
+
+    std::thread gs_cycle;
+
     std::vector<Unit> _units;
     std::vector<Object3D*> _unitObjects;
 
@@ -294,13 +299,13 @@ void ZxcApplication::initUnits(){
             setMpRegen(1).
             setArmor(3).
             setResist(0.25);
-    Hero firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
-    Hero secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+    firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
+    secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
 
-    gameState = GameState(firstHero, secondHero);
+    gameState = GameState(*firstHero, *secondHero);
 
-    addUnit(firstHero);
-    addUnit(secondHero);
+    addUnit(*firstHero);
+    addUnit(*secondHero);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -309,8 +314,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 		.setWindowFlags(Configuration::WindowFlag::Resizable) }
 
 {
-    std::thread gs_cycle(runClient);
-    gs_cycle.detach();
+    gs_cycle = std::thread(runClient);
 
 	setSwapInterval(1);
 	initScene();
@@ -479,6 +483,9 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         redraw();
     }
 
+    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
+    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
+    std::cout << '\n';
 }
 
 MAGNUM_APPLICATION_MAIN(ZxcApplication)
