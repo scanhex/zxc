@@ -1,9 +1,9 @@
 #include "Server.h"
 #include "../Utils/BufferIO.h"
-#include "../Game/GameStateServer.h"
+#include "../Game/GameState.h"
 
 //global Game State
-GameStateServer gameState(1.0 * TICK_TIME_GS_UPDATE / 1000);
+GameState gameState(1.0 * TICK_TIME_GS_UPDATE / 1000);
 bool running = false;
 boost::posix_time::ptime last_tick, now;
 
@@ -118,13 +118,13 @@ void ConnectionToClient::updateGSbyPlayer() {
     Player player = player_id_ == 0 ? Player::First : Player::Second;
     switch (action_idx) {
         case 1:
-            gameState.applySkill(player, SkillNum::First);
+            gameState.applyEvent(player, EventName::firstSkill);
             break;
         case 2:
-            gameState.applySkill(player, SkillNum::Second);
+            gameState.applyEvent(player, EventName::secondSkill);
             break;
         case 3:
-            gameState.applySkill(player, SkillNum::Third);
+            gameState.applyEvent(player, EventName::thirdSkill);
             break;
         default:
             assert(false); //wrong action
