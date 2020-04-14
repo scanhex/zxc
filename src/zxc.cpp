@@ -38,6 +38,7 @@
 #include <fstream>
 #include <cassert>
 
+#include "Client/Client.h"
 #include "Drawables.h"
 #include "Game/StatsBuilder.h"
 
@@ -292,11 +293,10 @@ void ZxcApplication::initUnits(){
             setMpRegen(1).
             setArmor(3).
             setResist(0.25);
-    Hero firstHero = Hero(heroStatsBuilder.create(), Point(0, 0));
-    Hero secondHero = Hero(heroStatsBuilder.create(), Point(0, 0));
+    Hero firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
+    Hero secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
     addUnit(firstHero);
     addUnit(secondHero);
-
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -305,6 +305,8 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 		.setWindowFlags(Configuration::WindowFlag::Resizable) }
 
 {
+    std::thread gs_cycle(runClient);
+
 	setSwapInterval(1);
 	initScene();
 	initUnits();
@@ -453,6 +455,11 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
         _unitObjects[0]->translate({1,0,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+
+        // draw skill use
         redraw();
     }
 
