@@ -4,6 +4,11 @@
 #include "Unit.h"
 #include "Skill.h"
 
+enum class Player;
+enum class SkillNum;
+class GameState;
+class Skill;
+
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;

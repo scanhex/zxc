@@ -3,6 +3,9 @@
 #include "Hero.h"
 #include "StatsBuilder.h"
 
+class Hero;
+enum class EventName;
+
 enum class Player {
     First,
     Second
@@ -12,7 +15,8 @@ enum class Player {
 class GameState {
 public:
     GameState(Hero &firstHero_, Hero &secondHero_) = delete;
-    explicit GameState(Hero &firstHero_, Hero &secondHero_, double gameTick);
+    GameState(Hero &firstHero_, Hero &secondHero_, double gameTick);
+    explicit GameState(double gameTick);
 
     bool gameIsFinished();
 
@@ -37,6 +41,6 @@ public:
 
 private:
     double gameTick_;
-    Hero firstHero;
-    Hero secondHero;
+    Hero* firstHero_;
+    Hero* secondHero_;
 };
