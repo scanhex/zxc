@@ -1,5 +1,5 @@
-#ifndef IO_H_
-#define IO_H_
+#pragma once
+
 namespace BufferIO {
     /*
     *  Functions to parse args to bytes and back
@@ -25,5 +25,3 @@ namespace BufferIO {
         uint64_t iValue;
     };
 }
-
-#endif

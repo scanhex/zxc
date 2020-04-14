@@ -8,7 +8,7 @@
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 16;
-static constexpr int MSG_FROM_CLIENT_SIZE = 1;//TODO change when add move
+static constexpr int MSG_FROM_CLIENT_SIZE = 17; //TODO change when add move
 
 using namespace boost::asio;
 

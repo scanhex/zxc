@@ -51,7 +51,7 @@ using namespace Math::Literals;
 typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
 typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
 
-boost::lockfree::queue<EventName> events{100};
+boost::lockfree::queue<Event> events{100};
 
 class ZxcApplication : public Platform::Application {
 public:
@@ -365,6 +365,13 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0,0,1});
         _unitObjects[0]->translate(newPosition - _unitObjects[0]->transformation().translation());
+
+        double x = newPosition.x(), y = newPosition.y();
+
+        Event curEvent(EventName::move, Player::First, x, y);
+        events.push(curEvent);
+        gameState->applyEvent(curEvent);
+
         redraw();
 	}
 }
@@ -472,26 +479,26 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
 
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        EventName curEvent = EventName::firstSkill;
+        Event curEvent(EventName::firstSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(Player::First, curEvent);
+        gameState->applyEvent(curEvent);
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        EventName curEvent = EventName::secondSkill;
+        Event curEvent(EventName::secondSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(Player::First, curEvent);
+        gameState->applyEvent(curEvent);
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        EventName curEvent = EventName::thirdSkill;
+        Event curEvent(EventName::thirdSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(Player::First, curEvent);
+        gameState->applyEvent(curEvent);
         // draw skill use
         redraw();
     }

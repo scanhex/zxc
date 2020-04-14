@@ -60,15 +60,25 @@ void GameState::update(double elapsedTime) {
     secondHero_->regenMana(manaPerTick);
 }
 
-void GameState::applyMove(Player player, int32_t x, int32_t y) {
-    // ----
+void GameState::applyMove(Player player, double x, double y) {
+    // TODO blink -> move
+    switch (player) {
+        case Player::First:
+            firstHero_->setPosition(x, y);
+            break;
+        case Player::Second:
+            secondHero_->setPosition(x, y);
+            break;
+        default:
+            assert(false);
+    }
 }
 
-void GameState::applyEvent(Player player, EventName eventName) {
+void GameState::applyEvent(Event event) {
     Hero *hero = firstHero_;
-    if (player == Player::Second) hero = secondHero_;
+    if (event.player_ == Player::Second) hero = secondHero_;
 
-    switch (eventName) {
+    switch (event.eventName_) {
         case EventName::firstSkill:
             hero->useSkill(SkillNum::first, *this);
             break;
@@ -77,6 +87,11 @@ void GameState::applyEvent(Player player, EventName eventName) {
             break;
         case EventName::thirdSkill:
             hero->useSkill(SkillNum::third, *this);
+            break;
+        case EventName::move:
+            assert(event.x_ && event.y_);
+
+            applyMove(event.player_, *event.x_, *event.y_);
             break;
         default:
             assert(false);

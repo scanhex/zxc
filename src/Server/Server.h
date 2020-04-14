@@ -15,8 +15,8 @@ static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
-static constexpr int MSG_FROM_SERVER_SIZE = 16;//size of default message to client
-static constexpr int MSG_FROM_CLIENT_SIZE = 1; //TODO change when add move action
+static constexpr int MSG_FROM_SERVER_SIZE = 16; //size of default message to client
+static constexpr int MSG_FROM_CLIENT_SIZE = 17; //TODO change when add move action
 
 using namespace boost::asio;
 
