@@ -38,8 +38,10 @@
 #include <fstream>
 #include <cassert>
 
-#include "Client/Client.h"
+#include <boost/lockfree/queue.hpp>
+
 #include "Drawables.h"
+#include "Client/Client.h"
 #include "Game/GameState.h"
 
 using namespace Magnum;
@@ -48,6 +50,8 @@ using namespace Math::Literals;
 
 typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
 typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
+
+boost::lockfree::queue<EventName> events{100};
 
 class ZxcApplication : public Platform::Application {
 public:
@@ -468,17 +472,26 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
 
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        gameState->applyEvent(Player::First, EventName::firstSkill);
+        EventName curEvent = EventName::firstSkill;
+
+        events.push(curEvent);
+        gameState->applyEvent(Player::First, curEvent);
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        gameState->applyEvent(Player::First, EventName::secondSkill);
+        EventName curEvent = EventName::secondSkill;
+
+        events.push(curEvent);
+        gameState->applyEvent(Player::First, curEvent);
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        gameState->applyEvent(Player::First, EventName::thirdSkill);
+        EventName curEvent = EventName::thirdSkill;
+
+        events.push(curEvent);
+        gameState->applyEvent(Player::First, curEvent);
         // draw skill use
         redraw();
     }

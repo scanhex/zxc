@@ -115,21 +115,15 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 }
 
 void ConnectionToClient::updateGSbyPlayer() {
-    uint8_t action_idx = BufferIO::readUInt8(0, read_buffer_);
+    uint8_t actionId = BufferIO::readUInt8(0, read_buffer_);
+    EventName e = intToEventName(actionId);
+
     Player player = player_id_ == 0 ? Player::First : Player::Second;
-    switch (action_idx) {
-        case 1:
-            gameState.applyEvent(player, EventName::firstSkill);
-            break;
-        case 2:
-            gameState.applyEvent(player, EventName::secondSkill);
-            break;
-        case 3:
-            gameState.applyEvent(player, EventName::thirdSkill);
-            break;
-        default:
-            assert(false); //wrong action
-    }
+    gameState.applyEvent(player, e);
+
+    std::cout << "ME: " << gameState.getHealthPoints(Player::First) << '\n';
+    std::cout << "SASHKA: " << gameState.getHealthPoints(Player::Second) << '\n';
+    std::cout << '\n';
 }
 
 void ConnectionToClient::writeGStoBuffer() {

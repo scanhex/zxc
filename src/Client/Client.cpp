@@ -1,10 +1,12 @@
 #include "Client.h"
 #include "../Game/GameState.h"
 #include "../Utils/BufferIO.h"
+#include <boost/lockfree/queue.hpp>
 #include <utility>
 
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
+extern boost::lockfree::queue<EventName> events;
 
 //local Game State example
 //GameState gameState;
@@ -42,9 +44,8 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
     if (!err) {
         connected_ = true;
         sock_.set_option(ip::tcp::no_delay(true));
-        std::cerr << "SUKA BLYAT 1\n";
         read(sock_, buffer(read_buffer_)); //wait for signal fro server to start
-        std::cerr << "SUKA BLYAT 2\n";
+        std::cout << "Game start!" << std::endl;
         readFromSocket();
         writeToSocket();
     } else {
@@ -54,10 +55,9 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    int32_t millis = rand() % 1000; //waiting for some action from player
-    timer_.expires_from_now(boost::posix_time::millisec(millis));
+    while (events.empty()) {}
 
-    timer_.async_wait(BIND_FN(writeToSocket));
+    writeToSocket();
 }
 
 void ConnectionToServer::writeToSocket() {
@@ -105,22 +105,21 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
 }
 
 void ConnectionToServer::parseGSFromBuffer() {
-    double hp = BufferIO::readDouble(0,read_buffer_);
+    double hp = BufferIO::readDouble(0, read_buffer_);
 //    gameState.setHealthPoints(hp, Player::First);
-    hp = BufferIO::readDouble(8,read_buffer_);
+    hp = BufferIO::readDouble(8, read_buffer_);
 //    gameState.setHealthPoints(hp, Player::Second);
 }
 
 void ConnectionToServer::writeActionToBuffer() {
-    uint8_t action = 1 + rand() % 3;//use random skill
-    BufferIO::writeUInt8(action, 0,write_buffer_);
+    EventName e;
+    events.pop(e);
+
+    BufferIO::writeUInt8(eventNameToInt(e), 0, write_buffer_);
 }
 
 void runClient() {
     std::string name;
-    //std::cin>>name;
-    srand(time(nullptr)); //to have different random in client examples
-    name = "";
     ConnectionToServer::ptr client = ConnectionToServer::newConnection(name);
     client->startConnection();
     std::cout << "Connect " << name << std::endl;
