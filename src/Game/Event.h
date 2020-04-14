@@ -5,7 +5,7 @@
 enum class Player;
 class GameState;
 
-enum class EventName{
+enum class EventName {
     firstSkill,
     secondSkill,
     thirdSkill
@@ -14,7 +14,7 @@ enum class EventName{
 class Event {
 public:
     Event() = delete;
-    inline explicit Event(Player player): player_{player} {}
+    inline explicit Event(Player player) : player_{player} {}
 
     virtual void handleEvent(GameState &gs) = 0;
 protected:
