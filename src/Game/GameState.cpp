@@ -1,15 +1,31 @@
 #include "GameState.h"
 
-GameState::GameState(Hero &firstHero_, Hero &secondHero_, double gameTick) : gameTick_{gameTick},
-                                                                             firstHero{firstHero_},
-                                                                             secondHero{secondHero_} {}
+GameState::GameState(Hero &firstHero, Hero &secondHero, double gameTick) : gameTick_{gameTick},
+                                                                             firstHero_{&firstHero},
+                                                                             secondHero_{&secondHero} {}
+
+GameState::GameState(double gameTick): gameTick_{gameTick} {
+    StatsBuilder heroStatsBuilder = StatsBuilder().
+            setDamage(100).
+            setAttackRange(100).
+            setMoveSpeed(350).
+            setAttackSpeed(100).
+            setMaxHp(1000).
+            setMaxMp(300).
+            setHpRegen(2).
+            setMpRegen(1).
+            setArmor(3).
+            setResist(0.25);
+    firstHero_ = new Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
+    secondHero_ = new Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+}
 
 double GameState::getHealthPoints(Player player) {
     switch (player) {
         case Player::First:
-            return firstHero.getHealthPoints();
+            return firstHero_->getHealthPoints();
         case Player::Second:
-            return secondHero.getHealthPoints();
+            return secondHero_->getHealthPoints();
         default:
             assert(false);
     }
@@ -18,10 +34,10 @@ double GameState::getHealthPoints(Player player) {
 void GameState::setHealthPoints(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.setHealthPoints(amount);
+            firstHero_->setHealthPoints(amount);
             break;
         case Player::Second:
-            secondHero.setHealthPoints(amount);
+            secondHero_->setHealthPoints(amount);
             break;
         default:
             assert(false);
@@ -29,20 +45,20 @@ void GameState::setHealthPoints(double amount, Player player) {
 }
 
 bool GameState::gameIsFinished() {
-    return firstHero.isDead() || secondHero.isDead();
+    return firstHero_->isDead() || secondHero_->isDead();
 }
 
 void GameState::update() {
     // only regen for now
-    double healPerTick = firstHero.getHpRegen() * gameTick_;
-    double manaPerTick = firstHero.getMpRegen() * gameTick_;
-    firstHero.applyHeal(healPerTick);
-    firstHero.regenMana(manaPerTick);
+    double healPerTick = firstHero_->getHpRegen() * gameTick_;
+    double manaPerTick = firstHero_->getMpRegen() * gameTick_;
+    firstHero_->applyHeal(healPerTick);
+    firstHero_->regenMana(manaPerTick);
 
-    healPerTick = secondHero.getHpRegen() * gameTick_;
-    manaPerTick = secondHero.getMpRegen() * gameTick_;
-    secondHero.applyHeal(healPerTick);
-    secondHero.regenMana(manaPerTick);
+    healPerTick = secondHero_->getHpRegen() * gameTick_;
+    manaPerTick = secondHero_->getMpRegen() * gameTick_;
+    secondHero_->applyHeal(healPerTick);
+    secondHero_->regenMana(manaPerTick);
 }
 
 void GameState::applyMove(Player player, int32_t x, int32_t y) {
@@ -50,18 +66,18 @@ void GameState::applyMove(Player player, int32_t x, int32_t y) {
 }
 
 void GameState::applyEvent(Player player, EventName eventName) {
-    Hero &hero = firstHero;
-    if(player == Player::Second) hero = secondHero;
+    Hero *hero = firstHero_;
+    if (player == Player::Second) hero = secondHero_;
 
     switch (eventName) {
         case EventName::firstSkill:
-            hero.useSkill(SkillNum::first, *this);
+            hero->useSkill(SkillNum::first, *this);
             break;
         case EventName::secondSkill:
-            hero.useSkill(SkillNum::second, *this);
+            hero->useSkill(SkillNum::second, *this);
             break;
         case EventName::thirdSkill:
-            hero.useSkill(SkillNum::third, *this);
+            hero->useSkill(SkillNum::third, *this);
             break;
         default:
             assert(false);
@@ -71,10 +87,10 @@ void GameState::applyEvent(Player player, EventName eventName) {
 void GameState::applyDamage(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.applyDamage(amount);
+            firstHero_->applyDamage(amount);
             break;
         case Player::Second:
-            secondHero.applyDamage(amount);
+            secondHero_->applyDamage(amount);
             break;
         default:
             assert(false);
@@ -84,10 +100,10 @@ void GameState::applyDamage(double amount, Player player) {
 void GameState::applyDamagePhys(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.applyDamagePhys(amount);
+            firstHero_->applyDamagePhys(amount);
             break;
         case Player::Second:
-            secondHero.applyDamagePhys(amount);
+            secondHero_->applyDamagePhys(amount);
             break;
         default:
             assert(false);
@@ -97,10 +113,10 @@ void GameState::applyDamagePhys(double amount, Player player) {
 void GameState::applyDamageMagic(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.applyDamageMagic(amount);
+            firstHero_->applyDamageMagic(amount);
             break;
         case Player::Second:
-            secondHero.applyDamageMagic(amount);
+            secondHero_->applyDamageMagic(amount);
             break;
         default:
             assert(false);
@@ -110,10 +126,10 @@ void GameState::applyDamageMagic(double amount, Player player) {
 void GameState::regenMana(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.regenMana(amount);
+            firstHero_->regenMana(amount);
             break;
         case Player::Second:
-            secondHero.regenMana(amount);
+            secondHero_->regenMana(amount);
             break;
         default:
             assert(false);
@@ -123,10 +139,10 @@ void GameState::regenMana(double amount, Player player) {
 void GameState::spendMana(double amount, Player player) {
     switch (player) {
         case Player::First:
-            firstHero.spendMana(amount);
+            firstHero_->spendMana(amount);
             break;
         case Player::Second:
-            secondHero.spendMana(amount);
+            secondHero_->spendMana(amount);
             break;
         default:
             assert(false);
@@ -136,9 +152,9 @@ void GameState::spendMana(double amount, Player player) {
 bool GameState::canSpendMana(double amount, Player player) const {
     switch (player) {
         case Player::First:
-            return firstHero.canSpendMana(amount);
+            return firstHero_->canSpendMana(amount);
         case Player::Second:
-            return secondHero.canSpendMana(amount);
+            return secondHero_->canSpendMana(amount);
         default:
             assert(false);
     }
@@ -147,9 +163,9 @@ bool GameState::canSpendMana(double amount, Player player) const {
 bool GameState::isDead(Player player) const {
     switch (player) {
         case Player::First:
-            return firstHero.isDead();
+            return firstHero_->isDead();
         case Player::Second:
-            return secondHero.isDead();
+            return secondHero_->isDead();
         default:
             assert(false);
     }

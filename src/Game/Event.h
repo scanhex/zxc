@@ -2,6 +2,9 @@
 
 #include "GameState.h"
 
+enum class Player;
+class GameState;
+
 enum class EventName{
     firstSkill,
     secondSkill,
@@ -11,11 +14,9 @@ enum class EventName{
 class Event {
 public:
     Event() = delete;
-    explicit Event(Player player);
+    inline explicit Event(Player player): player_{player} {}
 
     virtual void handleEvent(GameState &gs) = 0;
 protected:
     Player player_;
 };
-
-Event::Event(Player player) : player_{player} {}
