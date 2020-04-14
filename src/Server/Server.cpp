@@ -116,10 +116,17 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 
 void ConnectionToClient::updateGSbyPlayer() {
     uint8_t actionId = BufferIO::readUInt8(0, read_buffer_);
-    EventName e = intToEventName(actionId);
-
+    EventName eventName = intToEventName(actionId);
     Player player = player_id_ == 0 ? Player::First : Player::Second;
-    gameState.applyEvent(player, e);
+
+    Event event(eventName, player);
+
+    if(e == EventName::move){
+        event.x_ = BufferIO::readDouble(1, read_buffer_);
+        event.y_ = BufferIO::readDouble(9, read_buffer_);
+    }
+
+    gameState.applyEvent(event);
 
     std::cout << "ME: " << gameState.getHealthPoints(Player::First) << '\n';
     std::cout << "SASHKA: " << gameState.getHealthPoints(Player::Second) << '\n';
@@ -127,13 +134,11 @@ void ConnectionToClient::updateGSbyPlayer() {
 }
 
 void ConnectionToClient::writeGStoBuffer() {
-    if (player_id_ == 0) {
-        BufferIO::writeDouble(gameState.getHealthPoints(Player::First), 0, write_buffer_);
-        BufferIO::writeDouble(gameState.getHealthPoints(Player::Second), 8, write_buffer_);
-    } else {
-        BufferIO::writeDouble(gameState.getHealthPoints(Player::Second), 0, write_buffer_);
-        BufferIO::writeDouble(gameState.getHealthPoints(Player::First), 8, write_buffer_);
-    }
+    Player first = Player::First, second = Player::Second;
+    if(player_id_ == 1) std::swap(first, second);
+
+    BufferIO::writeDouble(gameState.getHealthPoints(first), 0, write_buffer_);
+    BufferIO::writeDouble(gameState.getHealthPoints(second), 8, write_buffer_);
 }
 
 

@@ -10,11 +10,12 @@ enum class SkillNum {
 
 class GameState;
 
-class Skill : public Event {
+class Skill {
 public:
     Skill(Player player, SkillNum type);
 
-    void handleEvent(GameState &gs) override;
+    void handleEvent(GameState &gs);
 private:
+    Player player_;
     SkillNum type_;
 };

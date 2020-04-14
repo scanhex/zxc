@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <optional>
 
 enum class Player;
 class GameState;
@@ -9,45 +10,20 @@ class GameState;
 enum class EventName {
     firstSkill,  // 1
     secondSkill, // 2
-    thirdSkill   // 3
+    thirdSkill,  // 3
+    move         // 4 (+ x & y)
 };
-
-uint8_t eventNameToInt(EventName e);
-EventName intToEventName(uint8_t eventId);
-
-
-inline uint8_t eventNameToInt(EventName e){
-    switch(e){
-        case EventName::firstSkill:
-            return 1;
-        case EventName::secondSkill:
-            return 2;
-        case EventName::thirdSkill:
-            return 3;
-        default:
-            assert(false);
-    }
-}
-
-inline EventName intToEventName(uint8_t eventId){
-    switch(eventId){
-        case 1:
-            return EventName::firstSkill;
-        case 2:
-            return EventName::secondSkill;
-        case 3:
-            return EventName::thirdSkill;
-        default:
-            assert(false);
-    }
-}
 
 class Event {
 public:
-    Event() = delete;
-    inline explicit Event(Player player) : player_{player} {}
+    Event();
+    explicit Event(EventName eventName, Player player);
+    Event(EventName eventName, Player player, double x, double y);
 
-    virtual void handleEvent(GameState &gs) = 0;
-protected:
+    static EventName intToEventName(uint8_t eventId);
+    uint8_t eventNameToInt();
+
+    EventName eventName_;
     Player player_;
+    std::optional<double> x_, y_;
 };

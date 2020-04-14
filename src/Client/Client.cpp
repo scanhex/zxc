@@ -2,11 +2,12 @@
 #include "../Game/GameState.h"
 #include "../Utils/BufferIO.h"
 #include <boost/lockfree/queue.hpp>
+#include <cassert>
 #include <utility>
 
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
-extern boost::lockfree::queue<EventName> events;
+extern boost::lockfree::queue<Event> events;
 
 //local Game State example
 //GameState gameState;
@@ -69,17 +70,12 @@ void ConnectionToServer::writeToSocket() {
 
 void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
     parseGSFromBuffer();
-//    if (cnt == 0)
-//        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
-//                  << gameState.getHealthPoints(Player::Second) << std::endl;
-//    cnt = (cnt + 1) % 50;
+    // TODO
 //    if (gameState.gameIsFinished()) {
 //
-//        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
-//                  << gameState.getHealthPoints(Player::Second) << std::endl;
 //
 //        if (gameState.getHealthPoints(Player::First) == 0)
-//            std::cout << username_ << ": I lost :(" << std::endl; //just some game result handling
+//            std::cout << username_ << ": I lost :(" << std::endl;
 //        else
 //            std::cout << username_ << ": I won :)" << std::endl;
 //
@@ -112,10 +108,17 @@ void ConnectionToServer::parseGSFromBuffer() {
 }
 
 void ConnectionToServer::writeActionToBuffer() {
-    EventName e;
+    Event e;
     events.pop(e);
 
-    BufferIO::writeUInt8(eventNameToInt(e), 0, write_buffer_);
+    BufferIO::writeUInt8(e.eventNameToInt(), 0, write_buffer_);
+
+    if(e.eventName_ == EventName::move){
+        assert(e.x_ && e.y_);
+
+        BufferIO::writeDouble(*e.x_, 1, write_buffer_);
+        BufferIO::writeDouble(*e.y_, 9, write_buffer_);
+    }
 }
 
 void runClient() {

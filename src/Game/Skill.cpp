@@ -3,7 +3,7 @@
 
 #include "GameState.h"
 
-Skill::Skill(Player player, SkillNum type) : Event{player}, type_{type} {}
+Skill::Skill(Player player, SkillNum type) : player_{player}, type_{type} {}
 
 void Skill::handleEvent(GameState &gs) {
     double damage = 0;

@@ -26,8 +26,8 @@ public:
 
     [[nodiscard]] bool isDead(Player player) const;
 
-    void applyMove(Player player, int32_t x, int32_t y);
-    void applyEvent(Player player, EventName eventName);
+    void applyMove(Player player, double x, double y);
+    void applyEvent(Event event);
 
     void setHealthPoints(double amount, Player player);
 

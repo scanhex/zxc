@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cstddef>
 #include "BufferIO.h"
+
 void BufferIO::writeUInt8(uint8_t d, size_t start_idx, uint8_t (&buffer)[1024]) {
     buffer[start_idx] = d;
 }
