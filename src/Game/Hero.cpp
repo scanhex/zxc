@@ -5,11 +5,10 @@ Hero::Hero(Stats stats, Point position, Player player) : Unit(stats, position),
                                                          player_{player},
                                                          gold_{START_GOLD},
                                                          level_{1},
-                                                         experience_{0} {
-    skills_.emplace_back(player_, SkillNum::first);
-    skills_.emplace_back(player_, SkillNum::second);
-    skills_.emplace_back(player_, SkillNum::third);
-}
+                                                         experience_{0},
+                                                         skills_{Skill(player_, SkillNum::first),
+                                                                 Skill(player_, SkillNum::second),
+                                                                 Skill(player_, SkillNum::third)} {}
 
 bool Hero::canSpendGold(uint32_t amount) {
     return gold_ >= amount;
@@ -39,7 +38,7 @@ void Hero::changeExperience(uint32_t delta) {
 }
 
 void Hero::useSkill(SkillNum skillNum, GameState &gameState) {
-    switch (skillNum){
+    switch (skillNum) {
         case SkillNum::first:
             skills_[0].handleEvent(gameState);
             break;

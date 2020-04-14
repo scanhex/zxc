@@ -8,6 +8,8 @@ enum class SkillNum {
     third   // C
 };
 
+class GameState;
+
 class Skill : public Event {
 public:
     Skill(Player player, SkillNum type);
@@ -16,3 +18,4 @@ public:
 private:
     SkillNum type_;
 };
+

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include "Unit.h"
 #include "Skill.h"
 
@@ -9,6 +8,8 @@ enum class SkillNum;
 class GameState;
 class Skill;
 
+
+constexpr uint32_t NUM_SKILLS = 3;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
@@ -18,11 +19,11 @@ class Hero : public Unit {
 private:
     Player player_;
 
-    std::vector<Skill> skills_;
-
     uint32_t gold_;
     uint32_t level_;
     uint32_t experience_;
+
+    Skill skills_[NUM_SKILLS];
 
 public:
     Hero(Stats stats, Point position, Player player);

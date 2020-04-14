@@ -1,5 +1,10 @@
 #pragma once
 
+enum class Player {
+    First,
+    Second
+};
+
 #include <optional>
 #include "Hero.h"
 #include "StatsBuilder.h"
@@ -7,22 +12,17 @@
 class Hero;
 enum class EventName;
 
-enum class Player {
-    First,
-    Second
-};
-
 
 class GameState {
 public:
+    GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
-    explicit GameState(double gameTick);
 
     bool gameIsFinished();
 
     double getHealthPoints(Player player);
 
-    void update();
+    void update(double elapsedTime);
 
     [[nodiscard]] bool isDead(Player player) const;
 
@@ -40,7 +40,6 @@ public:
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
 private:
-    std::optional<double> gameTick_;
-    Hero* firstHero_;
-    Hero* secondHero_;
+    Hero *firstHero_;
+    Hero *secondHero_;
 };
