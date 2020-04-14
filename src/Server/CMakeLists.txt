@@ -31,7 +31,6 @@ add_executable(Server main.cpp Server.cpp Server.h
         ../Game/Stats.cpp ../Game/Stats.h
         ../Game/StatsBuilder.cpp ../Game/StatsBuilder.h
         ../Game/GameState.cpp ../Game/GameState.h
-        ../Game/GameStateServer.h
         ../Game/Event.h)
 
 if(Boost_FOUND)
