@@ -18,4 +18,3 @@ public:
 private:
     SkillNum type_;
 };
-
