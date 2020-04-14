@@ -20,18 +20,9 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-add_executable(Server main.cpp Server.cpp Server.h
-        ../Utils/BufferIO.cpp ../Utils/BufferIO.h
-        ../Game/Hero.cpp ../Game/Hero.h
-        ../Game/Skill.cpp ../Game/Skill.h
-        ../Game/Item.cpp ../Game/Item.h
-        ../Game/Buff.cpp ../Game/Buff.h
-        ../Game/Unit.cpp ../Game/Unit.h
-        ../Game/Point.cpp ../Game/Point.h
-        ../Game/Stats.cpp ../Game/Stats.h
-        ../Game/StatsBuilder.cpp ../Game/StatsBuilder.h
-        ../Game/GameState.cpp ../Game/GameState.h
-        ../Game/Event.h)
+file(GLOB server_cpps "main.cpp" "Server.cpp" "Server.h" "../Utils/*.cpp" "../Utils/*.h" "../Game/*.cpp" "../Game/*.h")
+
+add_executable(Server ${server_cpps})
 
 if(Boost_FOUND)
     message(STATUS "Linking boost libraries")

@@ -116,12 +116,12 @@ void ConnectionToClient::waitForAllConnections(const boost::system::error_code &
 
 void ConnectionToClient::updateGSbyPlayer() {
     uint8_t actionId = BufferIO::readUInt8(0, read_buffer_);
-    EventName eventName = intToEventName(actionId);
+    EventName eventName = Event::intToEventName(actionId);
     Player player = player_id_ == 0 ? Player::First : Player::Second;
 
     Event event(eventName, player);
 
-    if(e == EventName::move){
+    if(event.eventName_ == EventName::move){
         event.x_ = BufferIO::readDouble(1, read_buffer_);
         event.y_ = BufferIO::readDouble(9, read_buffer_);
     }
