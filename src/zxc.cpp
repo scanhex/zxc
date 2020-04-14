@@ -40,7 +40,7 @@
 
 #include <boost/lockfree/queue.hpp>
 
-#include "Drawables.h"
+#include "Graphics/Drawables.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
 

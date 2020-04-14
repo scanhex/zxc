@@ -27,9 +27,9 @@ endif()
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 
-file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "*.cpp" "*.h")
+file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*.cpp" "*.h")
 
-add_executable(zxc ${zxc_cpps} Game/Event.cpp Game/Event.cpp)
+add_executable(zxc ${zxc_cpps})
 
 add_dependencies(zxc
 		MagnumPlugins::AssimpImporter

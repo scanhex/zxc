@@ -13,7 +13,7 @@
 #include <Magnum/Trade/MeshData3D.h>
 #include <Magnum/Primitives/Cube.h>
 #include <Magnum/Primitives/Circle.h>
-#include "Game/Hero.h"
+#include "../Game/Hero.h"
 
 #include<iostream>
 
