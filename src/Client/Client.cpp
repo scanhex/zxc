@@ -7,7 +7,7 @@ io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
 
 //local Game State example
-GameState gameState;
+//GameState gameState;
 
 //temporary counter for cout
 int32_t cnt = 0;
@@ -42,7 +42,9 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
     if (!err) {
         connected_ = true;
         sock_.set_option(ip::tcp::no_delay(true));
+        std::cerr << "SUKA BLYAT 1\n";
         read(sock_, buffer(read_buffer_)); //wait for signal fro server to start
+        std::cerr << "SUKA BLYAT 2\n";
         readFromSocket();
         writeToSocket();
     } else {
@@ -67,22 +69,22 @@ void ConnectionToServer::writeToSocket() {
 
 void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
     parseGSFromBuffer();
-    if (cnt == 0)
-        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
-                  << gameState.getHealthPoints(Player::Second) << std::endl;
-    cnt = (cnt + 1) % 50;
-    if (gameState.gameIsFinished()) {
-
-        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
-                  << gameState.getHealthPoints(Player::Second) << std::endl;
-
-        if (gameState.getHealthPoints(Player::First) == 0)
-            std::cout << username_ << ": I lost :(" << std::endl; //just some game result handling
-        else
-            std::cout << username_ << ": I won :)" << std::endl;
-
-        stopConnection();
-    }
+//    if (cnt == 0)
+//        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
+//                  << gameState.getHealthPoints(Player::Second) << std::endl;
+//    cnt = (cnt + 1) % 50;
+//    if (gameState.gameIsFinished()) {
+//
+//        std::cout << "my hp is " << gameState.getHealthPoints(Player::First) << ", enemy hp is "
+//                  << gameState.getHealthPoints(Player::Second) << std::endl;
+//
+//        if (gameState.getHealthPoints(Player::First) == 0)
+//            std::cout << username_ << ": I lost :(" << std::endl; //just some game result handling
+//        else
+//            std::cout << username_ << ": I won :)" << std::endl;
+//
+//        stopConnection();
+//    }
     readFromSocket();
 }
 
@@ -104,9 +106,9 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
 
 void ConnectionToServer::parseGSFromBuffer() {
     double hp = BufferIO::readDouble(0,read_buffer_);
-    gameState.setHealthPoints(hp, Player::First);
+//    gameState.setHealthPoints(hp, Player::First);
     hp = BufferIO::readDouble(8,read_buffer_);
-    gameState.setHealthPoints(hp, Player::Second);
+//    gameState.setHealthPoints(hp, Player::Second);
 }
 
 void ConnectionToServer::writeActionToBuffer() {

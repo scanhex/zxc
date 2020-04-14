@@ -27,7 +27,7 @@ endif()
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 
-file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "*.cpp" "*.h")
+file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "*.cpp" "*.h")
 
 add_executable(zxc ${zxc_cpps})
 
