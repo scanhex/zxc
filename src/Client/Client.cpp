@@ -1,9 +1,7 @@
 #include "Client.h"
 #include "../Utils/BufferIO.h"
 #include <boost/lockfree/queue.hpp>
-#include <cassert>
 #include <utility>
-#include <memory>
 
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
@@ -125,8 +123,6 @@ void ConnectionToServer::writeActionToBuffer() {
     BufferIO::writeUInt8(e.eventNameToInt(), 0, write_buffer_);
 
     if (e.eventName_ == EventName::move) {
-        //assert(e.x_ && e.y_);
-
         BufferIO::writeDouble(e.x_, 1, write_buffer_);
         BufferIO::writeDouble(e.y_, 9, write_buffer_);
     }

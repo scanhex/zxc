@@ -41,7 +41,7 @@ Point GameState::getPosition(Player player) {
     }
 }
 
-void GameState::setPosition(Point pos, Player player){
+void GameState::setPosition(Point pos, Player player) {
     switch (player) {
         case Player::First:
             firstHero_->setPosition(pos);
@@ -54,7 +54,7 @@ void GameState::setPosition(Point pos, Player player){
     }
 }
 
-void GameState::setPosition(double x, double y, Player player){
+void GameState::setPosition(double x, double y, Player player) {
     switch (player) {
         case Player::First:
             firstHero_->setPosition(x, y);
@@ -126,8 +126,6 @@ void GameState::applyEvent(Event event) {
             hero->useSkill(SkillNum::third, *this);
             break;
         case EventName::move:
-            assert(event.x_ && event.y_);
-
             applyMove(event.player_, event.x_, event.y_);
             break;
         default:
