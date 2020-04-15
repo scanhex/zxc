@@ -1,13 +1,34 @@
 # zxc
-Не забыть скачать сабмодули.
+## Подмодули
+```
+git submodule init   
+git submodule update
+```
 
-Надо установить SDL2 (brew install sdl2 или sudo apt install libsdl2-dev или на Windows скачать https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz и распаковать в папку с проектом)
+Инструкции по установке библиотек:
 
-Надо скачать boost (или хотя бы библиотеку boost Asio), рекомендуется версия 1.65.  
-sudo apt-get install libboost-all-dev или brew install boost  
-Для windows скачать отсюда:  
-https://www.boost.org/users/history/version_1_65_0.html
+## Ubuntu
+```
+sudo apt-get install libboost-all-dev   
+sudo apt install libsdl2-dev
+```
 
-Остальное должен сделать сам Clion, нужно просто запустить цель "zxc"
+## Mac OS X 
+```
+brew install boost   
+brew install sdl2
+```
 
-На винде могут быть проблемы с assimp.dll, также если скачать самый новый boost, то у него могут быть проблемы с Cmake-ом
+## Windows(MSVC)
+Скачать SDL2 в директорию проекта с https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz
+Скачать бинарники Boost: https://sourceforge.net/projects/boost/files/boost-binaries/
+Также нужно установить переменные среды `BOOST_INCLUDEDIR` на папку вида `boost_1_65_0` и `BOOST_LIBRARYDIR` на папку `boost_1_65_0\lib64-msvc-14.1`
+
+## Windows(MinGW )
+Аналогично MSVC, но бинарники Boost скачать отсюда не получится.
+SDL2 можно скачать с того же сайта, но файл будет с именем `SDL2-devel-2.0.10-mingw.tar.gz`
+
+## Запуск
+Просто запустить цель `zxc` в CMake.
+
+
