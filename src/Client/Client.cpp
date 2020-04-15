@@ -1,5 +1,4 @@
 #include "Client.h"
-#include "../Game/GameState.h"
 #include "../Utils/BufferIO.h"
 #include <boost/lockfree/queue.hpp>
 #include <cassert>
@@ -15,13 +14,12 @@ extern boost::lockfree::queue<Event> events;
 //temporary counter for cout
 int32_t cnt = 0;
 
-ConnectionToServer::ConnectionToServer(std::string username) : sock_(service),
-                                                               username_(std::move(username)),
-                                                               timer_(service) {
-}
+ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_(service),
+                                                               timer_(service),
+                                                               gameState_{gameState} {}
 
-ConnectionToServer::ptr ConnectionToServer::newConnection(const std::string &username) {
-    ptr new_(new ConnectionToServer(username));
+ConnectionToServer::ptr ConnectionToServer::newConnection(GameState& gameState) {
+    ptr new_(new ConnectionToServer(gameState));
     return new_;
 }
 
@@ -32,7 +30,7 @@ void ConnectionToServer::startConnection() {
 
 void ConnectionToServer::stopConnection() {
     if (!connected_) return;
-    std::cout << "stopping " << username_ << std::endl;
+    std::cout << "stopping " << std::endl;
     connected_ = false;
     sock_.close();
 }
@@ -56,9 +54,7 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    while (events.empty()) {}
-
-    writeToSocket();
+    waitForAction();
 }
 
 void ConnectionToServer::writeToSocket() {
@@ -100,11 +96,23 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
     return done ? 0 : 1;
 }
 
+void ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2){
+    gameState_.setHealthPoints(hp1, Player::First);
+    gameState_.setPosition(x1, y1, Player::First);
+
+    gameState_.setHealthPoints(hp2, Player::Second);
+    gameState_.setPosition(x2, y2, Player::Second);
+}
+
 void ConnectionToServer::parseGSFromBuffer() {
-    double hp = BufferIO::readDouble(0, read_buffer_);
-//    gameState.setHealthPoints(hp, Player::First);
-    hp = BufferIO::readDouble(8, read_buffer_);
-//    gameState.setHealthPoints(hp, Player::Second);
+    double hp1 = BufferIO::readDouble(0, read_buffer_);
+    double x1 = BufferIO::readDouble(8, read_buffer_);
+    double y1 = BufferIO::readDouble(16, read_buffer_);
+    double hp2 = BufferIO::readDouble(24, read_buffer_);
+    double x2 = BufferIO::readDouble(32, read_buffer_);
+    double y2 = BufferIO::readDouble(40, read_buffer_);
+
+    updateGS(hp1, x1, y1, hp2, x2, y2);
 }
 
 void ConnectionToServer::writeActionToBuffer() {
@@ -113,7 +121,7 @@ void ConnectionToServer::writeActionToBuffer() {
 
     BufferIO::writeUInt8(e.eventNameToInt(), 0, write_buffer_);
 
-    if(e.eventName_ == EventName::move){
+    if (e.eventName_ == EventName::move) {
         assert(e.x_ && e.y_);
 
         BufferIO::writeDouble(*e.x_, 1, write_buffer_);
@@ -121,11 +129,19 @@ void ConnectionToServer::writeActionToBuffer() {
     }
 }
 
-void runClient() {
-    std::string name;
-    ConnectionToServer::ptr client = ConnectionToServer::newConnection(name);
+void ConnectionToServer::waitForAction() {
+    if(events.empty()){
+        timer_.expires_from_now(boost::posix_time::millisec(1));
+        timer_.async_wait(BIND_FN(waitForAction));
+    }else{
+        writeToSocket();
+    }
+}
+
+void runClient(GameState& gameState) {
+    ConnectionToServer::ptr client = ConnectionToServer::newConnection(gameState);
     client->startConnection();
-    std::cout << "Connect " << name << std::endl;
+    std::cout << "Connected " << std::endl;
     service.run();
 }
 

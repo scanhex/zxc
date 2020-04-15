@@ -21,6 +21,7 @@ public:
     bool gameIsFinished();
 
     double getHealthPoints(Player player);
+    Point getPosition(Player player);
 
     void update(double elapsedTime);
 
@@ -30,6 +31,8 @@ public:
     void applyEvent(Event event);
 
     void setHealthPoints(double amount, Player player);
+    void setPosition(Point pos, Player player);
+    void setPosition(double x, double y, Player player);
 
     void applyDamage(double amount, Player player);
     void applyDamagePhys(double amount, Player player);
