@@ -18,7 +18,7 @@ public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
 
-    bool gameIsFinished();
+    bool gameIsFinished() const;
 
     double getHealthPoints(Player player);
     Point getPosition(Player player);
