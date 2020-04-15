@@ -1,8 +1,7 @@
 # zxc
 ## Подмодули
 ```
-git submodule init   
-git submodule update
+git submodule update --init
 ```
 
 Инструкции по установке библиотек:
