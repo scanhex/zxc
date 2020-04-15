@@ -14,7 +14,7 @@ find_package(MagnumPlugins REQUIRED AssimpImporter)
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 
-find_package(Boost COMPONENTS system thread REQUIRED)
+find_package(Boost COMPONENTS system thread regex REQUIRED)
 
 if(Boost_FOUND)
 	message(STATUS "Boost found")
@@ -32,10 +32,13 @@ file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*
 add_executable(zxc ${zxc_cpps})
 
 add_dependencies(zxc
-		MagnumPlugins::AssimpImporter
-		Magnum::AnyImageImporter
-		Magnum::AnySceneImporter) # AnyScene is useless now btw but i will leave it here anyway
+    MagnumPlugins::AssimpImporter
+    Magnum::AnyImageImporter
+        )
 
+if (MSVC)
+	target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter)
+endif()
 target_link_libraries(zxc PRIVATE
     ${Boost_LIBRARIES}
     Magnum::Application
@@ -45,12 +48,7 @@ target_link_libraries(zxc PRIVATE
     Magnum::SceneGraph
     Magnum::Shaders
     Magnum::Trade
-    #Magnum::AnySceneImporter
-    #Magnum::ObjImporter
-    #Magnum::AnyImageImporter
-    #Magnum::TgaImporter
     Magnum::Primitives
-    #MagnumPlugins::AssimpImporter
         )
 
 # Make the executable a default target to build & run in Visual Studio
