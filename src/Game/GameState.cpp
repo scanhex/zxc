@@ -30,6 +30,43 @@ double GameState::getHealthPoints(Player player) {
     }
 }
 
+Point GameState::getPosition(Player player) {
+    switch (player) {
+        case Player::First:
+            return firstHero_->getPosition();
+        case Player::Second:
+            return secondHero_->getPosition();
+        default:
+            assert(false);
+    }
+}
+
+void GameState::setPosition(Point pos, Player player){
+    switch (player) {
+        case Player::First:
+            firstHero_->setPosition(pos);
+            break;
+        case Player::Second:
+            secondHero_->setPosition(pos);
+            break;
+        default:
+            assert(false);
+    }
+}
+
+void GameState::setPosition(double x, double y, Player player){
+    switch (player) {
+        case Player::First:
+            firstHero_->setPosition(x, y);
+            break;
+        case Player::Second:
+            secondHero_->setPosition(x, y);
+            break;
+        default:
+            assert(false);
+    }
+}
+
 void GameState::setHealthPoints(double amount, Player player) {
     switch (player) {
         case Player::First:

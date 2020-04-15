@@ -136,9 +136,19 @@ void ConnectionToClient::updateGSbyPlayer() {
 void ConnectionToClient::writeGStoBuffer() {
     Player first = Player::First, second = Player::Second;
     if(player_id_ == 1) std::swap(first, second);
+    Point firstPos = gameState.getPosition(first);
+    Point secondPos = gameState.getPosition(second);
 
+    // my: {hp, x, y}
     BufferIO::writeDouble(gameState.getHealthPoints(first), 0, write_buffer_);
     BufferIO::writeDouble(gameState.getHealthPoints(second), 8, write_buffer_);
+    BufferIO::writeDouble(firstPos.x_, 8, write_buffer_);
+    BufferIO::writeDouble(firstPos.y_, 16, write_buffer_);
+
+    // his: {hp, x, y}
+    BufferIO::writeDouble(gameState.getHealthPoints(second), 24, write_buffer_);
+    BufferIO::writeDouble(secondPos.x_, 32, write_buffer_);
+    BufferIO::writeDouble(secondPos.y_, 40, write_buffer_);
 }
 
 
@@ -155,7 +165,7 @@ void handleNewConnection(ConnectionToClient::ptr client, const boost::system::er
 
 void updateGS() {
     // Максим -- просто шедевр, убейте его
-    gameState.update(1.0 / 100); // TODO: PASS ELAPSED TIME HERE
+    gameState.update(1.0 / 80); // TODO: PASS ELAPSED TIME HERE
 }
 
 void runGameStateCycle() {

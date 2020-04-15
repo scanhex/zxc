@@ -1,14 +1,14 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include <iostream>
 #include <thread>
 #include <string>
 #include <boost/asio.hpp>
+#include "../Game/GameState.h"
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 16;
-static constexpr int MSG_FROM_CLIENT_SIZE = 17; //TODO change when add move
+static constexpr int MSG_FROM_SERVER_SIZE = 64;
+static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add move
 
 using namespace boost::asio;
 
@@ -22,9 +22,9 @@ public:
     typedef std::shared_ptr<ConnectionToServer> ptr;
     typedef ConnectionToServer self_type;
 
-    ConnectionToServer(std::string username);
+    ConnectionToServer(GameState& gameState);
 
-    static ptr newConnection(const std::string &username);
+    static ptr newConnection(GameState& gameState);
 
     void startConnection();
 
@@ -48,6 +48,8 @@ private:
 
     size_t checkReadComplete(const boost::system::error_code &err, size_t bytes);
 
+    void waitForAction();
+
 private:
     /*
      * Functions for working with local Game State and player's actions
@@ -56,15 +58,17 @@ private:
 
     void writeActionToBuffer();
 
+    // TODO update GS by full copy
+    // poka tak
+    void updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2);
+
 private:
     ip::tcp::socket sock_;
     uint8_t read_buffer_[MAX_MSG];
     uint8_t write_buffer_[MAX_MSG];
     bool connected_;
-    std::string username_;
     deadline_timer timer_;
+    GameState& gameState_;
 };
 
-void runClient();
-
-#endif
+void runClient(GameState& gameState);

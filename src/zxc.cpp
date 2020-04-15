@@ -70,6 +70,8 @@ private:
 
     Vector3 positionOnSphere(const Vector2i& position) const;
 
+    void updateUnitsPosition();
+
     void addUnit(Unit &u);
 	void initScene();
 	void initUnits();
@@ -318,11 +320,12 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 		.setWindowFlags(Configuration::WindowFlag::Resizable) }
 
 {
-    gs_cycle = std::thread(runClient);
 
 	setSwapInterval(1);
 	initScene();
 	initUnits();
+
+    gs_cycle = std::thread(runClient, std::ref(gameState.value()));
 
 	//loadModels();
 	/*
@@ -342,16 +345,27 @@ void ZxcApplication::addUnit(Unit& u) {
     new UnitDrawable(*_unitObjects.back(), _drawables, _units.back());
 }
 
+void ZxcApplication::updateUnitsPosition(){
+    Point myPosition = gameState->getPosition(Player::First);
+    Point otherPosition = gameState->getPosition(Player::Second);
 
+    Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
+    Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
+    _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
+    _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+}
 
 void ZxcApplication::drawEvent() {
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
+
+    updateUnitsPosition();
 
 	assert(_camera);
 	_camera->draw(_drawables);
 
 	swapBuffers();
+	redraw();
 }
 
 void ZxcApplication::viewportEvent(ViewportEvent& event) {
@@ -463,6 +477,7 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
         _unitObjects[0]->translate({0,-1,0});
+        // does nothing because does not modify game state and send event
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
