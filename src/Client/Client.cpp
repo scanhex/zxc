@@ -3,10 +3,11 @@
 #include <boost/lockfree/queue.hpp>
 #include <cassert>
 #include <utility>
+#include <memory>
 
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
-extern boost::lockfree::queue<Event> events;
+extern boost::lockfree::queue <Event> events;
 
 //local Game State example
 //GameState gameState;
@@ -18,7 +19,7 @@ ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_(service),
                                                                timer_(service),
                                                                gameState_{gameState} {}
 
-ConnectionToServer::ptr ConnectionToServer::newConnection(GameState& gameState) {
+ConnectionToServer::ptr ConnectionToServer::newConnection(GameState &gameState) {
     ptr new_(new ConnectionToServer(gameState));
     return new_;
 }
@@ -54,6 +55,10 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
+    if (err) {
+        stopConnection();
+        return;
+    }
     waitForAction();
 }
 
@@ -66,17 +71,15 @@ void ConnectionToServer::writeToSocket() {
 
 void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
     parseGSFromBuffer();
-    // TODO
-//    if (gameState.gameIsFinished()) {
-//
-//
-//        if (gameState.getHealthPoints(Player::First) == 0)
-//            std::cout << username_ << ": I lost :(" << std::endl;
-//        else
-//            std::cout << username_ << ": I won :)" << std::endl;
-//
-//        stopConnection();
-//    }
+    if (gameState_.gameIsFinished()) {
+        //TODO handle game result
+        if (gameState_.getHealthPoints(Player::First) == 0)
+            std::cout << "I lost :(" << std::endl; //
+        else
+            std::cout << "I won :)" << std::endl;
+
+        stopConnection();
+    }
     readFromSocket();
 }
 
@@ -96,7 +99,7 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
     return done ? 0 : 1;
 }
 
-void ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2){
+void ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2) {
     gameState_.setHealthPoints(hp1, Player::First);
     gameState_.setPosition(x1, y1, Player::First);
 
@@ -122,23 +125,23 @@ void ConnectionToServer::writeActionToBuffer() {
     BufferIO::writeUInt8(e.eventNameToInt(), 0, write_buffer_);
 
     if (e.eventName_ == EventName::move) {
-        assert(e.x_ && e.y_);
+        //assert(e.x_ && e.y_);
 
-        BufferIO::writeDouble(*e.x_, 1, write_buffer_);
-        BufferIO::writeDouble(*e.y_, 9, write_buffer_);
+        BufferIO::writeDouble(e.x_, 1, write_buffer_);
+        BufferIO::writeDouble(e.y_, 9, write_buffer_);
     }
 }
 
 void ConnectionToServer::waitForAction() {
-    if(events.empty()){
+    if (events.empty()) {
         timer_.expires_from_now(boost::posix_time::millisec(1));
         timer_.async_wait(BIND_FN(waitForAction));
-    }else{
+    } else {
         writeToSocket();
     }
 }
 
-void runClient(GameState& gameState) {
+void runClient(GameState &gameState) {
     ConnectionToServer::ptr client = ConnectionToServer::newConnection(gameState);
     client->startConnection();
     std::cout << "Connected " << std::endl;

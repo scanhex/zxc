@@ -80,7 +80,7 @@ void GameState::setHealthPoints(double amount, Player player) {
     }
 }
 
-bool GameState::gameIsFinished() {
+bool GameState::gameIsFinished() const {
     return firstHero_->isDead() || secondHero_->isDead();
 }
 
@@ -128,7 +128,7 @@ void GameState::applyEvent(Event event) {
         case EventName::move:
             assert(event.x_ && event.y_);
 
-            applyMove(event.player_, *event.x_, *event.y_);
+            applyMove(event.player_, event.x_, event.y_);
             break;
         default:
             assert(false);

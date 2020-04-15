@@ -19,11 +19,10 @@ public:
     Event();
     explicit Event(EventName eventName, Player player);
     Event(EventName eventName, Player player, double x, double y);
-
     static EventName intToEventName(uint8_t eventId);
     uint8_t eventNameToInt();
 
     EventName eventName_;
     Player player_;
-    std::optional<double> x_, y_;
+    double x_, y_;
 };
