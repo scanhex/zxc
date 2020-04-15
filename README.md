@@ -1,7 +1,8 @@
 # zxc
 ## Подмодули
 ```
-git submodule update --init
+git submodule init   
+git submodule update
 ```
 
 Инструкции по установке библиотек:
@@ -19,7 +20,7 @@ brew install sdl2
 ```
 
 ## Windows(MSVC)
-Скачать SDL2 в директорию проекта с https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz
+Скачать SDL2 в директорию проекта с	SDL2-devel-2.0.10-VC.zip   
 Скачать бинарники Boost: https://sourceforge.net/projects/boost/files/boost-binaries/
 Также нужно установить переменные среды `BOOST_INCLUDEDIR` на папку вида `boost_1_65_0` и `BOOST_LIBRARYDIR` на папку `boost_1_65_0\lib64-msvc-14.1`
 
