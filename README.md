@@ -12,7 +12,7 @@ sudo apt-get install libboost-all-dev
 sudo apt install libsdl2-dev
 ```
 
-## Mac OS X 
+## macOS
 ```
 brew install boost   
 brew install sdl2
