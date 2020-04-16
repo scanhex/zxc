@@ -65,6 +65,7 @@ private:
 	void mouseReleaseEvent(MouseEvent& event) override;
 	void mouseMoveEvent(MouseMoveEvent& event) override;
 	void mouseScrollEvent(MouseScrollEvent& event) override;
+	void exitEvent(ExitEvent& event) override;
 
     void keyPressEvent(KeyEvent &event) override;
 
@@ -521,6 +522,11 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
     std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
     std::cout << '\n';
+}
+
+void ZxcApplication::exitEvent(ExitEvent& event) {
+	std::cout << "Vi v adekvate?" << '\n';
+	exit(0);
 }
 
 MAGNUM_APPLICATION_MAIN(ZxcApplication)
