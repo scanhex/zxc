@@ -6,12 +6,7 @@
 io_service service;
 ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
 extern boost::lockfree::queue <Event> events;
-
-//local Game State example
-//GameState gameState;
-
-//temporary counter for cout
-int32_t cnt = 0;
+extern bool exit_flag;
 
 ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_(service),
                                                                timer_(service),
@@ -29,8 +24,8 @@ void ConnectionToServer::startConnection() {
 
 void ConnectionToServer::stopConnection() {
     if (!connected_) return;
-    std::cout << "stopping " << std::endl;
     connected_ = false;
+    std::cout << "stopping " << std::endl;
     sock_.close();
 }
 
@@ -39,21 +34,20 @@ bool ConnectionToServer::isConnected() const {
 }
 
 void ConnectionToServer::handleConnection(const boost::system::error_code &err) {
-    if (!err) {
-        connected_ = true;
-        sock_.set_option(ip::tcp::no_delay(true));
-        read(sock_, buffer(read_buffer_)); //wait for signal fro server to start
-        std::cout << "Game start!" << std::endl;
-        readFromSocket();
-        writeToSocket();
-    } else {
+    if (err || exit_flag) {
         stopConnection();
         return;
     }
+    connected_ = true;
+    sock_.set_option(ip::tcp::no_delay(true));
+    read(sock_, buffer(read_buffer_)); //wait for signal for server to start
+    std::cout << "Game start!" << std::endl;
+    readFromSocket();
+    writeToSocket();
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || exit_flag) {
         stopConnection();
         return;
     }
@@ -61,6 +55,10 @@ void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &er
 }
 
 void ConnectionToServer::writeToSocket() {
+    if(exit_flag) {
+        stopConnection();
+        return;
+    }
     if (!isConnected()) return;
     writeActionToBuffer();
     sock_.async_write_some(buffer(write_buffer_, MSG_FROM_CLIENT_SIZE),
@@ -68,6 +66,10 @@ void ConnectionToServer::writeToSocket() {
 }
 
 void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
+    if(err || exit_flag) {
+        stopConnection();
+        return;
+    }
     parseGSFromBuffer();
     if (gameState_.gameIsFinished()) {
         //TODO handle game result
@@ -89,7 +91,7 @@ void ConnectionToServer::readFromSocket() {
 }
 
 size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || exit_flag) {
         stopConnection();
         return 0;
     }
@@ -129,6 +131,10 @@ void ConnectionToServer::writeActionToBuffer() {
 }
 
 void ConnectionToServer::waitForAction() {
+    if(exit_flag) {
+        stopConnection();
+        return;
+    }
     if (events.empty()) {
         timer_.expires_from_now(boost::posix_time::millisec(1));
         timer_.async_wait(BIND_FN(waitForAction));
@@ -142,5 +148,6 @@ void runClient(GameState &gameState) {
     client->startConnection();
     std::cout << "Connected " << std::endl;
     service.run();
+    std::cout << "Disonnected " << std::endl;
 }
 
