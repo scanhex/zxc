@@ -16,14 +16,16 @@ PluginManager::Manager<Text::AbstractFont> manager;
 Containers::Pointer<Text::AbstractFont> font;
 UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit) : SceneGraph::Drawable3D(object, &group), _unit(unit)
 {
-	_mesh = MeshTools::compile(Primitives::cubeSolid());
-    if (!font)
-		font = manager.loadAndInstantiate("StbTrueTypeFont");
-//    if (!font || !font->openData(rs.getRaw("arial.ttf"), 180.0f))
-    if (!font || !font->openFile("/Users/maxim/Downloads/arial.ttf", 180.0f))
-        Fatal{} << "Cannot open font file";
-    font->fillGlyphCache(cache, "0123456789.");
-    _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 20.0f, Text::Alignment::LineCenter });
+    _mesh = MeshTools::compile(Primitives::cubeSolid());
+    if (!font) {
+        font = manager.loadAndInstantiate("StbTrueTypeFont");
+    }
+	//    if (!font || !font->openData(rs.getRaw("arial.ttf"), 180.0f))
+	if (!font || !font->openFile("../../resources/arial.ttf", 180.0f))
+		Fatal{} << "Cannot open font file";
+	else std::cout << "Font loaded" << std::endl;
+	font->fillGlyphCache(cache, "0123456789.");
+    _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 1.0f, Text::Alignment::LineCenter });
     _hpRenderer->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
 }
 
@@ -36,7 +38,7 @@ void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3
     .setProjectionMatrix(camera.projectionMatrix());
     _mesh.draw(_shader);
     _hpShader.setColor(0x00ff00_rgbf)
-        .setTransformationProjectionMatrix(camera.projectionMatrix() * transformationMatrix)
+        .setTransformationProjectionMatrix(camera.projectionMatrix() * (Matrix4{ { 1.0f,0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f,0.0f},{0.0f,0.0f,1.0f,0.0f},{0.0f,1.0f,5.0f,1.0f} } * transformationMatrix))
         .bindVectorTexture(cache.texture());
     int32_t myHP = ceil(_unit.getHealthPoints());
     _hpRenderer->render(std::to_string(myHP));
