@@ -94,7 +94,7 @@ private:
 	std::optional<Hero> firstHero;
 	std::optional<Hero> secondHero;
 
-    std::thread gs_cycle;
+    std::thread network_thread;
 
     std::vector<Object3D*> _unitObjects;
 
@@ -326,7 +326,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	initScene();
 	initUnits();
 
-    gs_cycle = std::thread(runClient, std::ref(gameState.value()));
+    network_thread = std::thread(runClient, std::ref(gameState.value()));
 
 	//loadModels();
 	/*
@@ -527,7 +527,7 @@ void ZxcApplication::exitEvent(ExitEvent& event) {
     exit_flag = true;
     std::cout << "Vi v adekvate?" << '\n';
     std::cout << "net" << std::endl;
-    gs_cycle.join();
+    network_thread.join();
     exit(0);
 }
 

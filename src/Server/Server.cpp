@@ -165,7 +165,7 @@ void handleNewConnection(ConnectionToClient::ptr client, const boost::system::er
 
 void updateGS() {
     // Максим -- просто шедевр, убейте его
-    gameState.update(1.0 / 80); // TODO: PASS ELAPSED TIME HERE
+    gameState.update(1.0 / TICK_TIME_GS_UPDATE);
 }
 
 void runGameStateCycle() {
