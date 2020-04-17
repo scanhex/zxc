@@ -1,5 +1,6 @@
 #include "Hero.h"
 #include <algorithm>
+#include "GameState.h"
 
 StatsBuilder Hero::defaultHeroStatsBuilder =
         StatsBuilder().

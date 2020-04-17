@@ -20,8 +20,8 @@ public:
 
     bool gameIsFinished() const;
 
-    double getHealthPoints(Player player);
-    Point getPosition(Player player);
+    double getHealthPoints(Player player) const;
+    Point getPosition(Player player) const;
 
     void update(double elapsedTime);
 
@@ -43,6 +43,8 @@ public:
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
 private:
+    Hero* getHero(Player player) const;
+
     Hero *firstHero_;
     Hero *secondHero_;
 };

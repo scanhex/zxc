@@ -9,65 +9,40 @@ GameState::GameState() {
     secondHero_ = new Hero(Player::Second);
 }
 
-double GameState::getHealthPoints(Player player) {
+Hero *GameState::getHero(Player player) const {
     switch (player) {
         case Player::First:
-            return firstHero_->getHealthPoints();
+            return firstHero_;
         case Player::Second:
-            return secondHero_->getHealthPoints();
+            return secondHero_;
         default:
             assert(false);
     }
 }
 
-Point GameState::getPosition(Player player) {
-    switch (player) {
-        case Player::First:
-            return firstHero_->getPosition();
-        case Player::Second:
-            return secondHero_->getPosition();
-        default:
-            assert(false);
-    }
+double GameState::getHealthPoints(Player player) const {
+    Hero *hero = getHero(player);
+    return hero->getHealthPoints();
+}
+
+Point GameState::getPosition(Player player) const {
+    Hero *hero = getHero(player);
+    return hero->getPosition();
 }
 
 void GameState::setPosition(Point pos, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->setPosition(pos);
-            break;
-        case Player::Second:
-            secondHero_->setPosition(pos);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->setPosition(pos);
 }
 
 void GameState::setPosition(double x, double y, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->setPosition(x, y);
-            break;
-        case Player::Second:
-            secondHero_->setPosition(x, y);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->setPosition(x, y);
 }
 
 void GameState::setHealthPoints(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->setHealthPoints(amount);
-            break;
-        case Player::Second:
-            secondHero_->setHealthPoints(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->setHealthPoints(amount);
 }
 
 bool GameState::gameIsFinished() const {
@@ -76,14 +51,14 @@ bool GameState::gameIsFinished() const {
 
 void GameState::update(double elapsedTime) {
     // only regen for now
-    if(!firstHero_->isDead()){
+    if (!firstHero_->isDead()) {
         double healPerTick = firstHero_->getHpRegen() * elapsedTime;
         double manaPerTick = firstHero_->getMpRegen() * elapsedTime;
         firstHero_->applyHeal(healPerTick);
         firstHero_->regenMana(manaPerTick);
     }
 
-    if(!secondHero_->isDead()){
+    if (!secondHero_->isDead()) {
         double healPerTick = secondHero_->getHpRegen() * elapsedTime;
         double manaPerTick = secondHero_->getMpRegen() * elapsedTime;
         secondHero_->applyHeal(healPerTick);
@@ -93,21 +68,12 @@ void GameState::update(double elapsedTime) {
 
 void GameState::applyMove(Player player, double x, double y) {
     // TODO blink -> move
-    switch (player) {
-        case Player::First:
-            firstHero_->setPosition(x, y);
-            break;
-        case Player::Second:
-            secondHero_->setPosition(x, y);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->setPosition(x, y);
 }
 
 void GameState::applyEvent(Event event) {
-    Hero *hero = firstHero_;
-    if (event.player_ == Player::Second) hero = secondHero_;
+    Hero *hero = getHero(event.player_);
 
     switch (event.eventName_) {
         case EventName::firstSkill:
@@ -128,88 +94,36 @@ void GameState::applyEvent(Event event) {
 }
 
 void GameState::applyDamage(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->applyDamage(amount);
-            break;
-        case Player::Second:
-            secondHero_->applyDamage(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->applyDamage(amount);
 }
 
 void GameState::applyDamagePhys(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->applyDamagePhys(amount);
-            break;
-        case Player::Second:
-            secondHero_->applyDamagePhys(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->applyDamagePhys(amount);
 }
 
 void GameState::applyDamageMagic(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->applyDamageMagic(amount);
-            break;
-        case Player::Second:
-            secondHero_->applyDamageMagic(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->applyDamageMagic(amount);
 }
 
 void GameState::regenMana(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->regenMana(amount);
-            break;
-        case Player::Second:
-            secondHero_->regenMana(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->regenMana(amount);
 }
 
 void GameState::spendMana(double amount, Player player) {
-    switch (player) {
-        case Player::First:
-            firstHero_->spendMana(amount);
-            break;
-        case Player::Second:
-            secondHero_->spendMana(amount);
-            break;
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    hero->spendMana(amount);
 }
 
 bool GameState::canSpendMana(double amount, Player player) const {
-    switch (player) {
-        case Player::First:
-            return firstHero_->canSpendMana(amount);
-        case Player::Second:
-            return secondHero_->canSpendMana(amount);
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    return hero->canSpendMana(amount);
 }
 
 bool GameState::isDead(Player player) const {
-    switch (player) {
-        case Player::First:
-            return firstHero_->isDead();
-        case Player::Second:
-            return secondHero_->isDead();
-        default:
-            assert(false);
-    }
+    Hero *hero = getHero(player);
+    return hero->isDead();
 }

@@ -3,9 +3,8 @@
 #include "Unit.h"
 #include "Skill.h"
 #include "StatsBuilder.h"
-#include "GameState.h"
 
-enum class Player;
+
 enum class SkillNum;
 class GameState;
 class Skill;

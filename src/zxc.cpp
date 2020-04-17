@@ -507,9 +507,9 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         redraw();
     }
 
-    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
-    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
-    std::cout << '\n';
+//    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
+//    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
+//    std::cout << '\n';
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
