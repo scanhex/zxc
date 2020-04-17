@@ -20,7 +20,7 @@ UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group,
     if (!font)
 		font = manager.loadAndInstantiate("StbTrueTypeFont");
 //    if (!font || !font->openData(rs.getRaw("arial.ttf"), 180.0f))
-    if (!font || !font->openFile("C:/Users/ISM/Code/zxc/resources/arial.ttf", 180.0f))
+    if (!font || !font->openFile("/Users/maxim/Downloads/arial.ttf", 180.0f))
         Fatal{} << "Cannot open font file";
     font->fillGlyphCache(cache, "0123456789.");
     _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 20.0f, Text::Alignment::LineCenter });
@@ -38,7 +38,8 @@ void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3
     _hpShader.setColor(0x00ff00_rgbf)
         .setTransformationProjectionMatrix(camera.projectionMatrix() * transformationMatrix)
         .bindVectorTexture(cache.texture());
-    _hpRenderer->render(std::to_string(_unit.getHealthPoints()));
+    int32_t myHP = ceil(_unit.getHealthPoints());
+    _hpRenderer->render(std::to_string(myHP));
     _hpRenderer->mesh().draw(_hpShader);
 }
 
