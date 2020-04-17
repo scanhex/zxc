@@ -72,11 +72,11 @@ private:
 
     Vector3 positionOnSphere(const Vector2i& position) const;
 
-    void updateUnitsPosition();
+    void updateGameState();
 
     void addUnit(Unit &u);
 	void initScene();
-	void initUnits();
+	void initGame();
 	void loadModels();
 	Float depthAt(const Vector2i& position) const;
 	Vector3 unproject(const Vector2i& position, Float depth) const;
@@ -90,7 +90,8 @@ private:
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
-	std::optional<GameState> gameState;
+    std::chrono::time_point<std::chrono::high_resolution_clock> curTime;
+    std::optional<GameState> gameState;
 	std::optional<Hero> firstHero;
 	std::optional<Hero> secondHero;
 
@@ -294,11 +295,12 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
         addObject(importer, materials, *object, id);
 }
 
-void ZxcApplication::initUnits(){
+void ZxcApplication::initGame(){
     firstHero = Hero(Player::First);
     secondHero = Hero(Player::Second);
 
     gameState = GameState(*firstHero, *secondHero);
+    curTime = std::chrono::high_resolution_clock::now();
 
     addUnit(*firstHero);
     addUnit(*secondHero);
@@ -313,7 +315,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 
 	setSwapInterval(1);
 	initScene();
-	initUnits();
+    initGame();
 
     network_thread = std::thread(runClient, std::ref(gameState.value()));
 
@@ -334,7 +336,7 @@ void ZxcApplication::addUnit(Unit& u) {
     new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
-void ZxcApplication::updateUnitsPosition(){
+void ZxcApplication::updateGameState(){
     Point myPosition = gameState->getPosition(Player::First);
     Point otherPosition = gameState->getPosition(Player::Second);
 
@@ -343,12 +345,16 @@ void ZxcApplication::updateUnitsPosition(){
 
     _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
     _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
+    gameState->update(std::chrono::duration_cast<std::chrono::milliseconds>(time - curTime).count());
+    curTime = time;
 }
 
 void ZxcApplication::drawEvent() {
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
-    updateUnitsPosition();
+    updateGameState();
 
 	assert(_camera);
 	_camera->draw(_drawables);
@@ -513,6 +519,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
+    static_cast<void>(event);
     exit_flag = true;
     std::cout << "Vi v adekvate?" << '\n';
     std::cout << "net" << std::endl;
