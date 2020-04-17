@@ -76,15 +76,19 @@ bool GameState::gameIsFinished() const {
 
 void GameState::update(double elapsedTime) {
     // only regen for now
-    double healPerTick = firstHero_->getHpRegen() * elapsedTime;
-    double manaPerTick = firstHero_->getMpRegen() * elapsedTime;
-    firstHero_->applyHeal(healPerTick);
-    firstHero_->regenMana(manaPerTick);
+    if(!firstHero_->isDead()){
+        double healPerTick = firstHero_->getHpRegen() * elapsedTime;
+        double manaPerTick = firstHero_->getMpRegen() * elapsedTime;
+        firstHero_->applyHeal(healPerTick);
+        firstHero_->regenMana(manaPerTick);
+    }
 
-    healPerTick = secondHero_->getHpRegen() * elapsedTime;
-    manaPerTick = secondHero_->getMpRegen() * elapsedTime;
-    secondHero_->applyHeal(healPerTick);
-    secondHero_->regenMana(manaPerTick);
+    if(!secondHero_->isDead()){
+        double healPerTick = secondHero_->getHpRegen() * elapsedTime;
+        double manaPerTick = secondHero_->getMpRegen() * elapsedTime;
+        secondHero_->applyHeal(healPerTick);
+        secondHero_->regenMana(manaPerTick);
+    }
 }
 
 void GameState::applyMove(Player player, double x, double y) {
