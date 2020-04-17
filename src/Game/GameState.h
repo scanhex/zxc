@@ -18,14 +18,14 @@ public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
 
-    bool gameIsFinished() const;
+    [[nodiscard]] bool gameIsFinished() const;
 
-    double getHealthPoints(Player player) const;
-    Point getPosition(Player player) const;
-
-    void update(double elapsedTime);
+    [[nodiscard]] double getHealthPoints(Player player) const;
+    [[nodiscard]] Point getPosition(Player player) const;
 
     [[nodiscard]] bool isDead(Player player) const;
+
+    void update(double elapsedTime);
 
     void applyMove(Player player, double x, double y);
     void applyEvent(Event event);
@@ -43,7 +43,7 @@ public:
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
 private:
-    Hero* getHero(Player player) const;
+    [[nodiscard]] Hero *getHero(Player player) const;
 
     Hero *firstHero_;
     Hero *secondHero_;
