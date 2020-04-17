@@ -1,3 +1,4 @@
+
 find_package(Magnum REQUIRED
         GL
         Sdl2Application
@@ -28,12 +29,14 @@ endif()
 
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
 
 file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h")
 
 file(GLOB server_cpps "Server/main.cpp" "Server/Server.cpp" "Server/Server.h" "Utils/*.cpp" "Utils/*.h" "Game/*.cpp" "Game/*.h")
 
 add_executable(Server ${server_cpps})
+
 
 add_executable(zxc ${zxc_cpps})
 
