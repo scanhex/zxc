@@ -153,6 +153,7 @@ void ConnectionToClient::writeGStoBuffer() {
 
 
 void handleNewConnection(ConnectionToClient::ptr client, const boost::system::error_code &err) {
+    // TODO Ruslan: client copied each time, make ref?
     if (err) {
         std::cout << err.message() << std::endl;
         throw;
