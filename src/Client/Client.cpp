@@ -44,7 +44,7 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
     read(sock_, buffer(read_buffer_)); //wait for signal for server to start
     std::cout << "Game start!" << std::endl;
     readFromSocket();
-    writeToSocket();
+    waitForAction();
 }
 
 void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
