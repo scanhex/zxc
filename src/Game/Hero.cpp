@@ -1,14 +1,31 @@
 #include "Hero.h"
 #include <algorithm>
 
-Hero::Hero(Stats stats, Point position, Player player) : Unit(stats, position),
-                                                         player_{player},
-                                                         gold_{START_GOLD},
-                                                         level_{1},
-                                                         experience_{0},
-                                                         skills_{Skill(player_, SkillNum::first),
-                                                                 Skill(player_, SkillNum::second),
-                                                                 Skill(player_, SkillNum::third)} {}
+StatsBuilder Hero::defaultHeroStatsBuilder =
+        StatsBuilder().
+                setDamage(100).
+                setAttackRange(100).
+                setMoveSpeed(350).
+                setAttackSpeed(100).
+                setMaxHp(1000).
+                setMaxMp(300).
+                setHpRegen(0.1).
+                setMpRegen(1).
+                setArmor(3).
+                setResist(0.25);
+
+Hero::Hero(Point position, Player player) : Unit(defaultHeroStatsBuilder.create(), position),
+                                            player_{player},
+                                            gold_{START_GOLD},
+                                            level_{1},
+                                            experience_{0},
+                                            skills_{Skill(player_, SkillNum::first),
+                                                    Skill(player_, SkillNum::second),
+                                                    Skill(player_, SkillNum::third)} {}
+
+Hero::Hero(Stats stats, Point position, Player player) : Hero(position, player) {
+    stats_ = stats;
+}
 
 bool Hero::canSpendGold(uint32_t amount) {
     return gold_ >= amount;
