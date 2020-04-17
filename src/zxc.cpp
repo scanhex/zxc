@@ -95,7 +95,6 @@ private:
 
     std::thread gs_cycle;
 
-    std::vector<Unit> _units;
     std::vector<Object3D*> _unitObjects;
 
 	Scene3D _scene;
@@ -341,9 +340,8 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 }
 
 void ZxcApplication::addUnit(Unit& u) {
-    _units.push_back(u);
     _unitObjects.push_back(new Object3D(&_manipulator));
-    new UnitDrawable(*_unitObjects.back(), _drawables, _units.back());
+    new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
 void ZxcApplication::updateUnitsPosition(){
