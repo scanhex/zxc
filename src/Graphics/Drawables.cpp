@@ -21,7 +21,7 @@ UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group,
         font = manager.loadAndInstantiate("StbTrueTypeFont");
     }
 	//    if (!font || !font->openData(rs.getRaw("arial.ttf"), 180.0f))
-	if (!font || !font->openFile("../../resources/arial.ttf", 180.0f))
+	if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
 		Fatal{} << "Cannot open font file";
 	else std::cout << "Font loaded" << std::endl;
 	font->fillGlyphCache(cache, "0123456789.");
