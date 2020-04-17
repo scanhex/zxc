@@ -25,7 +25,7 @@ public:
 
     [[nodiscard]] bool isDead(Player player) const;
 
-    void update(double elapsedTime);
+    void update(double elapsedTime); // time in milliseconds
 
     void applyMove(Player player, double x, double y);
     void applyEvent(Event event);

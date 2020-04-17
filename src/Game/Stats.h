@@ -14,8 +14,8 @@ private:
     uint32_t maxMP_;
     double healthPoints_;
     double manaPoints_;
-    double hpRegen_;
-    double mpRegen_;
+    double hpRegen_; // per second
+    double mpRegen_; // per second
 
     int32_t armor_; // adjust formula(see applyDamagePhys)?
     double resist_; // percent

@@ -164,8 +164,8 @@ void handleNewConnection(ConnectionToClient::ptr client, const boost::system::er
 }
 
 void updateGS() {
-    // Максим -- просто шедевр, убейте его
-    gameState.update(1.0 / TICK_TIME_GS_UPDATE);
+    // Максим -- хорош
+    gameState.update(TICK_TIME_GS_UPDATE);
 }
 
 void runGameStateCycle() {
@@ -174,7 +174,7 @@ void runGameStateCycle() {
         while ((now - last_tick).total_milliseconds() < TICK_TIME_GS_UPDATE) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             now = boost::posix_time::microsec_clock::local_time();
-            boost::posix_time::time_duration diff = now - last_tick;
+            boost::posix_time::time_duration diff = now - last_tick; // TODO Ruslan: delete if unused
         }
         //TODO may cause some problems in WINDOWS
         last_tick = now;

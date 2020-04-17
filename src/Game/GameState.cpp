@@ -50,6 +50,8 @@ bool GameState::gameIsFinished() const {
 }
 
 void GameState::update(double elapsedTime) {
+    assert(elapsedTime >= 0);
+    elapsedTime /= 1000.0;
     // only regen for now
     if (!firstHero_->isDead()) {
         double healPerTick = firstHero_->getHpRegen() * elapsedTime;
