@@ -3,6 +3,7 @@
 #include "Unit.h"
 #include "Skill.h"
 #include "StatsBuilder.h"
+#include "GameState.h"
 
 enum class Player;
 enum class SkillNum;
@@ -27,10 +28,13 @@ private:
     Skill skills_[NUM_SKILLS];
 
     static StatsBuilder defaultHeroStatsBuilder;
+    static Point firstHeroStartingPoint;
+    static Point secondHeroStartingPoint;
 
 public:
-    Hero(Stats stats, Point position, Player player);
-    Hero(Point position, Player player);
+    explicit Hero(Player player);
+    Hero(Player player, Point position);
+    Hero(Player player, Point position, Stats stats);
 
     bool canSpendGold(uint32_t amount);
     void addGold(uint32_t amount);

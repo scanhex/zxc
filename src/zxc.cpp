@@ -295,8 +295,8 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
 }
 
 void ZxcApplication::initUnits(){
-    firstHero = Hero(Point(0, 0), Player::First);
-    secondHero = Hero(Point(0, 0), Player::Second);
+    firstHero = Hero(Player::First);
+    secondHero = Hero(Player::Second);
 
     gameState = GameState(*firstHero, *secondHero);
 

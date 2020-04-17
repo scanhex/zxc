@@ -5,8 +5,8 @@ GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero}
 
 GameState::GameState() {
     // 2 default heros
-    firstHero_ = new Hero(Point(0, 0), Player::First);
-    secondHero_ = new Hero(Point(0, 0), Player::Second);
+    firstHero_ = new Hero(Player::First);
+    secondHero_ = new Hero(Player::Second);
 }
 
 double GameState::getHealthPoints(Player player) {

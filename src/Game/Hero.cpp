@@ -14,7 +14,22 @@ StatsBuilder Hero::defaultHeroStatsBuilder =
                 setArmor(3).
                 setResist(0.25);
 
-Hero::Hero(Point position, Player player) : Unit(defaultHeroStatsBuilder.create(), position),
+Point Hero::firstHeroStartingPoint = Point(-6, -6);
+Point Hero::secondHeroStartingPoint = Point(6, 6);
+
+Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder.create(),
+                                 player == Player::First ?
+                                 firstHeroStartingPoint :
+                                 secondHeroStartingPoint),
+                            player_{player},
+                            gold_{START_GOLD},
+                            level_{1},
+                            experience_{0},
+                            skills_{Skill(player_, SkillNum::first),
+                                    Skill(player_, SkillNum::second),
+                                    Skill(player_, SkillNum::third)} {}
+
+Hero::Hero(Player player, Point position) : Unit(defaultHeroStatsBuilder.create(), position),
                                             player_{player},
                                             gold_{START_GOLD},
                                             level_{1},
@@ -23,7 +38,7 @@ Hero::Hero(Point position, Player player) : Unit(defaultHeroStatsBuilder.create(
                                                     Skill(player_, SkillNum::second),
                                                     Skill(player_, SkillNum::third)} {}
 
-Hero::Hero(Stats stats, Point position, Player player) : Hero(position, player) {
+Hero::Hero(Player player, Point position, Stats stats) : Hero(player, position) {
     stats_ = stats;
 }
 
