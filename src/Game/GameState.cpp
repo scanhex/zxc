@@ -1,4 +1,5 @@
 #include "GameState.h"
+#include <cmath>
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
                                                           secondHero_{&secondHero} {}
@@ -49,29 +50,33 @@ bool GameState::gameIsFinished() const {
     return firstHero_->isDead() || secondHero_->isDead();
 }
 
-void GameState::update(double elapsedTime) {
+void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
-    elapsedTime /= 1000.0;
-    // only regen for now
-    if (!firstHero_->isDead()) {
-        double healPerTick = firstHero_->getHpRegen() * elapsedTime;
-        double manaPerTick = firstHero_->getMpRegen() * elapsedTime;
-        firstHero_->applyHeal(healPerTick);
-        firstHero_->regenMana(manaPerTick);
-    }
+    double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
-    if (!secondHero_->isDead()) {
-        double healPerTick = secondHero_->getHpRegen() * elapsedTime;
-        double manaPerTick = secondHero_->getMpRegen() * elapsedTime;
-        secondHero_->applyHeal(healPerTick);
-        secondHero_->regenMana(manaPerTick);
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if (!hero->isDead()) {
+            double healPerTick = hero->getHpRegen() * elapsedTimeInSeconds;
+            double manaPerTick = hero->getMpRegen() * elapsedTimeInSeconds;
+            hero->applyHeal(healPerTick);
+            hero->regenMana(manaPerTick);
+
+            Point vector = hero->getDestination() - hero->getPosition();
+            double factor = (hero->getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
+            if (vector.vectorLengthIsLessThan(factor)) {
+                hero->setPosition(hero->getDestination());
+            } else {
+                vector.normalize();
+                vector *= factor;
+                hero->changePositionBy(vector);
+            }
+        }
     }
 }
 
 void GameState::applyMove(Player player, double x, double y) {
-    // TODO blink -> move
     Hero *hero = getHero(player);
-    hero->setPosition(x, y);
+    hero->setDestination(x, y);
 }
 
 void GameState::applyEvent(Event event) {

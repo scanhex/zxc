@@ -17,19 +17,20 @@ protected:
 
     Stats stats_;
 
-    Point position_; // ??
+    Point position_;
+    Point destination_;
 
 public:
     Unit(Stats stats, Point position);
 
     void addItem(Item &item, size_t slot = -1);
 
-    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory
+    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory TODO
     void clearItems();
 
     void addBuff(Buff &buff);
 
-    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index
+    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index TODO
     void clearBuffs();
 
     void changeDamage(int32_t delta);
@@ -52,7 +53,9 @@ public:
 
     void changeArmor(int32_t delta);
     void changeResist(double delta);
-    void changePosition(double deltaX, double deltaY); // coords += deltaCoords
+
+    void changePositionBy(double deltaX, double deltaY); // coords += deltaCoords
+    void changePositionBy(Point vector); // += vector
 
     bool isDead();
 
@@ -98,4 +101,8 @@ public:
     [[nodiscard]] const Point &getPosition() const;
     void setPosition(const Point &position);
     void setPosition(double x, double y);
+
+    [[nodiscard]] const Point &getDestination() const;
+    void setDestination(const Point &destination);
+    void setDestination(double x, double y);
 };

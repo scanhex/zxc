@@ -2,7 +2,8 @@
 #include <algorithm>
 
 Unit::Unit(Stats stats, Point position) : stats_{stats},
-                                          position_{position} {
+                                          position_{position},
+                                          destination_{position} {
     stats_.refreshStats();
 }
 
@@ -94,7 +95,8 @@ void Unit::spendMana(double amount) {
 
 void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
-void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
+void Unit::changePositionBy(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
+void Unit::changePositionBy(Point vector) { position_ += vector; }
 
 bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 
@@ -140,3 +142,7 @@ void Unit::setResist(double resist) { stats_.setResist(resist); }
 const Point &Unit::getPosition() const { return position_; }
 void Unit::setPosition(const Point &position) { position_ = position; }
 void Unit::setPosition(double x, double y) { position_ = Point(x, y); }
+
+const Point &Unit::getDestination() const { return destination_; }
+void Unit::setDestination(const Point &destination) { destination_ = destination; }
+void Unit::setDestination(double x, double y) { destination_ = Point(x, y); }
