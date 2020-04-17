@@ -52,6 +52,7 @@ typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
 typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
 
 boost::lockfree::queue<Event> events{100};
+bool exit_flag = false;
 
 class ZxcApplication : public Platform::Application {
 public:
@@ -523,8 +524,11 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
-	std::cout << "Vi v adekvate?" << '\n';
-	exit(0);
+    exit_flag = true;
+    std::cout << "Vi v adekvate?" << '\n';
+    std::cout << "net" << std::endl;
+    gs_cycle.join();
+    exit(0);
 }
 
 MAGNUM_APPLICATION_MAIN(ZxcApplication)
