@@ -4,19 +4,9 @@ GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero}
                                                           secondHero_{&secondHero} {}
 
 GameState::GameState() {
-    StatsBuilder heroStatsBuilder = StatsBuilder().
-            setDamage(100).
-            setAttackRange(100).
-            setMoveSpeed(350).
-            setAttackSpeed(100).
-            setMaxHp(1000).
-            setMaxMp(300).
-            setHpRegen(2).
-            setMpRegen(1).
-            setArmor(3).
-            setResist(0.25);
-    firstHero_ = new Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
-    secondHero_ = new Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+    // 2 default heros
+    firstHero_ = new Hero(Point(0, 0), Player::First);
+    secondHero_ = new Hero(Point(0, 0), Player::Second);
 }
 
 double GameState::getHealthPoints(Player player) {

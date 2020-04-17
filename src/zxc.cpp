@@ -295,19 +295,8 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
 }
 
 void ZxcApplication::initUnits(){
-    StatsBuilder heroStatsBuilder = StatsBuilder().
-            setDamage(100).
-            setAttackRange(100).
-            setMoveSpeed(350).
-            setAttackSpeed(100).
-            setMaxHp(1000).
-            setMaxMp(300).
-            setHpRegen(2).
-            setMpRegen(1).
-            setArmor(3).
-            setResist(0.25);
-    firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
-    secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+    firstHero = Hero(Point(0, 0), Player::First);
+    secondHero = Hero(Point(0, 0), Player::Second);
 
     gameState = GameState(*firstHero, *secondHero);
 

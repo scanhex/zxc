@@ -11,7 +11,7 @@
 constexpr size_t MAX_ITEMS = 6;
 
 class Unit {
-private:
+protected:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
 
