@@ -7,9 +7,11 @@ find_package(Magnum REQUIRED
         ObjImporter
 		TgaImporter
         Primitives
-        MeshTools)
+        MeshTools
+        Text
+        )
 find_package(Assimp)
-find_package(MagnumPlugins REQUIRED AssimpImporter)
+find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
@@ -27,17 +29,18 @@ endif()
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 
-file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*.cpp" "*.h")
+file(GLOB zxc_cpps "Game/*.cpp" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h")
 
 add_executable(zxc ${zxc_cpps})
 
 add_dependencies(zxc
-    MagnumPlugins::AssimpImporter
     Magnum::AnyImageImporter
+    MagnumPlugins::AssimpImporter
+    MagnumPlugins::StbTrueTypeFont
         )
 
 if (MSVC)
-	target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter)
+	target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter MagnumPlugins::StbTrueTypeFont)
 endif()
 target_link_libraries(zxc PRIVATE
     ${Boost_LIBRARIES}
@@ -49,6 +52,7 @@ target_link_libraries(zxc PRIVATE
     Magnum::Shaders
     Magnum::Trade
     Magnum::Primitives
+    Magnum::Text
         )
 
 # Make the executable a default target to build & run in Visual Studio

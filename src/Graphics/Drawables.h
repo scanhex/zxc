@@ -2,6 +2,7 @@
 
 #include <Magnum/Shaders/Phong.h>
 #include <Magnum/Shaders/Flat.h>
+#include <Magnum/Shaders/Vector.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/Primitives/Cube.h>
@@ -13,6 +14,10 @@
 #include <Magnum/Trade/MeshData3D.h>
 #include <Magnum/Primitives/Cube.h>
 #include <Magnum/Primitives/Circle.h>
+#include <Magnum/Text/AbstractFont.h>
+#include <Magnum/Text/DistanceFieldGlyphCache.h>
+#include <Magnum/Text/Renderer.h>
+#include <Corrade/PluginManager/Manager.h>
 #include "../Game/Hero.h"
 
 #include<iostream>
@@ -23,15 +28,13 @@ using namespace Math::Literals;
 typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
 typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
 
+
 class UnitDrawable : public SceneGraph::Drawable3D
 {
 public:
-    explicit UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit) : SceneGraph::Drawable3D(object, &group), _unit(unit)
-    {
-        _mesh = MeshTools::compile(Primitives::cubeSolid());
-    }
+    explicit UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit);
     ~UnitDrawable() override {
-        std::cerr<<"Bye from UnitDrawable!"<<'\n';
+//        std::cerr<<"Bye from UnitDrawable!"<<'\n';
     }
 
 private:
@@ -39,7 +42,11 @@ private:
 
     GL::Mesh _mesh;
     Shaders::Phong _shader;
+    Shaders::Vector3D _hpShader;
+    Containers::Pointer<Text::Renderer2D> _hpRenderer;
     const Unit& _unit;
+
+	Text::GlyphCache cache{ Vector2i{512} };
 };
 
 class FlatDrawable: public SceneGraph::Drawable3D {
