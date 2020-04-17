@@ -40,6 +40,7 @@ void ConnectionToServer::handleConnection(const boost::system::error_code &err) 
     }
     connected_ = true;
     sock_.set_option(ip::tcp::no_delay(true));
+    //TODO may cause problem with exit
     read(sock_, buffer(read_buffer_)); //wait for signal for server to start
     std::cout << "Game start!" << std::endl;
     readFromSocket();
