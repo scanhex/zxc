@@ -14,8 +14,9 @@ static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
-static constexpr int MSG_FROM_SERVER_SIZE = 64; //size of default message to client
+static constexpr int MSG_FROM_SERVER_SIZE = 64;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add move action
+static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
 using namespace boost::asio;
 
@@ -47,7 +48,7 @@ private:
     /*
      * Functions for handling connection to client, e.g. reading/writing to socket
      */
-    void waitForAllConnections(const boost::system::error_code &err);
+    void waitForAllConnections(const boost::system::error_code &err, size_t bytes);
 
     void handleReadFromSocket(const boost::system::error_code &err, size_t bytes);
 
@@ -69,17 +70,17 @@ private:
 
 private:
     static int32_t running_connections_;
-    int player_id_;
+    int player_id_{};
     ip::tcp::socket sock_;
     uint8_t read_buffer_[MAX_MSG]{};
     uint8_t write_buffer_[MAX_MSG]{};
-    //std::string username_;
     deadline_timer timer_;
+    deadline_timer stop_timer_;
 };
 
 void updateGS();
 
-void handleNewConnection(ConnectionToClient::ptr client, const boost::system::error_code &err);
+void handleNewConnection(const ConnectionToClient::ptr& client, const boost::system::error_code &err);
 
 void runGameStateCycle();
 
