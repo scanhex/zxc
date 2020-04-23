@@ -10,8 +10,8 @@ Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{ser
                                                                        stop_timer_{service},
                                                                        gameState_{gameState} {}
 
-Client::ConnectionToServer::ptr Client::ConnectionToServer::newConnection(GameState &gameState) {
-    ptr new_(new ConnectionToServer(gameState));
+std::shared_ptr<Client::ConnectionToServer>  Client::ConnectionToServer::newConnection(GameState &gameState) {
+    std::shared_ptr<ConnectionToServer>  new_(new ConnectionToServer(gameState));
     return new_;
 }
 
@@ -208,4 +208,6 @@ void runClient(GameState &gameState){
     Client client(gameState);
     client.run();
 }
+
+//TODO refactor
 

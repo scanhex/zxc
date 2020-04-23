@@ -15,10 +15,10 @@ static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next ser
 
 using namespace boost::asio;
 
-#define BIND_FN(x)         std::bind(&self_type::x, shared_from_this())
-#define BIND_FN1(x, y)      std::bind(&self_type::x, shared_from_this(),y)
-#define BIND_FN2(x, y, z)    std::bind(&self_type::x, shared_from_this(),y,z)
-#define BIND_FN3(x, y, z, w)  std::bind(&self_type::x, shared_from_this(),y,z,w)
+#define BIND_FN(x)         std::bind(&ConnectionToServer ::x, shared_from_this())
+#define BIND_FN1(x, y)      std::bind(&ConnectionToServer ::x, shared_from_this(),y)
+#define BIND_FN2(x, y, z)    std::bind(&ConnectionToServer ::x, shared_from_this(),y,z)
+#define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToServer ::x, shared_from_this(),y,z,w)
 
 class Client final {
 public:
@@ -30,12 +30,10 @@ public:
 private:
     class ConnectionToServer : public std::enable_shared_from_this<ConnectionToServer> {
     public:
-        typedef std::shared_ptr<ConnectionToServer> ptr;
-        typedef ConnectionToServer self_type;
 
         ConnectionToServer(GameState &gameState);
 
-        static ptr newConnection(GameState &gameState);
+        static std::shared_ptr<ConnectionToServer> newConnection(GameState &gameState);
 
         void startConnection();
 
@@ -102,7 +100,7 @@ private:
     void checkServerResponse();
 
 private:
-    ConnectionToServer::ptr connection_;
+    std::shared_ptr<ConnectionToServer> connection_;
     boost::posix_time::ptime last_update, now;
 };
 

@@ -2,8 +2,9 @@
 #include "../Utils/BufferIO.h"
 #include "../Game/GameState.h"
 
-GameState gameState;
+GameState gameState; //TODO create class Server
 bool running = false;
+bool stopped = false;
 boost::posix_time::ptime last_tick, now;
 
 int32_t ConnectionToClient::running_connections_ = 0;
@@ -13,12 +14,17 @@ ip::tcp::acceptor acceptor(service, ip::tcp::endpoint(ip::tcp::v4(), 8001));
 std::mutex g_lock;
 
 
-ConnectionToClient::ConnectionToClient() : sock_(service),
+ConnectionToClient::ConnectionToClient() : is_connected_(false),
+                                           sock_(service),
                                            timer_(service),
                                            stop_timer_(service) {
 }
 
 void ConnectionToClient::startConnection() {
+    is_connected_ = true;
+    conn_checker_.join();
+    if (stopped)
+        return;
     sock_.set_option(ip::tcp::no_delay(true));
     player_id_ = running_connections_;
     ++ConnectionToClient::running_connections_;
@@ -26,8 +32,8 @@ void ConnectionToClient::startConnection() {
     timer_.async_wait(BIND_FN2(waitForAllConnections, std::placeholders::_1, 0));
 }
 
-ConnectionToClient::ptr ConnectionToClient::newClient() {
-    ptr new_client(new ConnectionToClient);
+std::shared_ptr<ConnectionToClient> ConnectionToClient::newClient() {
+    std::shared_ptr<ConnectionToClient> new_client(new ConnectionToClient);
     return new_client;
 }
 
@@ -36,16 +42,22 @@ int ConnectionToClient::connectionsNumber() const {
 }
 
 void ConnectionToClient::stopConnection() {
-    if (!running) return;
+    stopped = true;
+    is_connected_ = false;
     running = false;
-    running_connections_ = std::min(0, running_connections_ - 1);
-    if (!running_connections_) {
-        boost::system::error_code ec;
-        stop_timer_.expires_from_now(boost::posix_time::milliseconds(50));
-        stop_timer_.wait();
-        sock_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        sock_.close();
+    running_connections_ = std::max(0, running_connections_ - 1);
+    boost::system::error_code ec;
+    stop_timer_.expires_from_now(boost::posix_time::milliseconds(50));
+    stop_timer_.wait();
+    if (sock_.is_open()) {
+        sock_.cancel();
     }
+    if (acceptor.is_open()) {
+        acceptor.cancel();
+        acceptor.close();
+    }
+    sock_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    sock_.close();
 }
 
 ip::tcp::socket &ConnectionToClient::sock() {
@@ -53,17 +65,17 @@ ip::tcp::socket &ConnectionToClient::sock() {
 }
 
 void ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || stopped) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return;
     }
+    if (!running) return;
     if (!running_connections_) return;
     g_lock.lock();
     updateGSbyPlayer();
     g_lock.unlock();
-    if (running)
-        readFromSocket();
+    readFromSocket();
 }
 
 void ConnectionToClient::readFromSocket() {
@@ -74,17 +86,18 @@ void ConnectionToClient::readFromSocket() {
 }
 
 size_t ConnectionToClient::checkReadComplete(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || stopped) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return 0;
     }
+    if (!running) return 0;
     bool done = (bytes >= MSG_FROM_CLIENT_SIZE);
     return done ? 0 : 1;
 }
 
 void ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || stopped) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return;
@@ -105,12 +118,13 @@ void ConnectionToClient::writeToSocket() {
 }
 
 void ConnectionToClient::waitForAllConnections(const boost::system::error_code &err, size_t bytes) {
-    if (err) {
+    if (err || stopped) {
         std::cout << err.message() << std::endl;
         stopConnection();
-        throw;
+        return;
     }
     if (running_connections_ == PLAYERS_REQUIRED) {
+        running = true;
         BufferIO::writeUInt8(1, 0, write_buffer_);
         sock_.write_some(buffer(write_buffer_, MSG_WAIT_FROM_SERVER_SIZE));
         timer_.expires_from_now(boost::posix_time::milliseconds(TICK_TIME_SEND_GS));
@@ -162,15 +176,33 @@ void ConnectionToClient::writeGStoBuffer() {
     BufferIO::writeDouble(secondPos.y_, 40, write_buffer_);
 }
 
-void handleNewConnection(const ConnectionToClient::ptr &client, const boost::system::error_code &err) {
-    if (err) {
-        std::cout << err.message() << std::endl;
-        throw;
+void ConnectionToClient::connectionChecker() {
+    while (!is_connected_) {
+        if (stopped) {
+            stopConnection();
+            return;
+        }
+        timer_.expires_from_now(boost::posix_time::milliseconds(1));
+        timer_.wait();
     }
-    client->startConnection();
-    ConnectionToClient::ptr new_client = ConnectionToClient::newClient();
-    if (client->connectionsNumber() < PLAYERS_REQUIRED)
+}
+
+void ConnectionToClient::startChecker() {
+    conn_checker_ = std::thread(&ConnectionToClient::connectionChecker, this);
+}
+
+void handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err) {
+    client->startConnection(); //to stop checker if needed
+    if (err || stopped) {
+        client->stopConnection();
+        std::cout << err.message() << std::endl;
+        return;
+    }
+    if (client->connectionsNumber() < PLAYERS_REQUIRED) {
+        std::shared_ptr<ConnectionToClient> new_client = ConnectionToClient::newClient();
+        new_client->startChecker();
         acceptor.async_accept(new_client->sock(), std::bind(handleNewConnection, new_client, std::placeholders::_1));
+    }
 }
 
 void updateGS() {
@@ -179,7 +211,12 @@ void updateGS() {
 }
 
 void runGameStateCycle() {
-    while (running) {
+    while (!running) {
+        if (stopped)
+            return;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    while (running && !stopped) {
         now = boost::posix_time::microsec_clock::local_time();
         while ((now - last_tick).total_milliseconds() < TICK_TIME_GS_UPDATE) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -194,11 +231,11 @@ void runGameStateCycle() {
 }
 
 void runServer() {
-    last_tick = boost::posix_time::microsec_clock::local_time();
-    ConnectionToClient::ptr client = ConnectionToClient::newClient();
+    std::shared_ptr<ConnectionToClient> client = ConnectionToClient::newClient();
     std::this_thread::sleep_for(std::chrono::milliseconds(TICK_TIME_GS_UPDATE));
+    client->startChecker();
     acceptor.async_accept(client->sock(), std::bind(handleNewConnection, client, std::placeholders::_1));
-    running = true;
+    last_tick = boost::posix_time::microsec_clock::local_time();
     std::thread gs_cycle(runGameStateCycle);
     service.run();
     gs_cycle.join();
