@@ -20,23 +20,21 @@ static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
 using namespace boost::asio;
 
-#define BIND_FN(x)         std::bind(&self_type::x, shared_from_this())
-#define BIND_FN1(x, y)      std::bind(&self_type::x, shared_from_this(),y)
-#define BIND_FN2(x, y, z)    std::bind(&self_type::x, shared_from_this(),y,z)
-#define BIND_FN3(x, y, z, w)  std::bind(&self_type::x, shared_from_this(),y,z,w)
+#define BIND_FN(x)         std::bind(&ConnectionToClient::x, shared_from_this())
+#define BIND_FN1(x, y)      std::bind(&ConnectionToClient ::x, shared_from_this(),y)
+#define BIND_FN2(x, y, z)    std::bind(&ConnectionToClient ::x, shared_from_this(),y,z)
+#define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToClient ::x, shared_from_this(),y,z,w)
 
 
 class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
 
 public:
-    typedef std::shared_ptr<ConnectionToClient> ptr;
-    typedef ConnectionToClient self_type;
 
     ConnectionToClient();
 
     void startConnection();
 
-    static ptr newClient();
+    static std::shared_ptr<ConnectionToClient> newClient();
 
     int32_t connectionsNumber() const;
 
@@ -69,18 +67,30 @@ private:
     void writeGStoBuffer();
 
 private:
+
+    void connectionChecker();
+
+public:
+
+    void startChecker();
+
+private:
     static int32_t running_connections_;
+    bool is_connected_{false};
     int player_id_{};
     ip::tcp::socket sock_;
     uint8_t read_buffer_[MAX_MSG]{};
     uint8_t write_buffer_[MAX_MSG]{};
     deadline_timer timer_;
     deadline_timer stop_timer_;
+
+public:
+    std::thread conn_checker_;
 };
 
 void updateGS();
 
-void handleNewConnection(const ConnectionToClient::ptr& client, const boost::system::error_code &err);
+void handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err);
 
 void runGameStateCycle();
 
