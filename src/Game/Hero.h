@@ -27,13 +27,13 @@ private:
     Skill skills_[NUM_SKILLS];
 
     static StatsBuilder defaultHeroStatsBuilder;
-    static Point firstHeroStartingPoint;
-    static Point secondHeroStartingPoint;
+    static Position firstHeroStartingPosition;
+    static Position secondHeroStartingPosition;
 
 public:
     explicit Hero(Player player);
-    Hero(Player player, Point position);
-    Hero(Player player, Point position, Stats stats);
+    Hero(Player player, Position position);
+    Hero(Player player, Position position, Stats stats);
 
     bool canSpendGold(uint32_t amount);
     void addGold(uint32_t amount);
