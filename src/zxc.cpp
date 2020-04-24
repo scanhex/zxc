@@ -316,6 +316,10 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 {
 
 	setSwapInterval(1);
+	GL::Renderer::enable(GL::Renderer::Feature::Blending);
+	GL::Renderer::setBlendFunction(
+		GL::Renderer::BlendFunction::One, /* or SourceAlpha for non-premultiplied */
+		GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 	initScene();
     initGame();
 

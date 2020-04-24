@@ -23,7 +23,7 @@ UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group,
 		Fatal{} << "Cannot open font file";
 	else std::cout << "Font loaded" << std::endl;
 	font->fillGlyphCache(cache, "0123456789.");
-    _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 1.0f, Text::Alignment::LineCenter });
+    _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 0.5f, Text::Alignment::LineCenter });
     _hpRenderer->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
 }
 
@@ -38,7 +38,7 @@ void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3
     _mesh.draw(_shader);
     */
     _hpShader.setColor(0x00ff00_rgbf)
-        .setTransformationProjectionMatrix(camera.projectionMatrix() * (Matrix4{ { 1.0f,0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f,0.0f},{0.0f,0.0f,1.0f,0.0f},{0.0f,1.0f,5.0f,1.0f} } * Matrix4::translation(transformationMatrix.translation())))
+        .setTransformationProjectionMatrix(camera.projectionMatrix()  * Matrix4::translation(transformationMatrix.translation()) * Matrix4::translation({ 0.f, 1.f, 5.f }))
         .bindVectorTexture(cache.texture());
     int32_t myHP = ceil(_unit.getHealthPoints());
     _hpRenderer->render(std::to_string(myHP));
