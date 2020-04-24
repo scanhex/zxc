@@ -40,7 +40,6 @@ public:
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
 
-    GL::Mesh _mesh;
     Shaders::Phong _shader;
     Shaders::Vector3D _hpShader;
     Containers::Pointer<Text::Renderer2D> _hpRenderer;
