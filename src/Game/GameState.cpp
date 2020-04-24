@@ -1,4 +1,5 @@
 #define _USE_MATH_DEFINES
+
 #include "GameState.h"
 #include <cmath>
 
@@ -88,6 +89,9 @@ void GameState::update(double elapsedTime) { // time in milliseconds
                     hero->changeAngle(angle > myAngle ? -delta : delta);
                 }
             }
+
+            delta = std::abs(angle - myAngle);
+            if(std::min(delta, 2 * M_PI - delta) > 1) continue;
 
 
             double factor = (hero->getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
