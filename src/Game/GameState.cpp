@@ -2,6 +2,7 @@
 
 #include "GameState.h"
 #include <cmath>
+#include <algorithm>
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
                                                           secondHero_{&secondHero} {}
