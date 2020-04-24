@@ -22,6 +22,7 @@ public:
 
     [[nodiscard]] double getHealthPoints(Player player) const;
     [[nodiscard]] Point getPosition(Player player) const;
+    [[nodiscard]] double getAngle(Player player) const;
 
     [[nodiscard]] bool isDead(Player player) const;
 

@@ -19,6 +19,7 @@ protected:
 
     Point position_;
     Point destination_;
+    double angle_;
 
 public:
     Unit(Stats stats, Point position);
@@ -36,11 +37,13 @@ public:
     void changeDamage(int32_t delta);
     void changeAttackRange(int32_t delta);
     void changeMoveSpeed(int32_t delta);
+    void changeTurnRate(double delta);
     void changeAttackSpeed(int32_t delta);
     void changeMaxHP(int32_t delta);
     void changeMaxMP(int32_t delta);
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
+    void changeAngle(double delta);
 
     void applyHeal(double amount);
     void applyDamage(double amount);
@@ -70,6 +73,9 @@ public:
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);
+
+    [[nodiscard]] double getTurnRate() const;
+    void setTurnRate(double turnRate);
 
     [[nodiscard]] uint32_t getAttackSpeed() const;
     void setAttackSpeed(uint32_t attackSpeed);
@@ -105,4 +111,7 @@ public:
     [[nodiscard]] const Point &getDestination() const;
     void setDestination(const Point &destination);
     void setDestination(double x, double y);
+
+    [[nodiscard]] double getAngle() const;
+    void setAngle(double angle);
 };

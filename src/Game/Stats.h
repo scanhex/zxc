@@ -9,6 +9,7 @@ private:
 
     uint32_t moveSpeed_;
     uint32_t attackSpeed_;
+    double turnRate_;
 
     uint32_t maxHP_;
     uint32_t maxMP_;
@@ -26,6 +27,7 @@ public:
     void changeDamage(int32_t delta);
     void changeAttackRange(int32_t delta);
     void changeMoveSpeed(int32_t delta);
+    void changeTurnRate(int32_t delta);
     void changeAttackSpeed(int32_t delta);
     void changeMaxHP(int32_t delta);
     void changeMaxMP(int32_t delta);
@@ -48,6 +50,9 @@ public:
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);
+
+    [[nodiscard]] double getTurnRate() const;
+    void setTurnRate(double turnRate);
 
     [[nodiscard]] uint32_t getAttackSpeed() const;
     void setAttackSpeed(uint32_t attackSpeed);
