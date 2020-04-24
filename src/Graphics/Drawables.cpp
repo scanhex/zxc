@@ -66,8 +66,9 @@ void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Came
 
 void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
     _shader
-            .setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
-            .setLightColor(Color4(255, 255, 255, 255))
+			.setShininess(200.f)
+			.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+			.setLightColor(Color4(3.f, 3.f, 3.f, 3.f))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix())
