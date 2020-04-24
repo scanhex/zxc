@@ -132,23 +132,31 @@ size_t Client::ConnectionToServer::checkReadComplete(const boost::system::error_
     return done ? 0 : 1;
 }
 
-void Client::ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2) {
+void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_y1, double dest_x1, double dest_y1,
+                                          double hp2, double pos_x2, double pos_y2, double dest_x2, double dest_y2) {
     gameState_.setHealthPoints(hp1, Player::First);
-    gameState_.setPosition(x1, y1, Player::First);
+    gameState_.setPosition(pos_x1, pos_y1, Player::First);
+    gameState_.setDestination(dest_x1, dest_y1, Player::First);
 
     gameState_.setHealthPoints(hp2, Player::Second);
-    gameState_.setPosition(x2, y2, Player::Second);
+    gameState_.setPosition(pos_x2, pos_y2, Player::Second);
+    gameState_.setDestination(dest_x2, dest_y2, Player::Second);
 }
 
 void Client::ConnectionToServer::parseGSFromBuffer() {
     double hp1 = BufferIO::readDouble(0, read_buffer_);
-    double x1 = BufferIO::readDouble(8, read_buffer_);
-    double y1 = BufferIO::readDouble(16, read_buffer_);
-    double hp2 = BufferIO::readDouble(24, read_buffer_);
-    double x2 = BufferIO::readDouble(32, read_buffer_);
-    double y2 = BufferIO::readDouble(40, read_buffer_);
+    double pos_x1 = BufferIO::readDouble(8, read_buffer_);
+    double pos_y1 = BufferIO::readDouble(16, read_buffer_);
+    double dest_x1 = BufferIO::readDouble(24, read_buffer_);
+    double dest_y1 = BufferIO::readDouble(32, read_buffer_);
 
-    updateGS(hp1, x1, y1, hp2, x2, y2);
+    double hp2 = BufferIO::readDouble(40, read_buffer_);
+    double pos_x2 = BufferIO::readDouble(48, read_buffer_);
+    double pos_y2 = BufferIO::readDouble(56, read_buffer_);
+    double dest_x2 = BufferIO::readDouble(64, read_buffer_);
+    double dest_y2 = BufferIO::readDouble(72, read_buffer_);
+
+    updateGS(hp1, pos_x1, pos_y1, dest_x1, dest_y1, hp2, pos_x2, pos_y2, dest_x2, dest_y2);
 }
 
 void Client::ConnectionToServer::writeActionToBuffer() {
