@@ -10,8 +10,8 @@ Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{ser
                                                                        stop_timer_{service},
                                                                        gameState_{gameState} {}
 
-std::shared_ptr<Client::ConnectionToServer>  Client::ConnectionToServer::newConnection(GameState &gameState) {
-    std::shared_ptr<ConnectionToServer>  new_(new ConnectionToServer(gameState));
+std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConnection(GameState &gameState) {
+    std::shared_ptr<ConnectionToServer> new_(new ConnectionToServer(gameState));
     return new_;
 }
 
@@ -181,7 +181,7 @@ void Client::ConnectionToServer::runService() {
 }
 
 void Client::checkServerResponse() {
-    if(!connection_->isConnected()) return;
+    if (!connection_->isConnected()) return;
     now = boost::posix_time::microsec_clock::local_time();
     if ((now - last_update).total_milliseconds() > SERVER_RESPONSE_TIME) {
         connection_->stopConnection();
@@ -201,10 +201,9 @@ void Client::run() {
     std::cout << "Disonnected " << std::endl;
 }
 
-Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {
-}
+Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {}
 
-void runClient(GameState &gameState){
+void runClient(GameState &gameState) {
     Client client(gameState);
     client.run();
 }
