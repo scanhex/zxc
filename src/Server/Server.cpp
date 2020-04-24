@@ -164,16 +164,22 @@ void ConnectionToClient::writeGStoBuffer() {
     if (player_id_ == 1) std::swap(first, second);
     Point firstPos = gameState.getPosition(first);
     Point secondPos = gameState.getPosition(second);
+    Point firstDest = gameState.getDestination(first);
+    Point secondDest = gameState.getDestination(second);
 
     // my: {hp, x, y}
     BufferIO::writeDouble(gameState.getHealthPoints(first), 0, write_buffer_);
     BufferIO::writeDouble(firstPos.x_, 8, write_buffer_);
     BufferIO::writeDouble(firstPos.y_, 16, write_buffer_);
+    BufferIO::writeDouble(firstDest.x_, 24, write_buffer_);
+    BufferIO::writeDouble(firstDest.y_, 32, write_buffer_);
 
     // his: {hp, x, y}
-    BufferIO::writeDouble(gameState.getHealthPoints(second), 24, write_buffer_);
-    BufferIO::writeDouble(secondPos.x_, 32, write_buffer_);
-    BufferIO::writeDouble(secondPos.y_, 40, write_buffer_);
+    BufferIO::writeDouble(gameState.getHealthPoints(second), 40, write_buffer_);
+    BufferIO::writeDouble(secondPos.x_, 48, write_buffer_);
+    BufferIO::writeDouble(secondPos.y_, 56, write_buffer_);
+    BufferIO::writeDouble(secondDest.x_, 64, write_buffer_);
+    BufferIO::writeDouble(secondDest.y_, 72, write_buffer_);
 }
 
 void ConnectionToClient::connectionChecker() {

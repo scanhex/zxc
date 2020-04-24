@@ -8,7 +8,7 @@
 #include "../Game/GameState.h"
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 64;
+static constexpr int MSG_FROM_SERVER_SIZE = 128;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
@@ -77,7 +77,8 @@ private:
 
         // TODO update GS by full copy
         // poka tak
-        void updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2);
+        void updateGS(double hp1, double pos_x1, double pos_y1, double dest_x1, double dest_y1,
+                      double hp2, double pos_x2, double pos_y2, double dest_x2, double dest_y2);
 
     public:
 

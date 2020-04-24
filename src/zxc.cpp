@@ -364,7 +364,7 @@ void ZxcApplication::updateGameState(){
         _unitObjects[0]->rotate(Math::Rad<float>(myDelta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 
-    if (myNewAngle != myAngle) {
+    if (otherNewAngle != otherAngle) {
         _unitObjects[1]->rotate(Math::Rad<float>(otherDelta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 }

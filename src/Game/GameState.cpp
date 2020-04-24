@@ -39,6 +39,11 @@ double GameState::getAngle(Player player) const {
     return hero->getAngle();
 }
 
+Point GameState::getDestination(Player player) const {
+    Hero *hero = getHero(player);
+    return hero->getDestination();
+}
+
 void GameState::setPosition(Point pos, Player player) {
     Hero *hero = getHero(player);
     hero->setPosition(pos);
@@ -52,6 +57,11 @@ void GameState::setPosition(double x, double y, Player player) {
 void GameState::setHealthPoints(double amount, Player player) {
     Hero *hero = getHero(player);
     hero->setHealthPoints(amount);
+}
+
+void GameState::setDestination(double x, double y, Player player) {
+    Hero *hero = getHero(player);
+    hero->setDestination(x, y);
 }
 
 bool GameState::gameIsFinished() const {
@@ -92,7 +102,7 @@ void GameState::update(double elapsedTime) { // time in milliseconds
             }
 
             delta = std::abs(angle - myAngle);
-            if(std::min(delta, 2 * M_PI - delta) > 1) continue;
+            if (std::min(delta, 2 * M_PI - delta) > 1) continue;
 
 
             double factor = (hero->getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
@@ -167,3 +177,4 @@ bool GameState::isDead(Player player) const {
     Hero *hero = getHero(player);
     return hero->isDead();
 }
+
