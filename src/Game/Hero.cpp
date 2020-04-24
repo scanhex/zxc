@@ -7,7 +7,7 @@ StatsBuilder Hero::defaultHeroStatsBuilder =
                 setDamage(100).
                 setAttackRange(100).
                 setMoveSpeed(450).
-                setTurnRate(450).
+                setTurnRate(500).
                 setAttackSpeed(100).
                 setMaxHp(1000).
                 setMaxMp(300).
