@@ -6,7 +6,7 @@
 Unit::Unit(Stats stats, Point position) : stats_{stats},
                                           position_{position},
                                           destination_{position},
-                                          angle_{0} {
+                                          angle_{M_PI} {
     stats_.refreshStats();
 }
 

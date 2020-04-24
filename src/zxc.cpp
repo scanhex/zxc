@@ -352,7 +352,7 @@ void ZxcApplication::updateGameState(){
         _unitObjects[0]->rotate(Math::Rad<float>(myNewAngle - myAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 
-    if (myNewAngle != myAngle) {
+    if (otherNewAngle != otherAngle) {
         _unitObjects[1]->rotate(Math::Rad<float>(otherNewAngle - otherAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 }
@@ -477,24 +477,6 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
-        _unitObjects[0]->translate({0,-1,0});
-        // does nothing because does not modify game state and send event
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
-        _unitObjects[0]->translate({0,1,0});
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
-        _unitObjects[0]->translate({-1,0,0});
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
-        _unitObjects[0]->translate({1,0,0});
-        redraw();
-    }
-
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
         Event curEvent(EventName::firstSkill, Player::First);
 
@@ -519,10 +501,6 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         // draw skill use
         redraw();
     }
-
-//    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
-//    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
-//    std::cout << '\n';
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
