@@ -115,7 +115,7 @@ void ZxcApplication::initScene() {
 	/* (c) Confucius */
 	_cameraObject
 		.setParent(&_scene)
-		.translate(Vector3::zAxis(20.0f));
+		.translate(Vector3::zAxis(30.0f));
 	(*(_camera = new SceneGraph::Camera3D{ _cameraObject }))
 		.setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
 		.setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -338,7 +338,13 @@ void ZxcApplication::addUnit(Unit& u) {
 
 void ZxcApplication::updateGameState(){
     Point myPosition = gameState->getPosition(Player::First);
+    double myAngle = gameState->getAngle(Player::First);
     Point otherPosition = gameState->getPosition(Player::Second);
+    double otherAngle = gameState->getAngle(Player::Second);
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
+    gameState->update(std::chrono::duration_cast<std::chrono::milliseconds>(time - curTime).count());
+    curTime = time;
 
     Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
     Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
@@ -346,9 +352,16 @@ void ZxcApplication::updateGameState(){
     _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
     _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
-    gameState->update(std::chrono::duration_cast<std::chrono::milliseconds>(time - curTime).count());
-    curTime = time;
+    double myNewAngle = gameState->getAngle(Player::First);
+    double otherNewAngle = gameState->getAngle(Player::Second);
+
+    if (myNewAngle != myAngle) {
+        _unitObjects[0]->rotate(Math::Rad<float>(myNewAngle - myAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+    }
+
+    if (myNewAngle != myAngle) {
+        _unitObjects[1]->rotate(Math::Rad<float>(otherNewAngle - otherAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+    }
 }
 
 void ZxcApplication::drawEvent() {
