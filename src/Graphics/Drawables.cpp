@@ -36,13 +36,13 @@ void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3
     .setNormalMatrix(transformationMatrix.normalMatrix())
     .setProjectionMatrix(camera.projectionMatrix());
     _mesh.draw(_shader);
-    */
     _hpShader.setColor(0x00ff00_rgbf)
         .setTransformationProjectionMatrix(camera.projectionMatrix()  * Matrix4::translation(transformationMatrix.translation()) * Matrix4::translation({ 0.f, 1.f, 5.f }))
         .bindVectorTexture(cache.texture());
     int32_t myHP = ceil(_unit.getHealthPoints());
     _hpRenderer->render(std::to_string(myHP));
     _hpRenderer->mesh().draw(_hpShader);
+    */
 }
 
 
