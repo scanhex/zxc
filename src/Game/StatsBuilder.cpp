@@ -19,6 +19,11 @@ StatsBuilder &StatsBuilder::setMoveSpeed(uint32_t moveSpeed) {
     return *this;
 }
 
+StatsBuilder &StatsBuilder::setTurnRate(double turnRate) {
+    stats_.setTurnRate(turnRate);
+    return *this;
+}
+
 StatsBuilder &StatsBuilder::setAttackSpeed(uint32_t attackSpeed) {
     stats_.setAttackSpeed(attackSpeed);
     return *this;
