@@ -325,7 +325,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 }
 
 void ZxcApplication::addUnit(Unit& u) {
-	_unitObjects.push_back(loadModel(RESOURCE_DIR "/nevermore_blender.fbx").release());
+	_unitObjects.push_back(loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx").release());
 	new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
