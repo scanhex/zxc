@@ -160,40 +160,59 @@ Pointer<Object3D> ZxcApplication::loadModel(std::string filename) {
 
 	/* Load all textures. Textures that fail to load will be NullOpt. */
 	/**/
-	_textures = Containers::Array<Containers::Optional<GL::Texture2D>>{ importer->textureCount() };
-	for (UnsignedInt i = 0; i != importer->textureCount(); ++i) {
-		Debug{} << "Importing texture" << i << importer->textureName(i);
+	if (!_textures.size()) { // TODO apply correct memoization
+		_textures = Containers::Array<Containers::Optional<GL::Texture2D>>{ importer->textureCount() };
+		for (UnsignedInt i = 0; i != importer->textureCount(); ++i) {
+			Debug{} << "Importing texture" << i << importer->textureName(i);
 
-		Containers::Optional<Trade::TextureData> textureData = importer->texture(i);
-		if (!textureData || textureData->type() != Trade::TextureData::Type::Texture2D) {
-			Warning{} << "Cannot load texture properties, skipping";
-			continue;
+			Containers::Optional<Trade::TextureData> textureData = importer->texture(i);
+			if (!textureData || textureData->type() != Trade::TextureData::Type::Texture2D) {
+				Warning{} << "Cannot load texture properties, skipping";
+				continue;
+			}
+
+			Debug{} << "Importing image" << textureData->image() << importer->image2DName(textureData->image());
+
+			Containers::Optional<Trade::ImageData2D> imageData = importer->image2D(textureData->image());
+			GL::TextureFormat format;
+			if (imageData && imageData->format() == PixelFormat::RGB8Unorm)
+				format = GL::TextureFormat::RGB8;
+			else if (imageData && imageData->format() == PixelFormat::RGBA8Unorm)
+				format = GL::TextureFormat::RGBA8;
+			else {
+				Warning{} << "Cannot load texture image, skipping";
+				continue;
+			}
+
+			/* Configure the texture */
+			GL::Texture2D texture;
+			texture
+				.setMagnificationFilter(textureData->magnificationFilter())
+				.setMinificationFilter(textureData->minificationFilter(), textureData->mipmapFilter())
+				.setWrapping(textureData->wrapping().xy())
+				.setStorage(Math::log2(imageData->size().max()) + 1, format, imageData->size())
+				.setSubImage(0, {}, *imageData)
+				.generateMipmap();
+
+			_textures[i] = std::move(texture);
 		}
 
-		Debug{} << "Importing image" << textureData->image() << importer->image2DName(textureData->image());
 
-		Containers::Optional<Trade::ImageData2D> imageData = importer->image2D(textureData->image());
-		GL::TextureFormat format;
-		if (imageData && imageData->format() == PixelFormat::RGB8Unorm)
-			format = GL::TextureFormat::RGB8;
-		else if (imageData && imageData->format() == PixelFormat::RGBA8Unorm)
-			format = GL::TextureFormat::RGBA8;
-		else {
-			Warning{} << "Cannot load texture image, skipping";
-			continue;
+		/* Load all meshes. Meshes that fail to load will be NullOpt. */
+		_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
+		for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
+			Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
+
+			Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
+
+			if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
+				Warning{} << "Cannot load the mesh, skipping";
+				continue;
+			}
+
+			/* Compile the mesh */
+			_meshes[i] = MeshTools::compile(*meshData);
 		}
-
-		/* Configure the texture */
-		GL::Texture2D texture;
-		texture
-			.setMagnificationFilter(textureData->magnificationFilter())
-			.setMinificationFilter(textureData->minificationFilter(), textureData->mipmapFilter())
-			.setWrapping(textureData->wrapping().xy())
-			.setStorage(Math::log2(imageData->size().max()) + 1, format, imageData->size())
-			.setSubImage(0, {}, *imageData)
-			.generateMipmap();
-
-		_textures[i] = std::move(texture);
 	}
 
 	/* Load all materials. Materials that fail to load will be NullOpt. The
@@ -210,24 +229,6 @@ Pointer<Object3D> ZxcApplication::loadModel(std::string filename) {
 		}
 
 		materials[i] = std::move(static_cast<Trade::PhongMaterialData&>(*materialData));
-	}
-
-	/* Load all meshes. Meshes that fail to load will be NullOpt. */
-	if (!_meshes.size()) { // TODO apply correct memoization
-		_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
-		for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
-			Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
-
-			Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
-
-			if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
-				Warning{} << "Cannot load the mesh, skipping";
-				continue;
-			}
-
-			/* Compile the mesh */
-			_meshes[i] = MeshTools::compile(*meshData);
-		}
 	}
 
 	/* Load the scene */
@@ -402,8 +403,9 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 	const Float distance = _cameraObject.transformation().translation().z();
 
 	/* Move 15% of the distance back or forward */
-	_cameraObject.translate(Vector3::zAxis(
-		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
+	_cameraObject.translate(-_cameraObject.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1) );
+//	_cameraObject.translate(Vector3::zAxis(
+//		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
 	redraw();
 }
