@@ -351,13 +351,21 @@ void ZxcApplication::updateGameState(){
 
     double myNewAngle = gameState->getAngle(Player::First);
     double otherNewAngle = gameState->getAngle(Player::Second);
+    double myDelta = myNewAngle - myAngle;
+    double otherDelta = otherNewAngle - otherAngle;
+
+    if(myDelta <= -M_PI) myDelta += 2*M_PI;
+    if(myDelta >= M_PI) myDelta -= 2*M_PI;
+
+    if(otherDelta <= -M_PI) otherDelta += 2*M_PI;
+    if(otherDelta >= M_PI) otherDelta -= 2*M_PI;
 
     if (myNewAngle != myAngle) {
-        _unitObjects[0]->rotate(Math::Rad<float>(myNewAngle - myAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+        _unitObjects[0]->rotate(Math::Rad<float>(myDelta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 
-    if (otherNewAngle != otherAngle) {
-        _unitObjects[1]->rotate(Math::Rad<float>(otherNewAngle - otherAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+    if (myNewAngle != myAngle) {
+        _unitObjects[1]->rotate(Math::Rad<float>(otherDelta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 }
 
