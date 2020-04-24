@@ -5,8 +5,7 @@ find_package(Magnum REQUIRED
         SceneGraph
         Trade
         AnySceneImporter
-        ObjImporter
-	TgaImporter
+		TgaImporter
         Primitives
         MeshTools
         Text
@@ -42,6 +41,7 @@ add_executable(zxc ${zxc_cpps})
 
 add_dependencies(zxc
     Magnum::AnyImageImporter
+    Magnum::TgaImporter
     MagnumPlugins::AssimpImporter
     MagnumPlugins::StbTrueTypeFont
         )

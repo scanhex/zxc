@@ -6,6 +6,7 @@
 #include <Magnum/ImageView.h>
 #include <Magnum/Math/Math.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Constants.h>
 #include <Magnum/Math/FunctionsBatch.h>
 #include <Magnum/Mesh.h>
 #include <Magnum/PixelFormat.h>
@@ -45,13 +46,15 @@
 #include "Game/GameState.h"
 
 using namespace Magnum;
+using namespace Corrade;
 
 using namespace Math::Literals;
+using Corrade::Containers::Pointer;
 
 typedef SceneGraph::Object<SceneGraph::MatrixTransformation3D> Object3D;
 typedef SceneGraph::Scene<SceneGraph::MatrixTransformation3D> Scene3D;
 
-boost::lockfree::queue<Event> events{100};
+boost::lockfree::queue<Event> events{ 100 };
 bool exit_flag = false;
 
 class ZxcApplication : public Platform::Application {
@@ -68,25 +71,25 @@ private:
 	void mouseScrollEvent(MouseScrollEvent& event) override;
 	void exitEvent(ExitEvent& event) override;
 
-    void keyPressEvent(KeyEvent &event) override;
+	void keyPressEvent(KeyEvent& event) override;
 
-    Vector3 positionOnSphere(const Vector2i& position) const;
+	Vector3 positionOnSphere(const Vector2i& position) const;
 
-    void updateUnitsPosition();
+	void updateUnitsPosition();
 
-    void addUnit(Unit &u);
+	void addUnit(Unit& u);
 	void initScene();
 	void initUnits();
-	void loadModels();
+	Pointer<Object3D> loadModel(std::string filename);
 	Float depthAt(const Vector2i& position) const;
 	Vector3 unproject(const Vector2i& position, Float depth) const;
-    Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
+	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
 
 	void addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i);
 
 	Shaders::Phong _coloredShader,
 		_texturedShader{ Shaders::Phong::Flag::DiffuseTexture };
-	Shaders::Flat3D _flatShader {NoCreate};
+	Shaders::Flat3D _flatShader{ NoCreate };
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
@@ -94,12 +97,12 @@ private:
 	std::optional<Hero> firstHero;
 	std::optional<Hero> secondHero;
 
-    std::thread network_thread;
+	std::thread network_thread;
 
-    std::vector<Object3D*> _unitObjects;
+	std::vector<Object3D*> _unitObjects;
 
 	Scene3D _scene;
-	Object3D _manipulator, _cameraObject;
+	Object3D _cameraObject;
 	SceneGraph::Camera3D* _camera = nullptr;
 	Object3D _mapObject;
 	SceneGraph::DrawableGroup3D _drawables;
@@ -119,9 +122,6 @@ void ZxcApplication::initScene() {
 		.setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
 		.setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
 		.setViewport(GL::defaultFramebuffer.viewport().size());
-	/* Base object, parent of all (for easy manipulation) */
-	_manipulator.setParent(&_scene);
-
 	/* Setup renderer and shader defaults */
 	GL::Renderer::enable(GL::Renderer::Feature::DepthTest);
 	GL::Renderer::enable(GL::Renderer::Feature::FaceCulling);
@@ -136,21 +136,20 @@ void ZxcApplication::initScene() {
 
 	_flatShader = Shaders::Flat3D{};
 
-	_grid = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
-	auto grid = new Object3D{&_manipulator};
-    (*grid).scale(Vector3{8});
-    new FlatDrawable{*grid, _flatShader, _grid, _drawables};
+	_grid = MeshTools::compile(Primitives::grid3DSolid({ 15, 15 }));
+	auto grid = new Object3D{ &_scene };
+	(*grid).scale(Vector3{ 8 });
+	new FlatDrawable{ *grid, _flatShader, _grid, _drawables };
 }
 
-void ZxcApplication::loadModels() {
-
+Pointer<Object3D> ZxcApplication::loadModel(std::string filename) {
 	/* Load a scene importer plugin */
 	PluginManager::Manager<Trade::AbstractImporter> manager;
 	auto loadState = manager.load("AssimpImporter");
 	assert(loadState == Corrade::PluginManager::LoadState::Loaded || loadState == Corrade::PluginManager::LoadState::Static);
-	Corrade::Containers::Pointer<Trade::AbstractImporter> importer = manager.instantiate("AssimpImporter");
+	Pointer<Trade::AbstractImporter> importer = manager.instantiate("AssimpImporter");
 
-	std::string filename = "C:/Users/ISM/Code/zxc/resources/nevermore/nevermore_blender.fbx";
+	Pointer<Object3D> manipulator(new Object3D(&_scene));
 
 	Debug{} << "Opening file" << filename;
 
@@ -213,19 +212,21 @@ void ZxcApplication::loadModels() {
 	}
 
 	/* Load all meshes. Meshes that fail to load will be NullOpt. */
-	_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
-	for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
-		Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
+	if (!_meshes.size()) { // TODO apply correct memoization
+		_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
+		for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
+			Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
 
-		Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
+			Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
 
-		if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
-			Warning{} << "Cannot load the mesh, skipping";
-			continue;
+			if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
+				Warning{} << "Cannot load the mesh, skipping";
+				continue;
+			}
+
+			/* Compile the mesh */
+			_meshes[i] = MeshTools::compile(*meshData);
 		}
-
-		/* Compile the mesh */
-		_meshes[i] = MeshTools::compile(*meshData);
 	}
 
 	/* Load the scene */
@@ -235,84 +236,84 @@ void ZxcApplication::loadModels() {
 		Containers::Optional<Trade::SceneData> sceneData = importer->scene(importer->defaultScene());
 		if (!sceneData) {
 			Error{} << "Cannot load scene, exiting";
-			return;
+			return manipulator;
 		}
 
 		/* Recursively add all children */
 		for (UnsignedInt objectId : sceneData->children3D())
-			addObject(*importer, materials, _manipulator, objectId);
+			addObject(*importer, materials, *manipulator, objectId);
 
 		/* The format has no scene support, display just the first loaded mesh with
 		   a default material and be done with it */
 	}
 	else if (!_meshes.empty() && _meshes[0])
-		new ColoredDrawable{ _manipulator, _coloredShader, *_meshes[0], 0xffffff_rgbf, _drawables };
+		new ColoredDrawable{ *manipulator, _coloredShader, *_meshes[0], 0xffffff_rgbf, _drawables };
+	return manipulator;
 }
 
 void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i) {
-    Debug{} << "Importing object" << i << importer.object3DName(i);
-    Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
-    if (!objectData) {
-        Error{} << "Cannot import object, skipping";
-        return;
-    }
+	Debug{} << "Importing object" << i << importer.object3DName(i);
+	Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
+	if (!objectData) {
+		Error{} << "Cannot import object, skipping";
+		return;
+	}
 
-    /* Add the object to the scene and set its transformation */
-    auto* object = new Object3D{ &parent };
-    object->setTransformation(objectData->transformation());
+	/* Add the object to the scene and set its transformation */
+	auto* object = new Object3D{ &parent };
+	object->setTransformation(Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }) * objectData->transformation());
+	/* Add a drawable if the object has a mesh and the mesh is loaded */
+	if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
+		Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
 
-    /* Add a drawable if the object has a mesh and the mesh is loaded */
-    if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
-        Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
+		/* Material not available / not loaded, use a default material */
+		if (materialId == -1 || !materials[materialId]) {
+			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
 
-        materialId = -1;
+			/* Textured material. If the texture failed to load, again just use a
+			   default colored material. */
+		}
+		else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
+			Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
+			std::cerr << materials[materialId]->diffuseTexture() << std::endl;
+			if (texture)
+				new TexturedDrawable{ *object, _texturedShader, *_meshes[objectData->instance()], *texture, _drawables };
+			else
+				new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
 
-        /* Material not available / not loaded, use a default material */
-        if (materialId == -1 || !materials[materialId]) {
-            new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
+			/* Color-only material */
+		}
+		else {
+			new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), _drawables };
+		}
+	}
 
-            /* Textured material. If the texture failed to load, again just use a
-               default colored material. */
-        }
-        else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
-            Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
-            std::cerr << materials[materialId]->diffuseTexture() << std::endl;
-            if (texture)
-                new TexturedDrawable{ *object, _texturedShader, *_meshes[objectData->instance()], *texture, _drawables };
-            else
-                new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], 0xfffffe_rgbf, _drawables };
-
-            /* Color-only material */
-        }
-        else {
-            new ColoredDrawable{ *object, _coloredShader, *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), _drawables };
-        }
-    }
-
-    /* Recursively add children */
-    for (std::size_t id : objectData->children())
-        addObject(importer, materials, *object, id);
+	Debug{} << objectData->children().size();
+	/* Recursively add children */
+	for (std::size_t id : objectData->children()) {
+		addObject(importer, materials, *object, id);
+	}
 }
 
-void ZxcApplication::initUnits(){
-    StatsBuilder heroStatsBuilder = StatsBuilder().
-            setDamage(100).
-            setAttackRange(100).
-            setMoveSpeed(350).
-            setAttackSpeed(100).
-            setMaxHp(1000).
-            setMaxMp(300).
-            setHpRegen(2).
-            setMpRegen(1).
-            setArmor(3).
-            setResist(0.25);
-    firstHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::First);
-    secondHero = Hero(heroStatsBuilder.create(), Point(0, 0), Player::Second);
+void ZxcApplication::initUnits() {
+	StatsBuilder heroStatsBuilder = StatsBuilder().
+		setDamage(100).
+		setAttackRange(100).
+		setMoveSpeed(350).
+		setAttackSpeed(100).
+		setMaxHp(1000).
+		setMaxMp(300).
+		setHpRegen(2).
+		setMpRegen(1).
+		setArmor(3).
+		setResist(0.25);
+	firstHero = Hero(heroStatsBuilder.create(), Point(6, 6), Player::First);
+	secondHero = Hero(heroStatsBuilder.create(), Point(6, 6), Player::Second);
 
-    gameState = GameState(*firstHero, *secondHero);
+	gameState = GameState(*firstHero, *secondHero);
 
-    addUnit(*firstHero);
-    addUnit(*secondHero);
+	addUnit(*firstHero);
+	addUnit(*secondHero);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -326,40 +327,31 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	initScene();
 	initUnits();
 
-    network_thread = std::thread(runClient, std::ref(gameState.value()));
+	network_thread = std::thread(runClient, std::ref(gameState.value()));
 
-	//loadModels();
-	/*
-	Utility::Arguments args;
-	args.addArgument("file").setHelp("file", "file to load")
-		.addOption("importer", "AnySceneImporter").setHelp("importer", "importer plugin to use")
-		.addSkippedPrefix("magnum", "engine-specific options")
-		.setGlobalHelp("Displays a 3D scene file provided on command line.")
-		.parse(arguments.argc, arguments.argv);
-	*/
 
 }
 
 void ZxcApplication::addUnit(Unit& u) {
-    _unitObjects.push_back(new Object3D(&_manipulator));
-    new UnitDrawable(*_unitObjects.back(), _drawables, u);
+	_unitObjects.push_back(loadModel(RESOURCE_DIR "/nevermore_blender.fbx").release());
+	new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
-void ZxcApplication::updateUnitsPosition(){
-    Point myPosition = gameState->getPosition(Player::First);
-    Point otherPosition = gameState->getPosition(Player::Second);
+void ZxcApplication::updateUnitsPosition() {
+	Point myPosition = gameState->getPosition(Player::First);
+	Point otherPosition = gameState->getPosition(Player::Second);
 
-    Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
-    Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
+	Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
+	Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
-    _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
-    _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+	_unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
+	_unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
 }
 
 void ZxcApplication::drawEvent() {
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
-    updateUnitsPosition();
+	updateUnitsPosition();
 
 	assert(_camera);
 	_camera->draw(_drawables);
@@ -377,16 +369,16 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Left)
 		_previousPosition = positionOnSphere(event.position());
 	if (event.button() == MouseEvent::Button::Right) {
-        auto newPosition = intersectWithPlane(event.position(), {0,0,1});
-        _unitObjects[0]->translate(newPosition - _unitObjects[0]->transformation().translation());
+		auto newPosition = intersectWithPlane(event.position(), { 0,0,1 });
+		_unitObjects[0]->translate(newPosition - _unitObjects[0]->transformation().translation());
 
-        double x = newPosition.x(), y = newPosition.y();
+		double x = newPosition.x(), y = newPosition.y();
 
-        Event curEvent(EventName::move, Player::First, x, y);
-        events.push(curEvent);
-        gameState->applyEvent(curEvent);
+		Event curEvent(EventName::move, Player::First, x, y);
+		events.push(curEvent);
+		gameState->applyEvent(curEvent);
 
-        redraw();
+		redraw();
 	}
 }
 
@@ -410,47 +402,47 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 
 //Assuming plane contains zero
 Vector3 ZxcApplication::intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const {
-    /* We have to take window size, not framebuffer size, since the position is
-       in window coordinates and the two can be different on HiDPI systems */
-    const Vector2i viewSize = windowSize();
-    const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
-    const Vector3 ray_nds{2*Vector2{viewPosition}/Vector2{viewSize} - Vector2{1.0f}, 1};
-    const Vector4 ray_clip{ray_nds.x(), ray_nds.y(), -1, 1};
-    Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
-    ray_eye.z() = -1, ray_eye.w() = 0;
-    Vector3 ray_world = (_camera->cameraMatrix().inverted() * ray_eye).xyz().normalized();
-    const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
-    return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
+	/* We have to take window size, not framebuffer size, since the position is
+	   in window coordinates and the two can be different on HiDPI systems */
+	const Vector2i viewSize = windowSize();
+	const Vector2i viewPosition{ windowPosition.x(), viewSize.y() - windowPosition.y() - 1 };
+	const Vector3 ray_nds{ 2 * Vector2{viewPosition} / Vector2{viewSize} -Vector2{1.0f}, 1 };
+	const Vector4 ray_clip{ ray_nds.x(), ray_nds.y(), -1, 1 };
+	Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
+	ray_eye.z() = -1, ray_eye.w() = 0;
+	Vector3 ray_world = (_camera->cameraMatrix().inverted() * ray_eye).xyz().normalized();
+	const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
+	return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
 }
 
 Float ZxcApplication::depthAt(const Vector2i& windowPosition) const {
-    /* First scale the position from being relative to window size to being
-       relative to framebuffer size as those two can be different on HiDPI
-       systems */
-    const Vector2i position = windowPosition*Vector2{framebufferSize()}/Vector2{windowSize()};
-    const Vector2i fbPosition{position.x(), GL::defaultFramebuffer.viewport().sizeY() - position.y() - 1};
+	/* First scale the position from being relative to window size to being
+	   relative to framebuffer size as those two can be different on HiDPI
+	   systems */
+	const Vector2i position = windowPosition * Vector2{ framebufferSize() } / Vector2{ windowSize() };
+	const Vector2i fbPosition{ position.x(), GL::defaultFramebuffer.viewport().sizeY() - position.y() - 1 };
 
-    GL::defaultFramebuffer.mapForRead(GL::DefaultFramebuffer::ReadAttachment::Front);
-    Image2D data = GL::defaultFramebuffer.read(
-            Range2Di::fromSize(fbPosition, Vector2i{1}).padded(Vector2i{2}),
-            {GL::PixelFormat::DepthComponent, GL::PixelType::Float});
+	GL::defaultFramebuffer.mapForRead(GL::DefaultFramebuffer::ReadAttachment::Front);
+	Image2D data = GL::defaultFramebuffer.read(
+		Range2Di::fromSize(fbPosition, Vector2i{ 1 }).padded(Vector2i{ 2 }),
+		{ GL::PixelFormat::DepthComponent, GL::PixelType::Float });
 
-    return Math::min<Float>(Containers::arrayCast<const Float>(data.data()));
+	return Math::min<Float>(Containers::arrayCast<const Float>(data.data()));
 }
 
 Vector3 ZxcApplication::unproject(const Vector2i& windowPosition, Float depth) const {
-    /* We have to take window size, not framebuffer size, since the position is
-       in window coordinates and the two can be different on HiDPI systems */
-    const Vector2i viewSize = windowSize();
-    const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
-    const Vector3 in{2*Vector2{viewPosition}/Vector2{viewSize} - Vector2{1.0f}, depth*2.0f - 1.0f};
+	/* We have to take window size, not framebuffer size, since the position is
+	   in window coordinates and the two can be different on HiDPI systems */
+	const Vector2i viewSize = windowSize();
+	const Vector2i viewPosition{ windowPosition.x(), viewSize.y() - windowPosition.y() - 1 };
+	const Vector3 in{ 2 * Vector2{viewPosition} / Vector2{viewSize} -Vector2{1.0f}, depth * 2.0f - 1.0f };
 
 
-      return (_cameraObject.absoluteTransformationMatrix()*_camera->projectionMatrix().inverted()).transformPoint(in);
-      /*
-    Use the following to get the camera-relative coordinates instead of global:
+	return (_cameraObject.absoluteTransformationMatrix() * _camera->projectionMatrix().inverted()).transformPoint(in);
+	/*
+  Use the following to get the camera-relative coordinates instead of global:
 //    return _camera->projectionMatrix().inverted().transformPoint(in);
-       */
+	   */
 }
 
 Vector3 ZxcApplication::positionOnSphere(const Vector2i& position) const {
@@ -474,61 +466,61 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 	redraw();
 }
 
-void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
-        _unitObjects[0]->translate({0,-1,0});
-        // does nothing because does not modify game state and send event
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
-        _unitObjects[0]->translate({0,1,0});
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
-        _unitObjects[0]->translate({-1,0,0});
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
-        _unitObjects[0]->translate({1,0,0});
-        redraw();
-    }
+void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent& event) {
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
+		_unitObjects[0]->translate({ 0,-1,0 });
+		// does nothing because does not modify game state and send event
+		redraw();
+	}
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
+		_unitObjects[0]->translate({ 0,1,0 });
+		redraw();
+	}
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
+		_unitObjects[0]->translate({ -1,0,0 });
+		redraw();
+	}
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
+		_unitObjects[0]->translate({ 1,0,0 });
+		redraw();
+	}
 
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        Event curEvent(EventName::firstSkill, Player::First);
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+		Event curEvent(EventName::firstSkill, Player::First);
 
-        events.push(curEvent);
-        gameState->applyEvent(curEvent);
-        // draw skill use
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        Event curEvent(EventName::secondSkill, Player::First);
+		events.push(curEvent);
+		gameState->applyEvent(curEvent);
+		// draw skill use
+		redraw();
+	}
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
+		Event curEvent(EventName::secondSkill, Player::First);
 
-        events.push(curEvent);
-        gameState->applyEvent(curEvent);
-        // draw skill use
-        redraw();
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        Event curEvent(EventName::thirdSkill, Player::First);
+		events.push(curEvent);
+		gameState->applyEvent(curEvent);
+		// draw skill use
+		redraw();
+	}
+	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
+		Event curEvent(EventName::thirdSkill, Player::First);
 
-        events.push(curEvent);
-        gameState->applyEvent(curEvent);
-        // draw skill use
-        redraw();
-    }
+		events.push(curEvent);
+		gameState->applyEvent(curEvent);
+		// draw skill use
+		redraw();
+	}
 
-    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
-    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
-    std::cout << '\n';
+	std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
+	std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
+	std::cout << '\n';
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
-    exit_flag = true;
-    std::cout << "Vi v adekvate?" << '\n';
-    std::cout << "net" << std::endl;
-    network_thread.join();
-    exit(0);
+	exit_flag = true;
+	std::cout << "Vi v adekvate?" << '\n';
+	std::cout << "net" << std::endl;
+	network_thread.join();
+	exit(0);
 }
 
 MAGNUM_APPLICATION_MAIN(ZxcApplication)
