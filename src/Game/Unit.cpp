@@ -1,8 +1,11 @@
 #include "Unit.h"
 #include <algorithm>
+#include <cmath>
 
 Unit::Unit(Stats stats, Point position) : stats_{stats},
-                                          position_{position} {
+                                          position_{position},
+                                          destination_{position},
+                                          angle_{0} {
     stats_.refreshStats();
 }
 
@@ -55,11 +58,17 @@ void Unit::clearBuffs() {
 void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
 void Unit::changeAttackRange(int32_t delta) { stats_.changeAttackRange(delta); }
 void Unit::changeMoveSpeed(int32_t delta) { stats_.changeMoveSpeed(delta); }
+void Unit::changeTurnRate(double delta) { stats_.changeTurnRate(delta); }
 void Unit::changeAttackSpeed(int32_t delta) { stats_.changeAttackSpeed(delta); }
 void Unit::changeMaxHP(int32_t delta) { stats_.changeMaxHP(delta); }
 void Unit::changeMaxMP(int32_t delta) { stats_.changeMaxMP(delta); }
 void Unit::changeHPRegen(double delta) { stats_.changeHPRegen(delta); }
 void Unit::changeMPRegen(double delta) { stats_.changeMPRegen(delta); }
+void Unit::changeAngle(double delta) {
+    angle_ += delta;
+    if (angle_ < 0) angle_ += 2 * M_PI;
+    if (angle_ >= 2 * M_PI) angle_ -= 2 * M_PI;
+}
 
 void Unit::applyHeal(double amount) {
     stats_.changeHP(amount);
@@ -94,7 +103,8 @@ void Unit::spendMana(double amount) {
 
 void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
-void Unit::changePosition(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
+void Unit::changePositionBy(double deltaX, double deltaY) { position_ += Point(deltaX, deltaY); }
+void Unit::changePositionBy(Point vector) { position_ += vector; }
 
 bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
 
@@ -109,6 +119,9 @@ void Unit::setAttackRange(uint32_t attackRange) { stats_.setAttackRange(attackRa
 
 uint32_t Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
 void Unit::setMoveSpeed(uint32_t moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
+
+double Unit::getTurnRate() const { return stats_.getTurnRate(); }
+void Unit::setTurnRate(double turnRate) { stats_.setTurnRate(turnRate); }
 
 uint32_t Unit::getAttackSpeed() const { return stats_.getAttackSpeed(); }
 void Unit::setAttackSpeed(uint32_t attackSpeed) { stats_.setAttackSpeed(attackSpeed); }
@@ -140,3 +153,10 @@ void Unit::setResist(double resist) { stats_.setResist(resist); }
 const Point &Unit::getPosition() const { return position_; }
 void Unit::setPosition(const Point &position) { position_ = position; }
 void Unit::setPosition(double x, double y) { position_ = Point(x, y); }
+
+const Point &Unit::getDestination() const { return destination_; }
+void Unit::setDestination(const Point &destination) { destination_ = destination; }
+void Unit::setDestination(double x, double y) { destination_ = Point(x, y); }
+
+void Unit::setAngle(double angle) { angle_ = angle; }
+double Unit::getAngle() const { return angle_; }

@@ -2,73 +2,106 @@
 
 #include <iostream>
 #include <thread>
+#include <utility>
 #include <string>
 #include <boost/asio.hpp>
 #include "../Game/GameState.h"
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 64;
-static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add move
+static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
+static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
+static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
 
 using namespace boost::asio;
 
-#define BIND_FN(x)         std::bind(&self_type::x, shared_from_this())
-#define BIND_FN1(x, y)      std::bind(&self_type::x, shared_from_this(),y)
-#define BIND_FN2(x, y, z)    std::bind(&self_type::x, shared_from_this(),y,z)
-#define BIND_FN3(x, y, z, w)  std::bind(&self_type::x, shared_from_this(),y,z,w)
+#define BIND_FN(x)         std::bind(&ConnectionToServer ::x, shared_from_this())
+#define BIND_FN1(x, y)      std::bind(&ConnectionToServer ::x, shared_from_this(),y)
+#define BIND_FN2(x, y, z)    std::bind(&ConnectionToServer ::x, shared_from_this(),y,z)
+#define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToServer ::x, shared_from_this(),y,z,w)
 
-class ConnectionToServer : public std::enable_shared_from_this<ConnectionToServer> {
+class Client final {
 public:
-    typedef std::shared_ptr<ConnectionToServer> ptr;
-    typedef ConnectionToServer self_type;
 
-    ConnectionToServer(GameState& gameState);
+    Client(GameState &gameState);
 
-    static ptr newConnection(GameState& gameState);
-
-    void startConnection();
-
-    void stopConnection();
-
-    bool isConnected() const;
+    void run();
 
 private:
-    /*
-     * Functions for handling connection to client, e.g. reading/writing to socket
-     */
-    void handleConnection(const boost::system::error_code &err);
+    class ConnectionToServer : public std::enable_shared_from_this<ConnectionToServer> {
+    public:
 
-    void handleWriteToSocket(const boost::system::error_code &err, size_t bytes);
+        ConnectionToServer(GameState &gameState);
 
-    void writeToSocket();
+        static std::shared_ptr<ConnectionToServer> newConnection(GameState &gameState);
 
-    void handleReadFromSocket(const boost::system::error_code &err, size_t bytes);
+        void startConnection();
 
-    void readFromSocket();
+        void stopConnection();
 
-    size_t checkReadComplete(const boost::system::error_code &err, size_t bytes);
+        bool isConnected() const;
 
-    void waitForAction();
+    private:
+        /*
+         * Functions for handling connection to client, e.g. reading/writing to socket
+         */
+        void handleConnection(const boost::system::error_code &err);
+
+        void handleWriteToSocket(const boost::system::error_code &err, size_t bytes);
+
+        void writeToSocket();
+
+        void handleReadFromSocket(const boost::system::error_code &err, size_t bytes);
+
+        void readFromSocket();
+
+        size_t checkReadComplete(const boost::system::error_code &err, size_t bytes);
+
+        size_t checkWaitReadComplete(const boost::system::error_code &err, size_t bytes);
+
+        void waitForAction();
+
+        void waitForGameStart();
+
+        void handleWaitRead(const boost::system::error_code &err, size_t bytes);
+
+        void runGame();
+
+    private:
+        /*
+         * Functions for working with local Game State and player's actions
+         */
+        void parseGSFromBuffer();
+
+        void writeActionToBuffer();
+
+        // TODO update GS by full copy
+        // poka tak
+        void updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2);
+
+    public:
+
+        void runService();
+
+    private:
+        io_service service;
+        ip::tcp::endpoint ep{ip::address::from_string("127.0.0.1"), 8001};
+        ip::tcp::socket sock_;
+        uint8_t read_buffer_[MAX_MSG]{};
+        uint8_t write_buffer_[MAX_MSG]{};
+        bool connected_{};
+        deadline_timer timer_;
+        deadline_timer stop_timer_;
+        GameState &gameState_;
+    };
 
 private:
-    /*
-     * Functions for working with local Game State and player's actions
-     */
-    void parseGSFromBuffer();
 
-    void writeActionToBuffer();
-
-    // TODO update GS by full copy
-    // poka tak
-    void updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2);
+    void checkServerResponse();
 
 private:
-    ip::tcp::socket sock_;
-    uint8_t read_buffer_[MAX_MSG];
-    uint8_t write_buffer_[MAX_MSG];
-    bool connected_;
-    deadline_timer timer_;
-    GameState& gameState_;
+    std::shared_ptr<ConnectionToServer> connection_;
+    boost::posix_time::ptime last_update, now;
 };
 
-void runClient(GameState& gameState);
+void runClient(GameState &gameState);

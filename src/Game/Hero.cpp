@@ -1,14 +1,48 @@
 #include "Hero.h"
 #include <algorithm>
+#include "GameState.h"
 
-Hero::Hero(Stats stats, Point position, Player player) : Unit(stats, position),
-                                                         player_{player},
-                                                         gold_{START_GOLD},
-                                                         level_{1},
-                                                         experience_{0},
-                                                         skills_{Skill(player_, SkillNum::first),
-                                                                 Skill(player_, SkillNum::second),
-                                                                 Skill(player_, SkillNum::third)} {}
+StatsBuilder Hero::defaultHeroStatsBuilder =
+        StatsBuilder().
+                setDamage(100).
+                setAttackRange(100).
+                setMoveSpeed(450).
+                setTurnRate(150).
+                setAttackSpeed(100).
+                setMaxHp(1000).
+                setMaxMp(300).
+                setHpRegen(1.5).
+                setMpRegen(1).
+                setArmor(3).
+                setResist(0.25);
+
+Point Hero::firstHeroStartingPoint = Point(-6, -6);
+Point Hero::secondHeroStartingPoint = Point(6, 6);
+
+Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder.create(),
+                                 player == Player::First ?
+                                 firstHeroStartingPoint :
+                                 secondHeroStartingPoint),
+                            player_{player},
+                            gold_{START_GOLD},
+                            level_{1},
+                            experience_{0},
+                            skills_{Skill(player_, SkillNum::first),
+                                    Skill(player_, SkillNum::second),
+                                    Skill(player_, SkillNum::third)} {}
+
+Hero::Hero(Player player, Point position) : Unit(defaultHeroStatsBuilder.create(), position),
+                                            player_{player},
+                                            gold_{START_GOLD},
+                                            level_{1},
+                                            experience_{0},
+                                            skills_{Skill(player_, SkillNum::first),
+                                                    Skill(player_, SkillNum::second),
+                                                    Skill(player_, SkillNum::third)} {}
+
+Hero::Hero(Player player, Point position, Stats stats) : Hero(player, position) {
+    stats_ = stats;
+}
 
 bool Hero::canSpendGold(uint32_t amount) {
     return gold_ >= amount;

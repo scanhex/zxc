@@ -1,53 +1,63 @@
 #include "Client.h"
 #include "../Utils/BufferIO.h"
 #include <boost/lockfree/queue.hpp>
-#include <utility>
 
-io_service service;
-ip::tcp::endpoint ep(ip::address::from_string("127.0.0.1"), 8001);
-extern boost::lockfree::queue <Event> events;
+extern boost::lockfree::queue<Event> events;
 extern bool exit_flag;
 
-ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_(service),
-                                                               timer_(service),
-                                                               gameState_{gameState} {}
+Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service},
+                                                                       timer_{service},
+                                                                       stop_timer_{service},
+                                                                       gameState_{gameState} {}
 
-ConnectionToServer::ptr ConnectionToServer::newConnection(GameState &gameState) {
-    ptr new_(new ConnectionToServer(gameState));
+std::shared_ptr<Client::ConnectionToServer>  Client::ConnectionToServer::newConnection(GameState &gameState) {
+    std::shared_ptr<ConnectionToServer>  new_(new ConnectionToServer(gameState));
     return new_;
 }
 
-void ConnectionToServer::startConnection() {
+void Client::ConnectionToServer::startConnection() {
     sock_.async_connect(ep, BIND_FN1(handleConnection, std::placeholders::_1));
 }
 
 
-void ConnectionToServer::stopConnection() {
+void Client::ConnectionToServer::stopConnection() {
     if (!connected_) return;
     connected_ = false;
     std::cout << "stopping " << std::endl;
     sock_.close();
 }
 
-bool ConnectionToServer::isConnected() const {
+bool Client::ConnectionToServer::isConnected() const {
     return connected_;
 }
 
-void ConnectionToServer::handleConnection(const boost::system::error_code &err) {
+void Client::ConnectionToServer::handleConnection(const boost::system::error_code &err) {
     if (err || exit_flag) {
         stopConnection();
         return;
     }
     connected_ = true;
     sock_.set_option(ip::tcp::no_delay(true));
-    //TODO may cause problem with exit
-    read(sock_, buffer(read_buffer_)); //wait for signal for server to start
-    std::cout << "Game start!" << std::endl;
-    readFromSocket();
-    writeToSocket();
+    waitForGameStart();
 }
 
-void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
+void Client::ConnectionToServer::runGame() {
+    std::cout << "Game start!" << std::endl;
+    readFromSocket();
+    waitForAction();
+}
+
+void Client::ConnectionToServer::waitForGameStart() {
+    if (exit_flag) {
+        stopConnection();
+        return;
+    }
+    async_read(sock_, buffer(read_buffer_),
+               BIND_FN2(checkWaitReadComplete, std::placeholders::_1, std::placeholders::_2),
+               BIND_FN2(handleWaitRead, std::placeholders::_1, std::placeholders::_2));
+}
+
+void Client::ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
     if (err || exit_flag) {
         stopConnection();
         return;
@@ -55,8 +65,8 @@ void ConnectionToServer::handleWriteToSocket(const boost::system::error_code &er
     waitForAction();
 }
 
-void ConnectionToServer::writeToSocket() {
-    if(exit_flag) {
+void Client::ConnectionToServer::writeToSocket() {
+    if (exit_flag) {
         stopConnection();
         return;
     }
@@ -66,8 +76,30 @@ void ConnectionToServer::writeToSocket() {
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
-void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    if(err || exit_flag) {
+size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::error_code &err, size_t bytes) {
+    if (err || exit_flag) {
+        stopConnection();
+        return 0;
+    }
+    bool done = (bytes >= MSG_WAIT_FROM_SERVER_SIZE);
+    return done ? 0 : 1;
+}
+
+void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err, size_t bytes) {
+    if (err || exit_flag) {
+        stopConnection();
+        return;
+    }
+    uint8_t status = BufferIO::readUInt8(0, read_buffer_);
+    if (status) {
+        runGame();
+    } else {
+        waitForGameStart();
+    }
+}
+
+void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
+    if (err || exit_flag) {
         stopConnection();
         return;
     }
@@ -84,14 +116,14 @@ void ConnectionToServer::handleReadFromSocket(const boost::system::error_code &e
     readFromSocket();
 }
 
-void ConnectionToServer::readFromSocket() {
+void Client::ConnectionToServer::readFromSocket() {
     if (!isConnected()) return;
     async_read(sock_, buffer(read_buffer_),
                BIND_FN2(checkReadComplete, std::placeholders::_1, std::placeholders::_2),
                BIND_FN2(handleReadFromSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
-size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &err, size_t bytes) {
+size_t Client::ConnectionToServer::checkReadComplete(const boost::system::error_code &err, size_t bytes) {
     if (err || exit_flag) {
         stopConnection();
         return 0;
@@ -100,7 +132,7 @@ size_t ConnectionToServer::checkReadComplete(const boost::system::error_code &er
     return done ? 0 : 1;
 }
 
-void ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2) {
+void Client::ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, double x2, double y2) {
     gameState_.setHealthPoints(hp1, Player::First);
     gameState_.setPosition(x1, y1, Player::First);
 
@@ -108,7 +140,7 @@ void ConnectionToServer::updateGS(double hp1, double x1, double y1, double hp2, 
     gameState_.setPosition(x2, y2, Player::Second);
 }
 
-void ConnectionToServer::parseGSFromBuffer() {
+void Client::ConnectionToServer::parseGSFromBuffer() {
     double hp1 = BufferIO::readDouble(0, read_buffer_);
     double x1 = BufferIO::readDouble(8, read_buffer_);
     double y1 = BufferIO::readDouble(16, read_buffer_);
@@ -119,7 +151,7 @@ void ConnectionToServer::parseGSFromBuffer() {
     updateGS(hp1, x1, y1, hp2, x2, y2);
 }
 
-void ConnectionToServer::writeActionToBuffer() {
+void Client::ConnectionToServer::writeActionToBuffer() {
     Event e;
     events.pop(e);
 
@@ -131,8 +163,8 @@ void ConnectionToServer::writeActionToBuffer() {
     }
 }
 
-void ConnectionToServer::waitForAction() {
-    if(exit_flag) {
+void Client::ConnectionToServer::waitForAction() {
+    if (exit_flag) {
         stopConnection();
         return;
     }
@@ -144,11 +176,38 @@ void ConnectionToServer::waitForAction() {
     }
 }
 
-void runClient(GameState &gameState) {
-    ConnectionToServer::ptr client = ConnectionToServer::newConnection(gameState);
-    client->startConnection();
-    std::cout << "Connected " << std::endl;
+void Client::ConnectionToServer::runService() {
     service.run();
+}
+
+void Client::checkServerResponse() {
+    if(!connection_->isConnected()) return;
+    now = boost::posix_time::microsec_clock::local_time();
+    if ((now - last_update).total_milliseconds() > SERVER_RESPONSE_TIME) {
+        connection_->stopConnection();
+        return;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    now = boost::posix_time::microsec_clock::local_time();
+}
+
+void Client::run() {
+    connection_->startConnection();
+    std::cout << "Connected " << std::endl;
+    last_update = boost::posix_time::microsec_clock::local_time();
+    std::thread response_checker(&Client::checkServerResponse, this);
+    connection_->runService();
+    response_checker.join();
     std::cout << "Disonnected " << std::endl;
 }
+
+Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {
+}
+
+void runClient(GameState &gameState){
+    Client client(gameState);
+    client.run();
+}
+
+//TODO refactor
 

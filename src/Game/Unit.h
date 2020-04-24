@@ -11,35 +11,39 @@
 constexpr size_t MAX_ITEMS = 6;
 
 class Unit {
-private:
+protected:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
 
     Stats stats_;
 
-    Point position_; // ??
+    Point position_;
+    Point destination_;
+    double angle_;
 
 public:
     Unit(Stats stats, Point position);
 
     void addItem(Item &item, size_t slot = -1);
 
-    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory
+    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory TODO
     void clearItems();
 
     void addBuff(Buff &buff);
 
-    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index
+    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index TODO
     void clearBuffs();
 
     void changeDamage(int32_t delta);
     void changeAttackRange(int32_t delta);
     void changeMoveSpeed(int32_t delta);
+    void changeTurnRate(double delta);
     void changeAttackSpeed(int32_t delta);
     void changeMaxHP(int32_t delta);
     void changeMaxMP(int32_t delta);
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
+    void changeAngle(double delta);
 
     void applyHeal(double amount);
     void applyDamage(double amount);
@@ -52,7 +56,9 @@ public:
 
     void changeArmor(int32_t delta);
     void changeResist(double delta);
-    void changePosition(double deltaX, double deltaY); // coords += deltaCoords
+
+    void changePositionBy(double deltaX, double deltaY); // coords += deltaCoords
+    void changePositionBy(Point vector); // += vector
 
     bool isDead();
 
@@ -67,6 +73,9 @@ public:
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);
+
+    [[nodiscard]] double getTurnRate() const;
+    void setTurnRate(double turnRate);
 
     [[nodiscard]] uint32_t getAttackSpeed() const;
     void setAttackSpeed(uint32_t attackSpeed);
@@ -98,4 +107,11 @@ public:
     [[nodiscard]] const Point &getPosition() const;
     void setPosition(const Point &position);
     void setPosition(double x, double y);
+
+    [[nodiscard]] const Point &getDestination() const;
+    void setDestination(const Point &destination);
+    void setDestination(double x, double y);
+
+    [[nodiscard]] double getAngle() const;
+    void setAngle(double angle);
 };

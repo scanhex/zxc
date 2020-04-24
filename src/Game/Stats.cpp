@@ -5,6 +5,7 @@
 void Stats::changeDamage(int32_t delta) { damage_ += delta; }
 void Stats::changeAttackRange(int32_t delta) { attackRange_ += delta; }
 void Stats::changeMoveSpeed(int32_t delta) { moveSpeed_ += delta; }
+void Stats::changeTurnRate(int32_t delta) { turnRate_ += delta; }
 void Stats::changeAttackSpeed(int32_t delta) { attackSpeed_ += delta; }
 void Stats::changeMaxHP(int32_t delta) { maxHP_ += delta; }
 void Stats::changeMaxMP(int32_t delta) { maxMP_ += delta; }
@@ -40,6 +41,9 @@ void Stats::setAttackRange(uint32_t attackRange) { attackRange_ = attackRange; }
 
 uint32_t Stats::getMoveSpeed() const { return moveSpeed_; }
 void Stats::setMoveSpeed(uint32_t moveSpeed) { moveSpeed_ = moveSpeed; }
+
+double Stats::getTurnRate() const { return turnRate_; }
+void Stats::setTurnRate(double turnRate) { turnRate_ = turnRate; }
 
 uint32_t Stats::getAttackSpeed() const { return attackSpeed_; }
 void Stats::setAttackSpeed(uint32_t attackSpeed) { attackSpeed_ = attackSpeed; }

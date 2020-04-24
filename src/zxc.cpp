@@ -31,7 +31,6 @@
 #include <Magnum/Trade/PhongMaterialData.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/Trade/TextureData.h>
-//#include <MagnumPlugins/AssimpImporter/AssimpImporter.h>
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
@@ -75,12 +74,13 @@ private:
 
 	Vector3 positionOnSphere(const Vector2i& position) const;
 
-	void updateUnitsPosition();
+    void updateGameState();
 
 	void addUnit(Unit& u);
 	void initScene();
-	void initUnits();
 	Pointer<Object3D> loadModel(std::string filename);
+	void initGame();
+
 	Float depthAt(const Vector2i& position) const;
 	Vector3 unproject(const Vector2i& position, Float depth) const;
 	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
@@ -93,7 +93,8 @@ private:
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
-	std::optional<GameState> gameState;
+    std::chrono::time_point<std::chrono::high_resolution_clock> curTime;
+    std::optional<GameState> gameState;
 	std::optional<Hero> firstHero;
 	std::optional<Hero> secondHero;
 
@@ -117,7 +118,7 @@ void ZxcApplication::initScene() {
 	/* (c) Confucius */
 	_cameraObject
 		.setParent(&_scene)
-		.translate(Vector3::zAxis(20.0f));
+		.translate(Vector3::zAxis(30.0f));
 	(*(_camera = new SceneGraph::Camera3D{ _cameraObject }))
 		.setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
 		.setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -295,25 +296,15 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
 	}
 }
 
-void ZxcApplication::initUnits() {
-	StatsBuilder heroStatsBuilder = StatsBuilder().
-		setDamage(100).
-		setAttackRange(100).
-		setMoveSpeed(350).
-		setAttackSpeed(100).
-		setMaxHp(1000).
-		setMaxMp(300).
-		setHpRegen(2).
-		setMpRegen(1).
-		setArmor(3).
-		setResist(0.25);
-	firstHero = Hero(heroStatsBuilder.create(), Point(6, 6), Player::First);
-	secondHero = Hero(heroStatsBuilder.create(), Point(6, 6), Player::Second);
+void ZxcApplication::initGame(){
+    firstHero = Hero(Player::First);
+    secondHero = Hero(Player::Second);
 
-	gameState = GameState(*firstHero, *secondHero);
+    gameState = GameState(*firstHero, *secondHero);
+    curTime = std::chrono::high_resolution_clock::now();
 
-	addUnit(*firstHero);
-	addUnit(*secondHero);
+    addUnit(*firstHero);
+    addUnit(*secondHero);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -325,7 +316,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 
 	setSwapInterval(1);
 	initScene();
-	initUnits();
+    initGame();
 
 	network_thread = std::thread(runClient, std::ref(gameState.value()));
 
@@ -337,21 +328,38 @@ void ZxcApplication::addUnit(Unit& u) {
 	new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
-void ZxcApplication::updateUnitsPosition() {
-	Point myPosition = gameState->getPosition(Player::First);
-	Point otherPosition = gameState->getPosition(Player::Second);
+void ZxcApplication::updateGameState(){
+    Point myPosition = gameState->getPosition(Player::First);
+    double myAngle = gameState->getAngle(Player::First);
+    Point otherPosition = gameState->getPosition(Player::Second);
+    double otherAngle = gameState->getAngle(Player::Second);
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
+    gameState->update(std::chrono::duration_cast<std::chrono::milliseconds>(time - curTime).count());
+    curTime = time;
 
 	Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
 	Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
-	_unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
-	_unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+    _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
+    _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+
+    double myNewAngle = gameState->getAngle(Player::First);
+    double otherNewAngle = gameState->getAngle(Player::Second);
+
+    if (myNewAngle != myAngle) {
+        _unitObjects[0]->rotate(Math::Rad<float>(myNewAngle - myAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+    }
+
+    if (myNewAngle != myAngle) {
+        _unitObjects[1]->rotate(Math::Rad<float>(otherNewAngle - otherAngle), Math::Vector3{0.0f, 0.0f, 1.0f});
+    }
 }
 
 void ZxcApplication::drawEvent() {
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
-	updateUnitsPosition();
+    updateGameState();
 
 	assert(_camera);
 	_camera->draw(_drawables);
@@ -466,61 +474,62 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 	redraw();
 }
 
-void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent& event) {
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
-		_unitObjects[0]->translate({ 0,-1,0 });
-		// does nothing because does not modify game state and send event
-		redraw();
-	}
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
-		_unitObjects[0]->translate({ 0,1,0 });
-		redraw();
-	}
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
-		_unitObjects[0]->translate({ -1,0,0 });
-		redraw();
-	}
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
-		_unitObjects[0]->translate({ 1,0,0 });
-		redraw();
-	}
+void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::J) {
+        _unitObjects[0]->translate({0,-1,0});
+        // does nothing because does not modify game state and send event
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::K) {
+        _unitObjects[0]->translate({0,1,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::H) {
+        _unitObjects[0]->translate({-1,0,0});
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::L) {
+        _unitObjects[0]->translate({1,0,0});
+        redraw();
+    }
 
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-		Event curEvent(EventName::firstSkill, Player::First);
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+        Event curEvent(EventName::firstSkill, Player::First);
 
-		events.push(curEvent);
-		gameState->applyEvent(curEvent);
-		// draw skill use
-		redraw();
-	}
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-		Event curEvent(EventName::secondSkill, Player::First);
+        events.push(curEvent);
+        gameState->applyEvent(curEvent);
+        // draw skill use
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
+        Event curEvent(EventName::secondSkill, Player::First);
 
-		events.push(curEvent);
-		gameState->applyEvent(curEvent);
-		// draw skill use
-		redraw();
-	}
-	if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-		Event curEvent(EventName::thirdSkill, Player::First);
+        events.push(curEvent);
+        gameState->applyEvent(curEvent);
+        // draw skill use
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
+        Event curEvent(EventName::thirdSkill, Player::First);
 
-		events.push(curEvent);
-		gameState->applyEvent(curEvent);
-		// draw skill use
-		redraw();
-	}
+        events.push(curEvent);
+        gameState->applyEvent(curEvent);
+        // draw skill use
+        redraw();
+    }
 
-	std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
-	std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
-	std::cout << '\n';
+//    std::cout << "ME: " << gameState->getHealthPoints(Player::First) << '\n';
+//    std::cout << "SASHKA: " << gameState->getHealthPoints(Player::Second) << '\n';
+//    std::cout << '\n';
 }
 
 void ZxcApplication::exitEvent(ExitEvent& event) {
-	exit_flag = true;
-	std::cout << "Vi v adekvate?" << '\n';
-	std::cout << "net" << std::endl;
-	network_thread.join();
-	exit(0);
+    static_cast<void>(event);
+    exit_flag = true;
+    std::cout << "Vi v adekvate?" << '\n';
+    std::cout << "net" << std::endl;
+    network_thread.join();
+    exit(0);
 }
 
 MAGNUM_APPLICATION_MAIN(ZxcApplication)
