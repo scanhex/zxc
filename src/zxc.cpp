@@ -336,22 +336,21 @@ void ZxcApplication::addUnit(Unit& u) {
 }
 
 void ZxcApplication::updateGameState(){
-    double myAngle = gameState->getAngle(Player::First);
-    double otherAngle = gameState->getAngle(Player::Second);
+    double myAngle = _gameState->getAngle(Player::First);
+    double otherAngle = _gameState->getAngle(Player::Second);
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
 	_gameState->update(_timeline.previousFrameDuration() * 1000);
 
-    Point myPosition = gameState->getPosition(Player::First);
-    Point otherPosition = gameState->getPosition(Player::Second);
+    Point myPosition = _gameState->getPosition(Player::First);
+    Point otherPosition = _gameState->getPosition(Player::Second);
     Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
     Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
     _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
     _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
 
-    double myNewAngle = gameState->getAngle(Player::First);
-    double otherNewAngle = gameState->getAngle(Player::Second);
+    double myNewAngle = _gameState->getAngle(Player::First);
+    double otherNewAngle = _gameState->getAngle(Player::Second);
 
     if (myNewAngle != myAngle) {
         double delta = myNewAngle - myAngle;
