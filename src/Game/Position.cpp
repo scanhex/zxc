@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "Position.h"
 #include <cmath>
 #include <algorithm>
