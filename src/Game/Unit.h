@@ -7,6 +7,7 @@
 #include "Point.h"
 #include "Item.h"
 #include "Buff.h"
+#include "Position.h"
 
 constexpr size_t MAX_ITEMS = 6;
 
@@ -17,12 +18,10 @@ protected:
 
     Stats stats_;
 
-    Point position_;
-    Point destination_;
-    double angle_;
+    Position position_;
 
 public:
-    Unit(Stats stats, Point position);
+    Unit(Stats stats, Position position);
 
     void addItem(Item &item, size_t slot = -1);
 
@@ -43,7 +42,6 @@ public:
     void changeMaxMP(int32_t delta);
     void changeHPRegen(double delta);
     void changeMPRegen(double delta);
-    void changeAngle(double delta);
 
     void applyHeal(double amount);
     void applyDamage(double amount);
@@ -57,8 +55,7 @@ public:
     void changeArmor(int32_t delta);
     void changeResist(double delta);
 
-    void changePositionBy(double deltaX, double deltaY); // coords += deltaCoords
-    void changePositionBy(Point vector); // += vector
+    void updateUnit(double elapsedTimeInSeconds);
 
     bool isDead();
 
@@ -113,5 +110,4 @@ public:
     void setDestination(double x, double y);
 
     [[nodiscard]] double getAngle() const;
-    void setAngle(double angle);
 };

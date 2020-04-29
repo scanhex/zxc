@@ -39,6 +39,11 @@ double GameState::getAngle(Player player) const {
     return hero->getAngle();
 }
 
+Point GameState::getDestination(Player player) const {
+    Hero *hero = getHero(player);
+    return hero->getDestination();
+}
+
 void GameState::setPosition(Point pos, Player player) {
     Hero *hero = getHero(player);
     hero->setPosition(pos);
@@ -54,6 +59,11 @@ void GameState::setHealthPoints(double amount, Player player) {
     hero->setHealthPoints(amount);
 }
 
+void GameState::setDestination(double x, double y, Player player) {
+    Hero *hero = getHero(player);
+    hero->setDestination(x, y);
+}
+
 bool GameState::gameIsFinished() const {
     return firstHero_->isDead() || secondHero_->isDead();
 }
@@ -64,45 +74,7 @@ void GameState::update(double elapsedTime) { // time in milliseconds
 
     for (Hero *hero : {firstHero_, secondHero_}) {
         if (!hero->isDead()) {
-            double healPerTick = hero->getHpRegen() * elapsedTimeInSeconds;
-            double manaPerTick = hero->getMpRegen() * elapsedTimeInSeconds;
-            hero->applyHeal(healPerTick);
-            hero->regenMana(manaPerTick);
-
-            Point pos = hero->getPosition();
-            Point dest = hero->getDestination();
-            if (pos == dest) continue;
-            Point vector = dest - pos;
-            double angle = std::acos(vector.y_ / vector.vectorLength());
-            if (vector.x_ > 0) angle = 2 * M_PI - angle;
-            double delta = (hero->getTurnRate() / 100.0) * elapsedTimeInSeconds;
-            double myAngle = hero->getAngle();
-            if (std::abs(angle - myAngle) <= M_PI) {
-                if (std::abs(angle - myAngle) < delta) {
-                    hero->setAngle(angle);
-                } else {
-                    hero->changeAngle(angle > myAngle ? delta : -delta);
-                }
-            } else {
-                if (2 * M_PI - std::abs(angle - myAngle) < delta) {
-                    hero->setAngle(angle);
-                } else {
-                    hero->changeAngle(angle > myAngle ? -delta : delta);
-                }
-            }
-
-            delta = std::abs(angle - myAngle);
-            if(std::min(delta, 2 * M_PI - delta) > 1) continue;
-
-
-            double factor = (hero->getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
-            if (vector.vectorLengthIsLessThan(factor)) {
-                hero->setPosition(hero->getDestination());
-            } else {
-                vector.normalize();
-                vector *= factor;
-                hero->changePositionBy(vector);
-            }
+            hero->updateUnit(elapsedTimeInSeconds);
         }
     }
 }
