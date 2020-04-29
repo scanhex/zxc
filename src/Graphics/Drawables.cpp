@@ -75,3 +75,20 @@ void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Cam
 
     _mesh.draw(_shader);
 }
+
+void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+    if (_timeline.previousFrameDuration() >= _creationTime + COIL_ANIMATION_DURATION) {
+        delete &_object;
+        delete this;
+        return;
+    }
+    _shader
+        .setDiffuseColor(Color4(1, 0, 0))
+		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+		.setLightColor(Color4(3.f, 3.f, 3.f, 3.f))
+		.setTransformationMatrix(transformationMatrix)
+		.setNormalMatrix(transformationMatrix.normalMatrix())
+		.setProjectionMatrix(camera.projectionMatrix());
+
+    _mesh.draw(_shader);
+}

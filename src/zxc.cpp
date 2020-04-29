@@ -31,6 +31,7 @@
 #include <Magnum/Trade/PhongMaterialData.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/Trade/TextureData.h>
+#include <Magnum/Timeline.h>
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
@@ -41,6 +42,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include "Graphics/Drawables.h"
+#include "Graphics/EventHandlers.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
 
@@ -93,10 +95,9 @@ private:
 	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
 	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> curTime;
-    std::optional<GameState> gameState;
-	std::optional<Hero> firstHero;
-	std::optional<Hero> secondHero;
+    std::optional<GameState> _gameState;
+	std::optional<Hero> _firstHero;
+	std::optional<Hero> _secondHero;
 
 	std::thread network_thread;
 
@@ -110,6 +111,7 @@ private:
 	Vector3 _previousPosition;
 
 	GL::Mesh _grid;
+	Magnum::Timeline _timeline;
 };
 
 
@@ -298,14 +300,13 @@ void ZxcApplication::addObject(Trade::AbstractImporter& importer, Containers::Ar
 }
 
 void ZxcApplication::initGame(){
-    firstHero = Hero(Player::First);
-    secondHero = Hero(Player::Second);
+    _firstHero = Hero(Player::First);
+    _secondHero = Hero(Player::Second);
 
-    gameState = GameState(*firstHero, *secondHero);
-    curTime = std::chrono::high_resolution_clock::now();
+    _gameState = GameState(*_firstHero, *_secondHero);
 
-    addUnit(*firstHero);
-    addUnit(*secondHero);
+    addUnit(*_firstHero);
+    addUnit(*_secondHero);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -320,10 +321,11 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	GL::Renderer::setBlendFunction(
 		GL::Renderer::BlendFunction::One, /* or SourceAlpha for non-premultiplied */
 		GL::Renderer::BlendFunction::OneMinusSourceAlpha);
+	_timeline.start();
 	initScene();
     initGame();
 
-	network_thread = std::thread(runClient, std::ref(gameState.value()));
+	network_thread = std::thread(runClient, std::ref(_gameState.value()));
 
 
 }
@@ -334,14 +336,13 @@ void ZxcApplication::addUnit(Unit& u) {
 }
 
 void ZxcApplication::updateGameState(){
-    Point myPosition = gameState->getPosition(Player::First);
-    double myAngle = gameState->getAngle(Player::First);
-    Point otherPosition = gameState->getPosition(Player::Second);
-    double otherAngle = gameState->getAngle(Player::Second);
+    Point myPosition = _gameState->getPosition(Player::First);
+    double myAngle = _gameState->getAngle(Player::First);
+    Point otherPosition = _gameState->getPosition(Player::Second);
+    double otherAngle = _gameState->getAngle(Player::Second);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time = std::chrono::high_resolution_clock::now();
-    gameState->update(std::chrono::duration_cast<std::chrono::milliseconds>(time - curTime).count());
-    curTime = time;
+	_gameState->update(_timeline.previousFrameDuration() * 1000);
 
 	Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
 	Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
@@ -349,8 +350,8 @@ void ZxcApplication::updateGameState(){
     _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
     _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
 
-    double myNewAngle = gameState->getAngle(Player::First);
-    double otherNewAngle = gameState->getAngle(Player::Second);
+    double myNewAngle = _gameState->getAngle(Player::First);
+    double otherNewAngle = _gameState->getAngle(Player::Second);
     double myDelta = myNewAngle - myAngle;
     double otherDelta = otherNewAngle - otherAngle;
 
@@ -379,6 +380,7 @@ void ZxcApplication::drawEvent() {
 
 	swapBuffers();
 	redraw();
+	_timeline.nextFrame();
 }
 
 void ZxcApplication::viewportEvent(ViewportEvent& event) {
@@ -397,7 +399,7 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 
 		Event curEvent(EventName::move, Player::First, x, y);
 		events.push(curEvent);
-		gameState->applyEvent(curEvent);
+		_gameState->applyEvent(curEvent);
 
 		redraw();
 	}
@@ -493,7 +495,8 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::firstSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(curEvent);
+        _gameState->applyEvent(curEvent);
+		handleSkill(*_firstHero, SkillNum::first, _drawables);
         // draw skill use
         redraw();
     }
@@ -501,7 +504,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::secondSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(curEvent);
+        _gameState->applyEvent(curEvent);
         // draw skill use
         redraw();
     }
@@ -509,7 +512,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::thirdSkill, Player::First);
 
         events.push(curEvent);
-        gameState->applyEvent(curEvent);
+        _gameState->applyEvent(curEvent);
         // draw skill use
         redraw();
     }
