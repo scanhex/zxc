@@ -23,6 +23,7 @@ public:
     [[nodiscard]] double getHealthPoints(Player player) const;
     [[nodiscard]] Point getPosition(Player player) const;
     [[nodiscard]] double getAngle(Player player) const;
+    [[nodiscard]] Point getDestination(Player player) const;
 
     [[nodiscard]] bool isDead(Player player) const;
 
@@ -34,6 +35,7 @@ public:
     void setHealthPoints(double amount, Player player);
     void setPosition(Point pos, Player player);
     void setPosition(double x, double y, Player player);
+    void setDestination(double x, double y, Player player);
 
     void applyDamage(double amount, Player player);
     void applyDamagePhys(double amount, Player player);
