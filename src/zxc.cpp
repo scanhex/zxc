@@ -493,7 +493,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 
         events.push(curEvent);
         _gameState->applyEvent(curEvent);
-		handleSkill(*_firstHero, SkillNum::first, _drawables);
+		handleSkill(*_firstHero, SkillNum::first, _scene, _drawables, _timeline);
         // draw skill use
         redraw();
     }
@@ -502,6 +502,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 
         events.push(curEvent);
         _gameState->applyEvent(curEvent);
+		handleSkill(*_firstHero, SkillNum::second, _scene, _drawables, _timeline);
         // draw skill use
         redraw();
     }
@@ -510,6 +511,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 
         events.push(curEvent);
         _gameState->applyEvent(curEvent);
+		handleSkill(*_firstHero, SkillNum::third, _scene, _drawables, _timeline);
         // draw skill use
         redraw();
     }

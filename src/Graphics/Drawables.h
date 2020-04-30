@@ -89,13 +89,17 @@ constexpr float COIL_ANIMATION_DURATION = 0.4;
 
 class CoilDrawable : public SceneGraph::Drawable3D {
 public:
-	explicit CoilDrawable(Object3D& object, Shaders::Phong& shader, SceneGraph::DrawableGroup3D& group, Magnum::Timeline& timeline) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _object(object),  _timeline(timeline), _creationTime(_timeline.previousFrameTime()) {
+	explicit CoilDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, Magnum::Timeline& timeline) : SceneGraph::Drawable3D{ object, &group }, _object(object),  _timeline(timeline), _creationTime(_timeline.previousFrameTime()) {
+        Debug{} << "Coil create";
 	}
+    ~CoilDrawable() {
+        Debug{} << "Coil delete";
+    }
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
-    Shaders::Phong& _shader;
+    Shaders::Phong _shader;
     Object3D& _object;
     Magnum::Timeline& _timeline;
     float _creationTime;
-	GL::Mesh& _mesh = MeshTools::compile(Primitives::circle3DSolid(100));
+	GL::Mesh _mesh = MeshTools::compile(Primitives::circle3DSolid(100));
 };
