@@ -356,14 +356,14 @@ void ZxcApplication::updateGameState(){
         double delta = myNewAngle - myAngle;
         if (delta <= -M_PI) delta += 2 * M_PI;
         if (delta >= M_PI) delta -= 2 * M_PI;
-        _unitObjects[0]->rotate(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
+        _unitObjects[0]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 
     if (otherNewAngle != otherAngle) {
         double delta = otherNewAngle - otherAngle;
         if (delta <= -M_PI) delta += 2 * M_PI;
         if (delta >= M_PI) delta -= 2 * M_PI;
-        _unitObjects[1]->rotate(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
+        _unitObjects[1]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 }
 
@@ -372,7 +372,9 @@ void ZxcApplication::drawEvent() {
 
     updateGameState();
 
-	assert(_camera);
+//  Fps counter in console
+//	Debug{} << 1 / _timeline.previousFrameDuration();
+
 	_camera->draw(_drawables);
 
 	swapBuffers();

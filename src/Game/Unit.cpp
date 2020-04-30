@@ -103,7 +103,7 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
 
-    double turnDelta = (getTurnRate() / 100.0) * elapsedTimeInSeconds;
+    double turnDelta = getTurnRate() * (elapsedTimeInSeconds / 0.03);
     double moveDelta = (getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
     position_.update(turnDelta, moveDelta);
 }
