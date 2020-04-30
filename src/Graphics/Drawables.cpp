@@ -77,9 +77,9 @@ void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Cam
 }
 
 void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-    if (_timeline.previousFrameDuration() >= _creationTime + COIL_ANIMATION_DURATION) {
+    if (_timeline.previousFrameTime() >= _creationTime + COIL_ANIMATION_DURATION) {
         delete &_object;
-        delete this;
+//        delete this;
         return;
     }
     _shader
