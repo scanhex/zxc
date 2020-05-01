@@ -6,15 +6,10 @@
 #include <Magnum/ImageView.h>
 #include <Magnum/Math/Math.h>
 #include <Magnum/Math/Color.h>
-#include <Magnum/Math/Constants.h>
 #include <Magnum/Math/FunctionsBatch.h>
-#include <Magnum/Mesh.h>
-#include <Magnum/PixelFormat.h>
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
-#include <Magnum/GL/Texture.h>
-#include <Magnum/GL/TextureFormat.h>
 #include <Magnum/GL/PixelFormat.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/Platform/Sdl2Application.h>
@@ -23,19 +18,12 @@
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/SceneGraph/Scene.h>
 #include <Magnum/Primitives/Grid.h>
-#include <Magnum/Shaders/Phong.h>
-#include <Magnum/Trade/ImageData.h>
-#include <Magnum/Trade/MeshData3D.h>
-#include <Magnum/Trade/MeshObjectData3D.h>
-#include <Magnum/Trade/PhongMaterialData.h>
 #include <Magnum/Trade/SceneData.h>
-#include <Magnum/Trade/TextureData.h>
 #include <Magnum/Timeline.h>
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
 #include <iostream>
-#include <fstream>
 #include <cassert>
 
 #include <boost/lockfree/queue.hpp>
@@ -48,64 +36,7 @@
 #include "Graphics/ModelLoader.h"
 #include "Graphics/ShaderLibrary.h"
 
-using namespace Magnum;
-using namespace Corrade;
-
-using namespace Math::Literals;
-
-
-boost::lockfree::queue<Event> events{ 100 };
-bool exit_flag = false;
-
-class ZxcApplication : public Platform::Application {
-public:
-	explicit ZxcApplication(const Arguments& arguments);
-
-private:
-
-	void drawEvent() override;
-	void viewportEvent(ViewportEvent& event) override;
-	void mousePressEvent(MouseEvent& event) override;
-	void mouseReleaseEvent(MouseEvent& event) override;
-	void mouseMoveEvent(MouseMoveEvent& event) override;
-	void mouseScrollEvent(MouseScrollEvent& event) override;
-	void exitEvent(ExitEvent& event) override;
-
-	void keyPressEvent(KeyEvent& event) override;
-
-	Vector3 positionOnSphere(const Vector2i& position) const;
-
-    void updateGameState();
-
-	void addUnit(Unit& u);
-	void initCamera();
-	void initRenderer();
-	void initGrid();
-	void initScene();
-	void initGame();
-
-	Float depthAt(const Vector2i& position) const;
-	Vector3 unproject(const Vector2i& position, Float depth) const;
-	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
-
-    std::optional<GameState> _gameState;
-	std::optional<Hero> _firstHero;
-	std::optional<Hero> _secondHero;
-
-	std::thread network_thread;
-
-	std::vector<Object3D*> _unitObjects;
-
-	Scene3D _scene;
-	Object3D _cameraObject;
-	SceneGraph::Camera3D* _camera = nullptr;
-	Object3D _mapObject;
-	SceneGraph::DrawableGroup3D _drawables;
-	Vector3 _previousPosition;
-
-	GL::Mesh _grid;
-	Magnum::Timeline _timeline;
-};
+#include "zxc.h"
 
 
 void ZxcApplication::initCamera() {

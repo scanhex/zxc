@@ -28,15 +28,6 @@ UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group,
 }
 
 void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-    /*
-    _shader.setDiffuseColor(0xa5c9ea_rgbf)
-    .setLightPosition(camera.cameraMatrix().transformPoint(
-    { 5.0f, 5.0f, 7.0f }))
-    .setTransformationMatrix(transformationMatrix)
-    .setNormalMatrix(transformationMatrix.normalMatrix())
-    .setProjectionMatrix(camera.projectionMatrix());
-    _mesh.draw(_shader);
-    */
     _hpShader.setColor(0x00ff00_rgbf)
         .setTransformationProjectionMatrix(camera.projectionMatrix()  * Matrix4::translation(transformationMatrix.translation()) * Matrix4::translation({ 0.f, 1.f, 5.f }))
         .bindVectorTexture(cache.texture());
@@ -55,7 +46,7 @@ void FlatDrawable::draw(const Matrix4& transformation, SceneGraph::Camera3D& cam
 void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
     _shader
             .setDiffuseColor(_color)
-            .setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+            .setLightPosition(camera.cameraMatrix().translation())
             .setLightColor(Color4(255,255,255,255))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
@@ -79,12 +70,11 @@ void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Cam
 void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
     if (_timeline.previousFrameTime() >= _creationTime + COIL_ANIMATION_DURATION) {
         delete &_object;
-//        delete this;
         return;
     }
     _shader
         .setDiffuseColor(Color4(1, 0, 0))
-		.setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
+		.setLightPosition(camera.cameraMatrix().translation())
 		.setLightColor(Color4(3.f, 3.f, 3.f, 3.f))
 		.setTransformationMatrix(transformationMatrix)
 		.setNormalMatrix(transformationMatrix.normalMatrix())
