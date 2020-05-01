@@ -7,15 +7,24 @@ git submodule update --init
 Инструкции по установке библиотек:
 
 ## Ubuntu
+Boost
 ```
 apt-get install libboost-system-dev
 apt-get install libboost-thread-dev
 apt-get install libboost-date-time-dev
 apt-get install libboost-regex-dev
 apt-get install libboost-serialization-dev
-apt-get install libgl1-mesa-dev
+```
+или
+```
+apt-get install libboost-all-dev   
+```
 
-sudo apt install libsdl2-dev
+OpenGL & SDL2
+
+```
+apt-get install libgl1-mesa-dev
+apt-get install libsdl2-dev
 ```
 
 ## macOS
