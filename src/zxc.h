@@ -58,23 +58,23 @@ private:
 	Vector3 unproject(const Vector2i& position, Float depth) const;
 	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
 
-	ShaderLibrary _shaderLibrary;
-	ModelLoader _modelLoader;
-    std::optional<GameState> _gameState;
-	std::optional<Hero> _firstHero;
-	std::optional<Hero> _secondHero;
+	ShaderLibrary shaderLibrary_;
+	ModelLoader modelLoader_;
+    std::optional<GameState> gameState_;
+	std::optional<Hero> firstHero_;
+	std::optional<Hero> secondHero_;
 
-	std::thread network_thread;
+	std::thread networkThread_;
 
-	std::vector<Object3D*> _unitObjects;
+	std::vector<Object3D*> unitObjects_;
 
-	Scene3D _scene;
-	Object3D _cameraObject;
-	SceneGraph::Camera3D* _camera = nullptr;
-	Object3D _mapObject;
-	SceneGraph::DrawableGroup3D _drawables;
-	Vector3 _previousPosition;
+	Scene3D scene_;
+	Object3D cameraObject_;
+	SceneGraph::Camera3D* camera_ = nullptr;
+	Object3D mapObject_;
+	SceneGraph::DrawableGroup3D drawables_;
+	Vector3 previousPosition_;
 
-	GL::Mesh _grid;
-	Magnum::Timeline _timeline;
+	GL::Mesh grid_;
+	Magnum::Timeline timeline_;
 };

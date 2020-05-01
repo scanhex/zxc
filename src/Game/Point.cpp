@@ -5,7 +5,7 @@ Point::Point(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
 void Point::normalize() {
     if (fabs(x_) < 1e-8 && fabs(y_) < 1e-8) return;
-    double len = vectorLength();
+    double len = norm();
     x_ /= len;
     y_ /= len;
 }
@@ -57,10 +57,14 @@ bool Point::inRadius(double x, double y, double r) const {
     return ((x - x_) * (x - x_) + (y - y_) * (y - y_) <= r * r);
 }
 
-double Point::vectorLength() const {
-    return std::sqrt(x_ * x_ + y_ * y_);
+double Point::normSqr() const {
+    return x_ * x_ + y_ * y_;
 }
 
-bool Point::vectorLengthIsLessThan(double v) const {
-    return (x_ * x_ + y_ * y_ < v * v);
+double Point::norm() const {
+    return std::sqrt(normSqr());
+}
+
+bool Point::normLessThan(double v) const {
+    return (normSqr() < v * v);
 }

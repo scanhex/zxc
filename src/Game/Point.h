@@ -23,6 +23,7 @@ public:
 
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
 
-    [[nodiscard]] double vectorLength() const;
-    [[nodiscard]] bool vectorLengthIsLessThan(double v) const;
+    [[nodiscard]] double normSqr() const;
+    [[nodiscard]] double norm() const;
+    [[nodiscard]] bool normLessThan(double v) const;
 };
