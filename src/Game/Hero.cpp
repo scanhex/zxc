@@ -5,18 +5,18 @@
 #include "GameState.h"
 
 StatsBuilder Hero::defaultHeroStatsBuilder_ =
-        StatsBuilder().
-                setDamage(100).
-                setAttackRange(100).
-                setMoveSpeed(450).
-                setTurnRate(0.5).
-                setAttackSpeed(100).
-                setMaxHp(1000).
-                setMaxMp(300).
-                setHpRegen(1.5).
-                setMpRegen(1).
-                setArmor(3).
-                setResist(0.25);
+        StatsBuilder()
+                .setDamage(100)
+                .setAttackRange(100)
+                .setMoveSpeed(450)
+                .setTurnRate(0.5)
+                .setAttackSpeed(100)
+                .setMaxHp(1000)
+                .setMaxMp(300)
+                .setHpRegen(1.5)
+                .setMpRegen(1)
+                .setArmor(3)
+                .setResist(0.25);
 
 Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), -M_PI);
 Position Hero::secondHeroStartingPosition_ = Position(Point(6, 6), M_PI);
@@ -74,19 +74,7 @@ void Hero::changeExperience(uint32_t delta) {
 }
 
 void Hero::useSkill(SkillNum skillNum, GameState &gameState) {
-    switch (skillNum) {
-        case SkillNum::first:
-            skills_[0].handleEvent(gameState);
-            break;
-        case SkillNum::second:
-            skills_[1].handleEvent(gameState);
-            break;
-        case SkillNum::third:
-            skills_[2].handleEvent(gameState);
-            break;
-        default:
-            assert(false);
-    }
+    skills_[static_cast<uint8_t>(skillNum)].handleEvent(gameState);
 }
 
 

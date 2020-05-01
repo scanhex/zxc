@@ -5,7 +5,6 @@
 #include "StatsBuilder.h"
 
 
-enum class SkillNum;
 class GameState;
 class Skill;
 
