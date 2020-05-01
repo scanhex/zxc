@@ -41,10 +41,10 @@
 void ZxcApplication::initCamera() {
 	/* Every scene needs a camera */
 	/* (c) Confucius */
-	_cameraObject
-		.setParent(&_scene)
+	cameraObject_
+		.setParent(&scene_)
 		.translate(Vector3::zAxis(30.0f));
-	(*(_camera = new SceneGraph::Camera3D{ _cameraObject }))
+	(*(camera_ = new SceneGraph::Camera3D{cameraObject_ }))
 		.setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
 		.setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
 		.setViewport(GL::defaultFramebuffer.viewport().size());
@@ -65,30 +65,28 @@ void ZxcApplication::initRenderer()
 
 void ZxcApplication::initGrid()
 {
-	_grid = MeshTools::compile(Primitives::grid3DSolid({ 15, 15 }));
-	auto grid = new Object3D{ &_scene };
+    grid_ = MeshTools::compile(Primitives::grid3DSolid({15, 15 }));
+	auto grid = new Object3D{ &scene_ };
 	(*grid).scale(Vector3{ 8 });
-	new FlatDrawable{ *grid, ShaderLibrary::flatShader(), _grid, _drawables };
+	new FlatDrawable{*grid, ShaderLibrary::flatShader(), grid_, drawables_ };
 }
 
 void ZxcApplication::initScene() {
 	initCamera();
 	initRenderer();
 	/* Setup shaders */
-	/*
-	*/
-
+	
 	initGrid();
 }
 
 void ZxcApplication::initGame(){
-    _firstHero = Hero(Player::First);
-    _secondHero = Hero(Player::Second);
+    firstHero_ = Hero(Player::First);
+    secondHero_ = Hero(Player::Second);
 
-    _gameState = GameState(*_firstHero, *_secondHero);
+    gameState_ = GameState(*firstHero_, *secondHero_);
 
-    addUnit(*_firstHero);
-    addUnit(*_secondHero);
+    addUnit(*firstHero_);
+    addUnit(*secondHero_);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
@@ -99,49 +97,49 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 {
 
 	setSwapInterval(1);
-	_timeline.start();
+	timeline_.start();
 	initScene();
     initGame();
 
-	network_thread = std::thread(runClient, std::ref(_gameState.value()));
+    networkThread_ = std::thread(runClient, std::ref(gameState_.value()));
 
 
 }
 
 void ZxcApplication::addUnit(Unit& u) {
-	_unitObjects.push_back(_modelLoader.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", _scene, _drawables).release());
-	new UnitDrawable(*_unitObjects.back(), _drawables, u);
+	unitObjects_.push_back(modelLoader_.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", scene_, drawables_).release());
+	new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
 void ZxcApplication::updateGameState(){
-    double myAngle = _gameState->getAngle(Player::First);
-    double otherAngle = _gameState->getAngle(Player::Second);
+    double myAngle = gameState_->getAngle(Player::First);
+    double otherAngle = gameState_->getAngle(Player::Second);
 
-	_gameState->update(static_cast<double>(_timeline.previousFrameDuration()) * 1000);
+	gameState_->update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
-    Point myPosition = _gameState->getPosition(Player::First);
-    Point otherPosition = _gameState->getPosition(Player::Second);
+    Point myPosition = gameState_->getPosition(Player::First);
+    Point otherPosition = gameState_->getPosition(Player::Second);
     Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
     Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
-    _unitObjects[0]->translate(myVectorPosition - _unitObjects[0]->transformation().translation());
-    _unitObjects[1]->translate(otherVectorPosition - _unitObjects[1]->transformation().translation());
+    unitObjects_[0]->translate(myVectorPosition - unitObjects_[0]->transformation().translation());
+    unitObjects_[1]->translate(otherVectorPosition - unitObjects_[1]->transformation().translation());
 
-    double myNewAngle = _gameState->getAngle(Player::First);
-    double otherNewAngle = _gameState->getAngle(Player::Second);
+    double myNewAngle = gameState_->getAngle(Player::First);
+    double otherNewAngle = gameState_->getAngle(Player::Second);
 
     if (myNewAngle != myAngle) {
         double delta = myNewAngle - myAngle;
         if (delta <= -M_PI) delta += 2 * M_PI;
         if (delta >= M_PI) delta -= 2 * M_PI;
-        _unitObjects[0]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
+        unitObjects_[0]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 
     if (otherNewAngle != otherAngle) {
         double delta = otherNewAngle - otherAngle;
         if (delta <= -M_PI) delta += 2 * M_PI;
         if (delta >= M_PI) delta -= 2 * M_PI;
-        _unitObjects[1]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
+        unitObjects_[1]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
     }
 }
 
@@ -151,32 +149,32 @@ void ZxcApplication::drawEvent() {
     updateGameState();
 
 //  Fps counter in console
-//	Debug{} << 1 / _timeline.previousFrameDuration();
+//	Debug{} << 1 / timeline_.previousFrameDuration();
 
-	_camera->draw(_drawables);
+	camera_->draw(drawables_);
 
 	swapBuffers();
 	redraw();
-	_timeline.nextFrame();
+	timeline_.nextFrame();
 }
 
 void ZxcApplication::viewportEvent(ViewportEvent& event) {
 	GL::defaultFramebuffer.setViewport({ {}, event.framebufferSize() });
-	_camera->setViewport(event.windowSize());
+	camera_->setViewport(event.windowSize());
 }
 
 void ZxcApplication::mousePressEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Left)
-		_previousPosition = positionOnSphere(event.position());
+        previousPosition_ = positionOnSphere(event.position());
 	if (event.button() == MouseEvent::Button::Right) {
 		auto newPosition = intersectWithPlane(event.position(), { 0,0,1 });
-		_unitObjects[0]->translate(newPosition - _unitObjects[0]->transformation().translation());
+		unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
 
 		double x = newPosition.x(), y = newPosition.y();
 
 		Event curEvent(EventName::move, Player::First, x, y);
 		events.push(curEvent);
-		_gameState->applyEvent(curEvent);
+		gameState_->applyEvent(curEvent);
 
 		redraw();
 	}
@@ -184,18 +182,18 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 
 void ZxcApplication::mouseReleaseEvent(MouseEvent& event) {
 	if (event.button() == MouseEvent::Button::Left)
-		_previousPosition = Vector3();
+        previousPosition_ = Vector3();
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 	if (!event.offset().y()) return;
 
 	/* Distance to origin */
-	const Float distance = _cameraObject.transformation().translation().z();
+	const Float distance = cameraObject_.transformation().translation().z();
 
 	/* Move 15% of the distance back or forward */
-	_cameraObject.translate(-_cameraObject.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1) );
-//	_cameraObject.translate(Vector3::zAxis(
+	cameraObject_.translate(-cameraObject_.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1) );
+//	cameraObject_.translate(Vector3::zAxis(
 //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
 	redraw();
@@ -209,11 +207,11 @@ Vector3 ZxcApplication::intersectWithPlane(const Vector2i& windowPosition, const
 	const Vector2i viewPosition{ windowPosition.x(), viewSize.y() - windowPosition.y() - 1 };
 	const Vector3 ray_nds{ 2 * Vector2{viewPosition} / Vector2{viewSize} -Vector2{1.0f}, 1 };
 	const Vector4 ray_clip{ ray_nds.x(), ray_nds.y(), -1, 1 };
-	Vector4 ray_eye = _camera->projectionMatrix().inverted() * ray_clip;
+	Vector4 ray_eye = camera_->projectionMatrix().inverted() * ray_clip;
 	ray_eye.z() = -1, ray_eye.w() = 0;
-	Vector3 ray_world = (_camera->cameraMatrix().inverted() * ray_eye).xyz().normalized();
-	const Float dist = -Math::dot(_cameraObject.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
-	return _cameraObject.absoluteTransformation().translation() + ray_world * dist;
+	Vector3 ray_world = (camera_->cameraMatrix().inverted() * ray_eye).xyz().normalized();
+	const Float dist = -Math::dot(cameraObject_.absoluteTransformation().translation(), planeNormal) / Math::dot(ray_world, planeNormal);
+	return cameraObject_.absoluteTransformation().translation() + ray_world * dist;
 }
 
 Float ZxcApplication::depthAt(const Vector2i& windowPosition) const {
@@ -239,15 +237,15 @@ Vector3 ZxcApplication::unproject(const Vector2i& windowPosition, Float depth) c
 	const Vector3 in{ 2 * Vector2{viewPosition} / Vector2{viewSize} -Vector2{1.0f}, depth * 2.0f - 1.0f };
 
 
-	return (_cameraObject.absoluteTransformationMatrix() * _camera->projectionMatrix().inverted()).transformPoint(in);
+	return (cameraObject_.absoluteTransformationMatrix() * camera_->projectionMatrix().inverted()).transformPoint(in);
 	/*
   Use the following to get the camera-relative coordinates instead of global:
-//    return _camera->projectionMatrix().inverted().transformPoint(in);
+//    return camera_->projectionMatrix().inverted().transformPoint(in);
 	   */
 }
 
 Vector3 ZxcApplication::positionOnSphere(const Vector2i& position) const {
-	const Vector2 positionNormalized = Vector2{ position } / Vector2{ _camera->viewport() } -Vector2{ 0.5f };
+	const Vector2 positionNormalized = Vector2{ position } / Vector2{camera_->viewport() } - Vector2{0.5f };
 	const Float length = positionNormalized.length();
 	const Vector3 result(length > 1.0f ? Vector3(positionNormalized, 0.0f) : Vector3(positionNormalized, 1.0f - length));
 	return (result * Vector3::yScale(-1.0f)).normalized();
@@ -257,12 +255,12 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 	if (!(event.buttons() & MouseMoveEvent::Button::Left)) return;
 
 	const Vector3 currentPosition = positionOnSphere(event.position());
-	const Vector3 axis = Math::cross(_previousPosition, currentPosition);
+	const Vector3 axis = Math::cross(previousPosition_, currentPosition);
 
-	if (_previousPosition.length() < 0.001f || axis.length() < 0.001f) return;
+	if (previousPosition_.length() < 0.001f || axis.length() < 0.001f) return;
 
-	_cameraObject.rotate(Math::angle(_previousPosition, currentPosition), axis.normalized());
-	_previousPosition = currentPosition;
+	cameraObject_.rotate(Math::angle(previousPosition_, currentPosition), axis.normalized());
+    previousPosition_ = currentPosition;
 
 	redraw();
 }
@@ -272,8 +270,8 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::firstSkill, Player::First);
 
         events.push(curEvent);
-        _gameState->applyEvent(curEvent);
-		handleSkill(*_firstHero, SkillNum::first, _scene, _drawables, _timeline);
+        gameState_->applyEvent(curEvent);
+		handleSkill(*firstHero_, SkillNum::first, scene_, drawables_, timeline_);
         // draw skill use
         redraw();
     }
@@ -281,8 +279,8 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::secondSkill, Player::First);
 
         events.push(curEvent);
-        _gameState->applyEvent(curEvent);
-		handleSkill(*_firstHero, SkillNum::second, _scene, _drawables, _timeline);
+        gameState_->applyEvent(curEvent);
+		handleSkill(*firstHero_, SkillNum::second, scene_, drawables_, timeline_);
         // draw skill use
         redraw();
     }
@@ -290,8 +288,8 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         Event curEvent(EventName::thirdSkill, Player::First);
 
         events.push(curEvent);
-        _gameState->applyEvent(curEvent);
-		handleSkill(*_firstHero, SkillNum::third, _scene, _drawables, _timeline);
+        gameState_->applyEvent(curEvent);
+		handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_);
         // draw skill use
         redraw();
     }
@@ -302,7 +300,7 @@ void ZxcApplication::exitEvent(ExitEvent& event) {
     exit_flag = true;
     std::cout << "Vi v adekvate?" << '\n';
     std::cout << "net" << std::endl;
-    network_thread.join();
+    networkThread_.join();
     exit(0);
 }
 

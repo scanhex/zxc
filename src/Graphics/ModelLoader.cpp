@@ -38,8 +38,8 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D& scene, S
 
 	/* Load all textures. Textures that fail to load will be NullOpt. */
 	/**/
-	if (!_textures.size()) { // TODO apply correct memoization
-		_textures = Containers::Array<Containers::Optional<GL::Texture2D>>{ importer->textureCount() };
+	if (!textures_.size()) { // TODO apply correct memoization
+		textures_ = Containers::Array<Containers::Optional<GL::Texture2D>>{importer->textureCount() };
 		for (UnsignedInt i = 0; i != importer->textureCount(); ++i) {
 			Debug{} << "Importing texture" << i << importer->textureName(i);
 
@@ -72,12 +72,12 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D& scene, S
 				.setSubImage(0, {}, *imageData)
 				.generateMipmap();
 
-			_textures[i] = std::move(texture);
+            textures_[i] = std::move(texture);
 		}
 
 
 		/* Load all meshes. Meshes that fail to load will be NullOpt. */
-		_meshes = Containers::Array<Containers::Optional<GL::Mesh>>{ importer->mesh3DCount() };
+		meshes_ = Containers::Array<Containers::Optional<GL::Mesh>>{importer->mesh3DCount() };
 		for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
 			Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
 
@@ -89,7 +89,7 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D& scene, S
 			}
 
 			/* Compile the mesh */
-			_meshes[i] = MeshTools::compile(*meshData);
+			meshes_[i] = MeshTools::compile(*meshData);
 		}
 	}
 
@@ -126,8 +126,8 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D& scene, S
 		/* The format has no scene support, display just the first loaded mesh with
 		   a default material and be done with it */
 	}
-	else if (!_meshes.empty() && _meshes[0])
-		new ColoredDrawable{ *manipulator, ShaderLibrary::coloredShader(), *_meshes[0], 0xffffff_rgbf, drawables };
+	else if (!meshes_.empty() && meshes_[0])
+		new ColoredDrawable{*manipulator, ShaderLibrary::coloredShader(), *meshes_[0], 0xffffff_rgbf, drawables };
 	return manipulator;
 }
 
@@ -143,28 +143,28 @@ void ModelLoader::addObject(Trade::AbstractImporter& importer, Containers::Array
 	auto* object = new Object3D{ &parent };
 	object->setTransformation(Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }) * objectData->transformation());
 	/* Add a drawable if the object has a mesh and the mesh is loaded */
-	if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && _meshes[objectData->instance()]) {
+	if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 && meshes_[objectData->instance()]) {
 		Int materialId = static_cast<Trade::MeshObjectData3D*>(objectData.get())->material();
 
 		/* Material not available / not loaded, use a default material */
 		if (materialId == -1 || !materials[materialId]) {
-			new ColoredDrawable{ *object, ShaderLibrary::coloredShader(), *_meshes[objectData->instance()], 0xfffffe_rgbf, drawables };
+			new ColoredDrawable{*object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], 0xfffffe_rgbf, drawables };
 
 			/* Textured material. If the texture failed to load, again just use a
 			   default colored material. */
 		}
 		else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
-			Containers::Optional<GL::Texture2D>& texture = _textures[materials[materialId]->diffuseTexture()];
+			Containers::Optional<GL::Texture2D>& texture = textures_[materials[materialId]->diffuseTexture()];
 			std::cerr << materials[materialId]->diffuseTexture() << std::endl;
 			if (texture)
-				new TexturedDrawable{ *object, ShaderLibrary::texturedShader(), *_meshes[objectData->instance()], *texture, drawables };
+				new TexturedDrawable{*object, ShaderLibrary::texturedShader(), *meshes_[objectData->instance()], *texture, drawables };
 			else
-				new ColoredDrawable{ *object, ShaderLibrary::coloredShader(), *_meshes[objectData->instance()], 0xfffffe_rgbf, drawables };
+				new ColoredDrawable{*object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], 0xfffffe_rgbf, drawables };
 
 			/* Color-only material */
 		}
 		else {
-			new ColoredDrawable{ *object, ShaderLibrary::coloredShader(), *_meshes[objectData->instance()], materials[materialId]->diffuseColor(), drawables };
+			new ColoredDrawable{*object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], materials[materialId]->diffuseColor(), drawables };
 		}
 	}
 
