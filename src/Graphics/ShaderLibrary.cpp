@@ -1,21 +1,23 @@
 #include "ShaderLibrary.h"
+#include "Types.h"
 #include <Magnum/Math/Color.h>
+#include <cassert>
 
 using namespace Magnum::Math::Literals;
 
-Magnum::Shaders::Phong ShaderLibrary::_coloredShader = Magnum::Shaders::Phong{ Magnum::NoCreate };
-Magnum::Shaders::Phong ShaderLibrary::_texturedShader = Magnum::Shaders::Phong{ Magnum::NoCreate };
-Magnum::Shaders::Flat3D ShaderLibrary::_flatShader = Magnum::Shaders::Flat3D{ Magnum::NoCreate };
+ShaderLibrary* ShaderLibrary::instance_ = nullptr;
 
-void ShaderLibrary::initShaders() {
-	_coloredShader = Magnum::Shaders::Phong{};
-	_texturedShader = Magnum::Shaders::Phong{ Magnum::Shaders::Phong::Flag::DiffuseTexture };
-	_flatShader = Magnum::Shaders::Flat3D{};
-	_coloredShader
+ShaderLibrary::ShaderLibrary() {
+	assert(!instance_);
+    instance_ = this;
+    coloredShader_ = Magnum::Shaders::Phong{};
+    texturedShader_ = Magnum::Shaders::Phong{Magnum::Shaders::Phong::Flag::DiffuseTexture };
+    flatShader_ = Magnum::Shaders::Flat3D{};
+	coloredShader_
 		.setAmbientColor(0x111111_rgbf)
 		.setSpecularColor(0xffffff_rgbf)
 		.setShininess(8.0f);
-	_texturedShader
+	texturedShader_
 		.setAmbientColor(0x111111_rgbf)
 		.setSpecularColor(0x111111_rgbf)
 		.setShininess(8.0f);
