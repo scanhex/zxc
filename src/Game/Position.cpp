@@ -35,7 +35,7 @@ void Position::updatePoint(double deltaMove) {
     if (std::min(delta, 2 * M_PI - delta) > 0) return;
 
     Point vector = destination_ - current_;
-    if (vector.vectorLengthIsLessThan(deltaMove)) {
+    if (vector.normLessThan(deltaMove)) {
         current_ = destination_;
     } else {
         vector.normalize();
@@ -46,7 +46,7 @@ void Position::updatePoint(double deltaMove) {
 
 void Position::updateDestinationAngle() {
     Point vector = destination_ - current_;
-    destAngle_ = std::acos(vector.y_ / vector.vectorLength());
+    destAngle_ = std::acos(vector.y_ / vector.norm());
     if (vector.x_ > 0) {
         destAngle_ = 2 * M_PI - destAngle_;
     }

@@ -4,7 +4,7 @@
 #include <cmath>
 #include "GameState.h"
 
-StatsBuilder Hero::defaultHeroStatsBuilder =
+StatsBuilder Hero::defaultHeroStatsBuilder_ =
         StatsBuilder().
                 setDamage(100).
                 setAttackRange(100).
@@ -18,13 +18,13 @@ StatsBuilder Hero::defaultHeroStatsBuilder =
                 setArmor(3).
                 setResist(0.25);
 
-Position Hero::firstHeroStartingPosition = Position(Point(-6, -6), -M_PI);
-Position Hero::secondHeroStartingPosition = Position(Point(6, 6), M_PI);
+Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), -M_PI);
+Position Hero::secondHeroStartingPosition_ = Position(Point(6, 6), M_PI);
 
-Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder.create(),
+Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                                  player == Player::First ?
-                                 firstHeroStartingPosition :
-                                 secondHeroStartingPosition),
+                                 firstHeroStartingPosition_ :
+                                 secondHeroStartingPosition_),
                             player_{player},
                             gold_{START_GOLD},
                             level_{1},
@@ -33,7 +33,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder.create(),
                                     Skill(player_, SkillNum::second),
                                     Skill(player_, SkillNum::third)} {}
 
-Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder.create(), position),
+Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
                                                player_{player},
                                                gold_{START_GOLD},
                                                level_{1},
