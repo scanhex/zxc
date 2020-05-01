@@ -26,9 +26,9 @@ private:
 
     Skill skills_[NUM_SKILLS];
 
-    static StatsBuilder defaultHeroStatsBuilder;
-    static Position firstHeroStartingPosition;
-    static Position secondHeroStartingPosition;
+    static StatsBuilder defaultHeroStatsBuilder_;
+    static Position firstHeroStartingPosition_;
+    static Position secondHeroStartingPosition_;
 
 public:
     explicit Hero(Player player);

@@ -10,7 +10,6 @@ enum class Player {
 #include "StatsBuilder.h"
 
 class Hero;
-enum class EventName;
 
 
 class GameState {

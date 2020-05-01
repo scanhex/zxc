@@ -14,7 +14,7 @@
 
 PluginManager::Manager<Text::AbstractFont> manager;
 Containers::Pointer<Text::AbstractFont> font;
-UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit) : SceneGraph::Drawable3D(object, &group), _unit(unit)
+UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit) : SceneGraph::Drawable3D(object, &group), unit_(unit)
 {
     if (!font) {
         font = manager.loadAndInstantiate("StbTrueTypeFont");
@@ -23,62 +23,63 @@ UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group,
 		Fatal{} << "Cannot open font file";
 	else std::cout << "Font loaded" << std::endl;
 	font->fillGlyphCache(cache, "0123456789.");
-    _hpRenderer.reset(new Text::Renderer2D{ *font, cache, 0.5f, Text::Alignment::LineCenter });
-    _hpRenderer->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
+    hpRenderer_.reset(new Text::Renderer2D{*font, cache, 0.5f, Text::Alignment::LineCenter });
+    hpRenderer_->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
 }
 
 void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-    _hpShader.setColor(0x00ff00_rgbf)
+    hpShader_.setColor(0x00ff00_rgbf)
         .setTransformationProjectionMatrix(camera.projectionMatrix()  * Matrix4::translation(transformationMatrix.translation()) * Matrix4::translation({ 0.f, 1.f, 5.f }))
         .bindVectorTexture(cache.texture());
-    int32_t myHP = ceil(_unit.getHealthPoints());
-    _hpRenderer->render(std::to_string(myHP));
-    _hpRenderer->mesh().draw(_hpShader);
+    int32_t myHP = ceil(unit_.getHealthPoints());
+    hpRenderer_->render(std::to_string(myHP));
+    hpRenderer_->mesh().draw(hpShader_);
 }
 
 
 void FlatDrawable::draw(const Matrix4& transformation, SceneGraph::Camera3D& camera) {
-    _shader.setColor(0x747474_rgbf)
+    shader_.setColor(0x747474_rgbf)
             .setTransformationProjectionMatrix(camera.projectionMatrix()*transformation);
-    _mesh.draw(_shader);
+    mesh_.draw(shader_);
 }
 
 void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-    _shader
-            .setDiffuseColor(_color)
+    shader_
+            .setDiffuseColor(color_)
             .setLightPosition(camera.cameraMatrix().translation())
             .setLightColor(Color4(255,255,255,255))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
 
-    _mesh.draw(_shader);
+    mesh_.draw(shader_);
 }
 
 void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-	_shader
+	shader_
 		.setLightPosition(camera.cameraMatrix().translation())
 		.setLightColor(Color4(3.f, 3.f, 3.f, 3.f))
 		.setTransformationMatrix(transformationMatrix)
 		.setNormalMatrix(transformationMatrix.normalMatrix())
 		.setProjectionMatrix(camera.projectionMatrix())
-		.bindDiffuseTexture(_texture);
+		.bindDiffuseTexture(texture_);
 
-    _mesh.draw(_shader);
+    mesh_.draw(shader_);
 }
 
 void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
-    if (_timeline.previousFrameTime() >= _creationTime + COIL_ANIMATION_DURATION) {
-        delete &_object;
+    if (timeline_.previousFrameTime() >= creationTime_ + COIL_ANIMATION_DURATION) {
+// We can't delete self, because Magnum is currently iterating over the DrawableGroup and it can cause RE
+//        delete &object_;
         return;
     }
-    _shader
+    shader_
         .setDiffuseColor(Color4(1, 0, 0))
-		.setLightPosition(camera.cameraMatrix().translation())
+        .setLightPosition(camera.cameraMatrix().transformPoint({ -3.0f, 10.0f, 10.0f }))
 		.setLightColor(Color4(3.f, 3.f, 3.f, 3.f))
 		.setTransformationMatrix(transformationMatrix)
 		.setNormalMatrix(transformationMatrix.normalMatrix())
 		.setProjectionMatrix(camera.projectionMatrix());
 
-    _mesh.draw(_shader);
+    mesh_.draw(shader_);
 }
