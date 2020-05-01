@@ -4,19 +4,19 @@
 
 class ShaderLibrary {
 private:
-	static ShaderLibrary* _instance;
-	Magnum::Shaders::Phong _coloredShader{ Magnum::NoCreate }, _texturedShader{ Magnum::NoCreate };
-	Magnum::Shaders::Flat3D _flatShader{ Magnum::NoCreate };
+	static ShaderLibrary* instance_;
+	Magnum::Shaders::Phong coloredShader_{Magnum::NoCreate }, texturedShader_{Magnum::NoCreate };
+	Magnum::Shaders::Flat3D flatShader_{Magnum::NoCreate };
 public:
 	ShaderLibrary();
 
 	static Magnum::Shaders::Phong& coloredShader() {
-		return _instance->_coloredShader;
+		return instance_->coloredShader_;
 	}
 	static Magnum::Shaders::Phong& texturedShader() {
-		return _instance->_texturedShader;
+		return instance_->texturedShader_;
 	}
 	static Magnum::Shaders::Flat3D& flatShader() {
-		return _instance->_flatShader;
+		return instance_->flatShader_;
 	}
 };

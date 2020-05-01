@@ -41,55 +41,55 @@ public:
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
 
-    //    GL::Mesh _mesh;
-    Shaders::Phong _shader;
-    Shaders::Vector3D _hpShader;
-    Containers::Pointer<Text::Renderer2D> _hpRenderer;
-    const Unit& _unit;
+    //    GL::Mesh mesh_;
+    Shaders::Phong shader_;
+    Shaders::Vector3D hpShader_;
+    Containers::Pointer<Text::Renderer2D> hpRenderer_;
+    const Unit& unit_;
 
 	Text::GlyphCache cache{ Vector2i{512} };
 };
 
 class FlatDrawable: public SceneGraph::Drawable3D {
 public:
-    explicit FlatDrawable(Object3D& object, Shaders::Flat3D& shader, GL::Mesh& mesh, SceneGraph::DrawableGroup3D& drawables): SceneGraph::Drawable3D{object, &drawables}, _shader(shader), _mesh(mesh) {}
+    explicit FlatDrawable(Object3D& object, Shaders::Flat3D& shader, GL::Mesh& mesh, SceneGraph::DrawableGroup3D& drawables): SceneGraph::Drawable3D{object, &drawables}, shader_(shader), mesh_(mesh) {}
 
     void draw(const Matrix4& transformation, SceneGraph::Camera3D& camera);
 
 private:
-    Shaders::Flat3D& _shader;
-    GL::Mesh& _mesh;
+    Shaders::Flat3D& shader_;
+    GL::Mesh& mesh_;
 };
 
 class ColoredDrawable : public SceneGraph::Drawable3D {
 public:
-    explicit ColoredDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, const Color4& color, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _color{ color } {}
+    explicit ColoredDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, const Color4& color, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, shader_(shader), mesh_(mesh), color_{color } {}
 
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
 
-    Shaders::Phong& _shader;
-    GL::Mesh& _mesh;
-    Color4 _color;
+    Shaders::Phong& shader_;
+    GL::Mesh& mesh_;
+    Color4 color_;
 };
 
 class TexturedDrawable : public SceneGraph::Drawable3D {
 public:
-    explicit TexturedDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, GL::Texture2D& texture, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, _shader(shader), _mesh(mesh), _texture(texture) {}
+    explicit TexturedDrawable(Object3D& object, Shaders::Phong& shader, GL::Mesh& mesh, GL::Texture2D& texture, SceneGraph::DrawableGroup3D& group) : SceneGraph::Drawable3D{ object, &group }, shader_(shader), mesh_(mesh), texture_(texture) {}
 
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
 
-    Shaders::Phong& _shader;
-    GL::Mesh& _mesh;
-    GL::Texture2D& _texture;
+    Shaders::Phong& shader_;
+    GL::Mesh& mesh_;
+    GL::Texture2D& texture_;
 };
 
 constexpr float COIL_ANIMATION_DURATION = 0.4;
 
 class CoilDrawable : public SceneGraph::Drawable3D {
 public:
-	explicit CoilDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, Magnum::Timeline& timeline) : SceneGraph::Drawable3D{ object, &group }, _object(object),  _timeline(timeline), _creationTime(_timeline.previousFrameTime()) {
+	explicit CoilDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, Magnum::Timeline& timeline) : SceneGraph::Drawable3D{ object, &group }, object_(object), timeline_(timeline), creationTime_(timeline_.previousFrameTime()) {
         Debug{} << "Coil create";
 	}
     ~CoilDrawable() {
@@ -97,9 +97,9 @@ public:
     }
 private:
     void draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) override;
-    Shaders::Phong _shader;
-    Object3D& _object;
-    Magnum::Timeline& _timeline;
-    float _creationTime;
-	GL::Mesh _mesh = MeshTools::compile(Primitives::circle3DSolid(100));
+    Shaders::Phong shader_;
+    Object3D& object_;
+    Magnum::Timeline& timeline_;
+    float creationTime_;
+	GL::Mesh mesh_ = MeshTools::compile(Primitives::circle3DSolid(100));
 };

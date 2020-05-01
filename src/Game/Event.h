@@ -7,11 +7,11 @@
 enum class Player;
 class GameState;
 
-enum class EventName {
-    firstSkill,  // 1
-    secondSkill, // 2
-    thirdSkill,  // 3
-    move         // 4 (+ x & y)
+enum class EventName : uint8_t {
+    firstSkill  = 1,  // 1
+    secondSkill = 2, // 2
+    thirdSkill  = 3,  // 3
+    move        = 4  // 4 (+ x & y)
 };
 
 class Event {
