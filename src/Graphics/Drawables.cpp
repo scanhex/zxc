@@ -74,7 +74,7 @@ void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3
         return;
     }
     shader_
-        .setDiffuseColor(Color4(1.f, 0, 0))
+        .setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
 		.setLightPosition({0, 0, 10})
 		.setLightColor(Color4(1.f, 1.f, 1.f))
 		.setTransformationMatrix(transformationMatrix)
