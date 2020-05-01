@@ -2,10 +2,10 @@
 
 #include "Event.h"
 
-enum class SkillNum {
-    first,  // Z
-    second, // X
-    third   // C
+enum class SkillNum : uint8_t {
+    first = 0,  // Z
+    second = 1, // X
+    third = 2   // C
 };
 
 class GameState;

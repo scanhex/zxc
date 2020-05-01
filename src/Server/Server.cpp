@@ -138,7 +138,7 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
 
 void Server::ConnectionToClient::updateGSbyPlayer() {
     uint8_t actionId = BufferIO::readUInt8(0, read_buffer_);
-    EventName eventName = Event::intToEventName(actionId);
+    EventName eventName = static_cast<EventName>(actionId);
     Player player = player_id_ == 0 ? Player::First : Player::Second;
 
     Event event(eventName, player);
