@@ -5,9 +5,9 @@
 extern boost::lockfree::queue<Event> events;
 extern bool exit_flag;
 
-Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service},
-                                                                       timer_{service},
-                                                                       stop_timer_{service},
+Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
+                                                                       timer_{service_},
+                                                                       stop_timer_{service_},
                                                                        gameState_{gameState} {}
 
 std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConnection(GameState &gameState) {
@@ -16,7 +16,7 @@ std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConne
 }
 
 void Client::ConnectionToServer::startConnection() {
-    sock_.async_connect(ep, BIND_FN1(handleConnection, std::placeholders::_1));
+    sock_.async_connect(ep_, BIND_FN1(handleConnection, std::placeholders::_1));
 }
 
 
@@ -185,24 +185,24 @@ void Client::ConnectionToServer::waitForAction() {
 }
 
 void Client::ConnectionToServer::runService() {
-    service.run();
+    service_.run();
 }
 
 void Client::checkServerResponse() {
     if (!connection_->isConnected()) return;
-    now = boost::posix_time::microsec_clock::local_time();
-    if ((now - last_update).total_milliseconds() > SERVER_RESPONSE_TIME) {
+    now_ = boost::posix_time::microsec_clock::local_time();
+    if ((now_ - last_update_).total_milliseconds() > SERVER_RESPONSE_TIME) {
         connection_->stopConnection();
         return;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    now = boost::posix_time::microsec_clock::local_time();
+    now_ = boost::posix_time::microsec_clock::local_time();
 }
 
 void Client::run() {
     connection_->startConnection();
     std::cout << "Connected " << std::endl;
-    last_update = boost::posix_time::microsec_clock::local_time();
+    last_update_ = boost::posix_time::microsec_clock::local_time();
     std::thread response_checker(&Client::checkServerResponse, this);
     connection_->runService();
     response_checker.join();

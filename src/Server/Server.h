@@ -4,6 +4,7 @@
 #include <algorithm>
 #endif
 
+#include "../Game/GameState.h"
 #include <cstdio>
 #include <iostream>
 #include <thread>
@@ -15,7 +16,7 @@ static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
 static constexpr int MSG_FROM_SERVER_SIZE = 128;
-static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add move action
+static constexpr int MSG_FROM_CLIENT_SIZE = 32;
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
 using namespace boost::asio;
@@ -25,73 +26,99 @@ using namespace boost::asio;
 #define BIND_FN2(x, y, z)    std::bind(&ConnectionToClient ::x, shared_from_this(),y,z)
 #define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToClient ::x, shared_from_this(),y,z,w)
 
-
-class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
-
+class Server final {
 public:
+    Server();
 
-    ConnectionToClient();
-
-    void startConnection();
-
-    static std::shared_ptr<ConnectionToClient> newClient();
-
-    int32_t connectionsNumber() const;
-
-    void stopConnection();
-
-    ip::tcp::socket &sock();
-
-private:
-    /*
-     * Functions for handling connection to client, e.g. reading/writing to socket
-     */
-    void waitForAllConnections(const boost::system::error_code &err, size_t bytes);
-
-    void handleReadFromSocket(const boost::system::error_code &err, size_t bytes);
-
-    void readFromSocket();
-
-    size_t checkReadComplete(const boost::system::error_code &err, size_t bytes);
-
-    void handleWriteToSocket(const boost::system::error_code &err, size_t bytes);
-
-    void writeToSocket();
-
-private:
-    /*
-     * Functions for working with Game State
-     */
-    void updateGSbyPlayer();
-
-    void writeGStoBuffer();
+    void run();
 
 private:
 
-    void connectionChecker();
+    class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
 
-public:
+    public:
 
-    void startChecker();
+        ConnectionToClient(io_service& service, GameState& gs, bool& running, bool& stopped, ip::tcp::acceptor& ac, std::mutex& lock);
+
+        void startConnection();
+
+        static int32_t connectionsNumber() ;
+
+        void stopConnection();
+
+        ip::tcp::socket &sock();
+
+    private:
+        /*
+         * Functions for handling connection to client, e.g. reading/writing to socket
+         */
+        void waitForAllConnections(const boost::system::error_code &err, size_t bytes);
+
+        void handleReadFromSocket(const boost::system::error_code &err, size_t bytes);
+
+        void readFromSocket();
+
+        size_t checkReadComplete(const boost::system::error_code &err, size_t bytes);
+
+        void handleWriteToSocket(const boost::system::error_code &err, size_t bytes);
+
+        void writeToSocket();
+
+    private:
+        /*
+         * Functions for working with Game State
+         */
+        void updateGSbyPlayer();
+
+        void writeGStoBuffer();
+
+    private:
+
+        void connectionChecker();
+
+    public:
+
+        void startChecker();
+
+    private:
+        GameState& gameState;
+        bool& running_;
+        bool& stopped_;
+        ip::tcp::acceptor& acceptor_;
+        std::mutex& gs_lock_;
+        static int32_t running_connections_;
+        bool is_connected_{false};
+        int player_id_{};
+        ip::tcp::socket sock_;
+        uint8_t read_buffer_[MAX_MSG]{};
+        uint8_t write_buffer_[MAX_MSG]{};
+        deadline_timer timer_;
+        deadline_timer stop_timer_;
+
+    public:
+        std::thread conn_checker_;
+    };
 
 private:
-    static int32_t running_connections_;
-    bool is_connected_{false};
-    int player_id_{};
-    ip::tcp::socket sock_;
-    uint8_t read_buffer_[MAX_MSG]{};
-    uint8_t write_buffer_[MAX_MSG]{};
-    deadline_timer timer_;
-    deadline_timer stop_timer_;
 
-public:
-    std::thread conn_checker_;
+    void updateGS();
+
+    void handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err);
+
+    void runGameStateCycle();
+
+    std::shared_ptr<ConnectionToClient> newClient();
+
+private:
+    GameState gameState{};
+    bool running_{false};
+    bool stopped_{false};
+    boost::posix_time::ptime last_tick{};
+    boost::posix_time::ptime now{};
+
+    io_service service_{};
+    ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8001)};
+    std::mutex gs_lock_{};
 };
-
-void updateGS();
-
-void handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err);
-
-void runGameStateCycle();
 
 void runServer();

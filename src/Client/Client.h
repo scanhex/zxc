@@ -23,7 +23,7 @@ using namespace boost::asio;
 class Client final {
 public:
 
-    Client(GameState &gameState);
+    explicit Client(GameState &gameState);
 
     void run();
 
@@ -31,7 +31,7 @@ private:
     class ConnectionToServer : public std::enable_shared_from_this<ConnectionToServer> {
     public:
 
-        ConnectionToServer(GameState &gameState);
+        explicit ConnectionToServer(GameState &gameState);
 
         static std::shared_ptr<ConnectionToServer> newConnection(GameState &gameState);
 
@@ -85,8 +85,8 @@ private:
         void runService();
 
     private:
-        io_service service;
-        ip::tcp::endpoint ep{ip::address::from_string("127.0.0.1"), 8001};
+        io_service service_;
+        ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8001};
         ip::tcp::socket sock_;
         uint8_t read_buffer_[MAX_MSG]{};
         uint8_t write_buffer_[MAX_MSG]{};
@@ -102,7 +102,7 @@ private:
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;
-    boost::posix_time::ptime last_update, now;
+    boost::posix_time::ptime last_update_, now_;
 };
 
 void runClient(GameState &gameState);
