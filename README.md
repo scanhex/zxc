@@ -8,7 +8,13 @@ git submodule update --init
 
 ## Ubuntu
 ```
-sudo apt-get install libboost-all-dev   
+apt-get install libboost-system-dev
+apt-get install libboost-thread-dev
+apt-get install libboost-date-time-dev
+apt-get install libboost-regex-dev
+apt-get install libboost-serialization-dev
+apt-get install libgl1-mesa-dev
+
 sudo apt install libsdl2-dev
 ```
 
