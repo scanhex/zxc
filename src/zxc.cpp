@@ -75,7 +75,6 @@ void ZxcApplication::initGrid()
 void ZxcApplication::initScene() {
 	initCamera();
 	initRenderer();
-	ShaderLibrary::initShaders();
 	/* Setup shaders */
 	/*
 	*/
@@ -119,7 +118,7 @@ void ZxcApplication::updateGameState(){
     double myAngle = _gameState->getAngle(Player::First);
     double otherAngle = _gameState->getAngle(Player::Second);
 
-	_gameState->update(_timeline.previousFrameDuration() * 1000);
+	_gameState->update(static_cast<double>(_timeline.previousFrameDuration()) * 1000);
 
     Point myPosition = _gameState->getPosition(Player::First);
     Point otherPosition = _gameState->getPosition(Player::Second);
