@@ -22,7 +22,3 @@ ShaderLibrary::ShaderLibrary() {
 		.setSpecularColor(0x111111_rgbf)
 		.setShininess(8.0f);
 }
-
-ShaderLibrary::~ShaderLibrary() {
-	Debug{} << "~ShaderLibrary";
-}

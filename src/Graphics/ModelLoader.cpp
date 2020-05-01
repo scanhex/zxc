@@ -21,9 +21,6 @@
 #include "Drawables.h"
 #include "ShaderLibrary.h"
 
-Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
-Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
-
 Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D& scene, SceneGraph::DrawableGroup3D& drawables) {
 	/* Load a scene importer plugin */
 	Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;

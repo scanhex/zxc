@@ -7,7 +7,6 @@
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/SceneGraph/Drawable.h>
 #include <Magnum/SceneGraph/Scene.h>
-#include <Magnum/Trade/SceneData.h>
 #include <Magnum/Timeline.h>
 #include <Magnum/Magnum.h>
 
@@ -15,7 +14,7 @@
 #include <boost/lockfree/queue.hpp>
 
 #include "Graphics/Types.h"
-#include "Graphics/EventHandlers.h"
+#include "Graphics/ModelLoader.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
 
@@ -60,6 +59,7 @@ private:
 	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
 
 	ShaderLibrary _shaderLibrary;
+	ModelLoader _modelLoader;
     std::optional<GameState> _gameState;
 	std::optional<Hero> _firstHero;
 	std::optional<Hero> _secondHero;

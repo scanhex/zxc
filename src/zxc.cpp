@@ -33,7 +33,6 @@
 #include "Graphics/EventHandlers.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
-#include "Graphics/ModelLoader.h"
 #include "Graphics/ShaderLibrary.h"
 
 #include "zxc.h"
@@ -110,7 +109,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 }
 
 void ZxcApplication::addUnit(Unit& u) {
-	_unitObjects.push_back(ModelLoader::loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", _scene, _drawables).release());
+	_unitObjects.push_back(_modelLoader.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", _scene, _drawables).release());
 	new UnitDrawable(*_unitObjects.back(), _drawables, u);
 }
 
