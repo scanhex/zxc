@@ -1,4 +1,8 @@
 # zxc
+```
+git clone https://github.com/scanhex/zxc
+```
+
 ## Подмодули
 ```
 git submodule update --init
@@ -15,7 +19,7 @@ apt-get install libboost-date-time-dev
 apt-get install libboost-regex-dev
 apt-get install libboost-serialization-dev
 ```
-или
+или весь boost
 ```
 apt-get install libboost-all-dev   
 ```
