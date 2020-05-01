@@ -59,6 +59,7 @@ private:
 	Vector3 unproject(const Vector2i& position, Float depth) const;
 	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
 
+	ShaderLibrary _shaderLibrary;
     std::optional<GameState> _gameState;
 	std::optional<Hero> _firstHero;
 	std::optional<Hero> _secondHero;

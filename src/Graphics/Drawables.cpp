@@ -69,7 +69,8 @@ void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Cam
 
 void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
     if (_timeline.previousFrameTime() >= _creationTime + COIL_ANIMATION_DURATION) {
-        delete &_object;
+// We can't delete self, because Magnum is currently iterating over the DrawableGroup and it can cause RE
+//        delete &_object;
         return;
     }
     _shader
