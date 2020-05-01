@@ -12,6 +12,8 @@ using namespace Corrade;
 
 class ModelLoader {
 public:
-	static Pointer<Object3D> loadModel(std::string filename, Scene3D& scene, SceneGraph::DrawableGroup3D& drawables);
-	static void ModelLoader::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i, SceneGraph::DrawableGroup3D& drawables);
+	Containers::Array<Containers::Optional<GL::Mesh>> _meshes;
+	Containers::Array<Containers::Optional<GL::Texture2D>> _textures;
+	Pointer<Object3D> loadModel(std::string filename, Scene3D& scene, SceneGraph::DrawableGroup3D& drawables);
+	void ModelLoader::addObject(Trade::AbstractImporter& importer, Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials, Object3D& parent, UnsignedInt i, SceneGraph::DrawableGroup3D& drawables);
 };

@@ -9,7 +9,6 @@ private:
 	Magnum::Shaders::Flat3D _flatShader{ Magnum::NoCreate };
 public:
 	ShaderLibrary();
-	~ShaderLibrary();
 
 	static Magnum::Shaders::Phong& coloredShader() {
 		return _instance->_coloredShader;
