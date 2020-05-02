@@ -1,8 +1,7 @@
 #include "Event.h"
 #include "GameState.h"
 
-Event::Event() : eventName_{EventName::firstSkill}, player_{Player::First} {}
-// microkostyl iz-za boost tsqueue
+Event::Event() : eventName_{EventName::None}, player_{Player::First} {}
 
 Event::Event(EventName eventName, Player player) : eventName_{eventName},
                                                    player_{player} {}

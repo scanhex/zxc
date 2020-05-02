@@ -97,7 +97,7 @@ void GameState::applyEvent(Event event) {
         case EventName::thirdSkill:
             hero->useSkill(SkillNum::third, *this);
             break;
-        case EventName::move:
+        case EventName::Move:
             applyMove(event.player_, event.x_, event.y_);
             break;
         default:

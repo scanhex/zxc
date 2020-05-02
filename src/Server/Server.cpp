@@ -143,7 +143,7 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
     Event event(eventName, player);
 
-    if (event.eventName_ == EventName::move) {
+    if (event.eventName_ == EventName::Move) {
         event.x_ = BufferIO::readDouble(1, read_buffer_);
         event.y_ = BufferIO::readDouble(9, read_buffer_);
     }

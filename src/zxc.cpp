@@ -172,7 +172,7 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 
 		double x = newPosition.x(), y = newPosition.y();
 
-		Event curEvent(EventName::move, Player::First, x, y);
+		Event curEvent(EventName::Move, Player::First, x, y);
 		events.push(curEvent);
 		gameState_->applyEvent(curEvent);
 
@@ -272,7 +272,6 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         events.push(curEvent);
         gameState_->applyEvent(curEvent);
 		handleSkill(*firstHero_, SkillNum::first, scene_, drawables_, timeline_);
-        // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
@@ -281,7 +280,6 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         events.push(curEvent);
         gameState_->applyEvent(curEvent);
 		handleSkill(*firstHero_, SkillNum::second, scene_, drawables_, timeline_);
-        // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
@@ -289,8 +287,14 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 
         events.push(curEvent);
         gameState_->applyEvent(curEvent);
-		handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_);
-        // draw skill use
+        handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_);
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
+        // events.push(curEvent);
+        // gameState_->applyEvent(curEvent);
+        // handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_);
+        // TODO add stop event
         redraw();
     }
 }

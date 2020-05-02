@@ -165,7 +165,7 @@ void Client::ConnectionToServer::writeActionToBuffer() {
 
     BufferIO::writeUInt8(static_cast<uint8_t>(e.eventName_), 0, write_buffer_);
 
-    if (e.eventName_ == EventName::move) {
+    if (e.eventName_ == EventName::Move) {
         BufferIO::writeDouble(e.x_, 1, write_buffer_);
         BufferIO::writeDouble(e.y_, 9, write_buffer_);
     }

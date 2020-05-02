@@ -8,10 +8,11 @@ enum class Player;
 class GameState;
 
 enum class EventName : uint8_t {
-    firstSkill  = 1,  // 1
-    secondSkill = 2, // 2
-    thirdSkill  = 3,  // 3
-    move        = 4  // 4 (+ x & y)
+    None = 0,
+    ShortCoilUse = 1,
+    MidCoilUse = 2,
+    LongCoilUse = 3,
+    Move = 4
 };
 
 class Event {
