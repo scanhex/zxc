@@ -110,10 +110,6 @@ void Server::ConnectionToClient::writeToSocket() {
     writeGStoBuffer();
     gs_lock_.unlock();
     writer_.flushBuffer();
-  //  for (int i = 0; i < 48; ++i)
-  //      std::cout << (int) writer_.write_buffer_[i] << " ";
-  //  std::cout << '\n';
- //   std::cout<<std::endl;
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }

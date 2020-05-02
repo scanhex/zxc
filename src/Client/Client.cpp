@@ -146,10 +146,6 @@ void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_
 }
 
 void Client::ConnectionToServer::parseGSFromBuffer() {
-  //  for (int i = 0; i < 48; ++i)
- //       std::cout << (int) reader_.read_buffer_[i] << " ";
-  //  std::cout << '\n';
-  //  std::cout << std::endl;
     double hp1 = reader_.readDouble();
     double pos_x1 = reader_.readDouble();
     double pos_y1 = reader_.readDouble();
