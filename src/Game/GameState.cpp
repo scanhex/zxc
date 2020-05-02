@@ -139,8 +139,3 @@ bool GameState::isDead(Player player) const {
     Hero *hero = getHero(player);
     return hero->isDead();
 }
-
-void GameState::handle(MoveEvent &event) {
-    event.x;
-    event.y;
-}
