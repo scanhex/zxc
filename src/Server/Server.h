@@ -5,6 +5,7 @@
 #endif
 
 #include "../Game/GameState.h"
+#include "../Utils/BufferIO.h"
 #include <cstdio>
 #include <iostream>
 #include <thread>
@@ -90,8 +91,8 @@ private:
         bool is_connected_{false};
         int player_id_{};
         ip::tcp::socket sock_;
-        uint8_t read_buffer_[MAX_MSG]{};
-        uint8_t write_buffer_[MAX_MSG]{};
+        BufferIO::BufferReader reader_{};
+        BufferIO::BufferWriter writer_{};
         deadline_timer timer_;
         deadline_timer stop_timer_;
 

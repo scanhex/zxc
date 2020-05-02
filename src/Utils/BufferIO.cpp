@@ -1,48 +1,67 @@
 #include <cstdint>
 #include <cstddef>
+#include <cassert>
 #include "BufferIO.h"
 
-void BufferIO::writeUInt8(uint8_t d, size_t start_idx, uint8_t (&buffer)[1024]) {
-    buffer[start_idx] = d;
+void BufferIO::BufferWriter::writeUInt8(uint8_t d) {
+    assert(idx_ + 1 <= MAX_BUF);
+    write_buffer_[idx_] = d;
+    idx_++;
 }
 
-void BufferIO::writeDouble(double d, size_t start_idx, uint8_t (&buffer)[1024]) {
+void BufferIO::BufferWriter::writeDouble(double d) {
     binaryDouble u;
     u.dValue = d;
-    writeInt64(u.iValue, start_idx, buffer);
+    writeInt64(u.iValue);
 }
 
-void BufferIO::writeInt32(int32_t d, size_t start_idx, uint8_t (&buffer)[1024]) {
+void BufferIO::BufferWriter::writeInt32(int32_t d) {
+    assert(idx_ + 4 <= MAX_BUF);
     for (size_t i = 0; i < 4; i++)
-        buffer[start_idx + 3 - i] = (d >> (i * 8));
+        write_buffer_[idx_ + 3 - i] = (d >> (i * 8));
+    idx_ += 4;
 }
 
-void BufferIO::writeInt64(int64_t d, size_t start_idx, uint8_t (&buffer)[1024]) {
+void BufferIO::BufferWriter::writeInt64(int64_t d) {
+    assert(idx_ + 8 <= MAX_BUF);
     for (size_t i = 0; i < 8; i++)
-        buffer[start_idx + 7 - i] = (d >> (i * 8));
+        write_buffer_[idx_ + 7 - i] = (d >> (i * 8));
+    idx_ += 8;
 }
 
-
-uint8_t BufferIO::readUInt8(size_t start_idx, uint8_t (&buffer)[1024]) {
-    return buffer[start_idx];
+void BufferIO::BufferWriter::flushBuffer() {
+    idx_ = 0;
 }
 
-double BufferIO::readDouble(size_t start_idx, uint8_t (&buffer)[1024]) {
+uint8_t BufferIO::BufferReader::readUInt8() {
+    assert(idx_ + 1 <= 1024);
+    return read_buffer_[idx_++];
+}
+
+double BufferIO::BufferReader::readDouble() {
     binaryDouble u;
-    u.iValue = BufferIO::readInt64(start_idx, buffer);
+    u.iValue = BufferIO::BufferReader::readInt64();
     return u.dValue;
 }
 
-int32_t BufferIO::readInt32(size_t start_idx, uint8_t (&buffer)[1024]) {
+int32_t BufferIO::BufferReader::readInt32() {
+    assert(idx_ + 4 <= 1024);
     int32_t result = 0;
     for (size_t i = 0; i < 4; i++)
-        result = (result << 8) + buffer[start_idx + i];
+        result = (result << 8) + read_buffer_[idx_ + i];
+    idx_ += 4;
     return result;
 }
 
-int64_t BufferIO::readInt64(size_t start_idx, uint8_t (&buffer)[1024]) {
+int64_t BufferIO::BufferReader::readInt64() {
+    assert(idx_ + 4 <= 1024);
     int64_t result = 0;
     for (size_t i = 0; i < 8; i++)
-        result = (result << 8) + buffer[start_idx + i];
+        result = (result << 8) + read_buffer_[idx_ + i];
+    idx_ += 8;
     return result;
+}
+
+void BufferIO::BufferReader::flushBuffer() {
+    idx_ = 0;
 }

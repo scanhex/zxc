@@ -5,6 +5,7 @@
 #include <utility>
 #include <string>
 #include <boost/asio.hpp>
+#include "../Utils/BufferIO.h"
 #include "../Game/GameState.h"
 
 static constexpr int MAX_MSG = 1024;
@@ -88,8 +89,8 @@ private:
         io_service service_;
         ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8001};
         ip::tcp::socket sock_;
-        uint8_t read_buffer_[MAX_MSG]{};
-        uint8_t write_buffer_[MAX_MSG]{};
+        BufferIO::BufferReader reader_{};
+        BufferIO::BufferWriter writer_{};
         bool connected_{};
         deadline_timer timer_;
         deadline_timer stop_timer_;
