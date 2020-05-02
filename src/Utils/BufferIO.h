@@ -1,27 +1,56 @@
 #pragma once
 
+#include <cstdint>
+
 namespace BufferIO {
-    /*
-    *  Functions to parse args to bytes and back
-    */
-    void writeUInt8(uint8_t d, size_t start_idx, uint8_t (&buffer)[1024]);
 
-    void writeDouble(double d, size_t start_idx, uint8_t (&buffer)[1024]);
+static constexpr int MAX_BUF = 1024;
 
-    void writeInt32(int32_t d, size_t start_idx, uint8_t (&buffer)[1024]);
+union binaryDouble {
+    double dValue;
+    uint64_t iValue;
+};
 
-    void writeInt64(int64_t d, size_t start_idx, uint8_t (&buffer)[1024]);
+/*
+*  Classes to parse args to bytes and back
+*/
+class BufferWriter final {
+public:
+    void writeUInt8(uint8_t d);
 
-    uint8_t readUInt8(size_t start_idx, uint8_t (&buffer)[1024]);
+    void writeDouble(double d);
 
-    double readDouble(size_t start_idx, uint8_t (&buffer)[1024]);
+    void writeInt32(int32_t d);
 
-    int32_t readInt32(size_t start_idx, uint8_t (&buffer)[1024]);
+    void writeInt64(int64_t d);
 
-    int64_t readInt64(size_t start_idx, uint8_t (&buffer)[1024]);
+    void flushBuffer();
 
-    union binaryDouble {
-        double dValue;
-        uint64_t iValue;
-    };
+public:
+    uint8_t write_buffer_[MAX_BUF]{};
+
+private:
+    size_t idx_{0};
+};
+
+class BufferReader final {
+public:
+
+    uint8_t readUInt8();
+
+    double readDouble();
+
+    int32_t readInt32();
+
+    int64_t readInt64();
+
+    void flushBuffer();
+
+public:
+    uint8_t read_buffer_[MAX_BUF]{};
+
+private:
+    size_t idx_{0};
+};
+
 }

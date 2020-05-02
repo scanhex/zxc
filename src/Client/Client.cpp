@@ -1,5 +1,4 @@
 #include "Client.h"
-#include "../Utils/BufferIO.h"
 #include <boost/lockfree/queue.hpp>
 
 extern boost::lockfree::queue<Event> events;
@@ -52,7 +51,8 @@ void Client::ConnectionToServer::waitForGameStart() {
         stopConnection();
         return;
     }
-    async_read(sock_, buffer(read_buffer_),
+    reader_.flushBuffer();
+    async_read(sock_, buffer(reader_.read_buffer_),
                BIND_FN2(checkWaitReadComplete, std::placeholders::_1, std::placeholders::_2),
                BIND_FN2(handleWaitRead, std::placeholders::_1, std::placeholders::_2));
 }
@@ -72,7 +72,8 @@ void Client::ConnectionToServer::writeToSocket() {
     }
     if (!isConnected()) return;
     writeActionToBuffer();
-    sock_.async_write_some(buffer(write_buffer_, MSG_FROM_CLIENT_SIZE),
+    writer_.flushBuffer();
+    sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_CLIENT_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -90,7 +91,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
         stopConnection();
         return;
     }
-    uint8_t status = BufferIO::readUInt8(0, read_buffer_);
+    uint8_t status = reader_.readUInt8();
     if (status) {
         runGame();
     } else {
@@ -118,7 +119,8 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
 
 void Client::ConnectionToServer::readFromSocket() {
     if (!isConnected()) return;
-    async_read(sock_, buffer(read_buffer_),
+    reader_.flushBuffer();
+    async_read(sock_, buffer(reader_.read_buffer_),
                BIND_FN2(checkReadComplete, std::placeholders::_1, std::placeholders::_2),
                BIND_FN2(handleReadFromSocket, std::placeholders::_1, std::placeholders::_2));
 }
@@ -144,17 +146,21 @@ void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_
 }
 
 void Client::ConnectionToServer::parseGSFromBuffer() {
-    double hp1 = BufferIO::readDouble(0, read_buffer_);
-    double pos_x1 = BufferIO::readDouble(8, read_buffer_);
-    double pos_y1 = BufferIO::readDouble(16, read_buffer_);
-    double dest_x1 = BufferIO::readDouble(24, read_buffer_);
-    double dest_y1 = BufferIO::readDouble(32, read_buffer_);
+  //  for (int i = 0; i < 48; ++i)
+ //       std::cout << (int) reader_.read_buffer_[i] << " ";
+  //  std::cout << '\n';
+  //  std::cout << std::endl;
+    double hp1 = reader_.readDouble();
+    double pos_x1 = reader_.readDouble();
+    double pos_y1 = reader_.readDouble();
+    double dest_x1 = reader_.readDouble();
+    double dest_y1 = reader_.readDouble();
 
-    double hp2 = BufferIO::readDouble(40, read_buffer_);
-    double pos_x2 = BufferIO::readDouble(48, read_buffer_);
-    double pos_y2 = BufferIO::readDouble(56, read_buffer_);
-    double dest_x2 = BufferIO::readDouble(64, read_buffer_);
-    double dest_y2 = BufferIO::readDouble(72, read_buffer_);
+    double hp2 = reader_.readDouble();
+    double pos_x2 = reader_.readDouble();
+    double pos_y2 = reader_.readDouble();
+    double dest_x2 = reader_.readDouble();
+    double dest_y2 = reader_.readDouble();
 
     updateGS(hp1, pos_x1, pos_y1, dest_x1, dest_y1, hp2, pos_x2, pos_y2, dest_x2, dest_y2);
 }
@@ -163,11 +169,11 @@ void Client::ConnectionToServer::writeActionToBuffer() {
     Event e;
     events.pop(e);
 
-    BufferIO::writeUInt8(static_cast<uint8_t>(e.eventName_), 0, write_buffer_);
+    writer_.writeUInt8(static_cast<uint8_t>(e.eventName_));
 
     if (e.eventName_ == EventName::move) {
-        BufferIO::writeDouble(e.x_, 1, write_buffer_);
-        BufferIO::writeDouble(e.y_, 9, write_buffer_);
+        writer_.writeDouble(e.x_);
+        writer_.writeDouble(e.y_);
     }
 }
 

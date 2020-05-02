@@ -1,5 +1,4 @@
 #include "Server.h"
-#include "../Utils/BufferIO.h"
 
 int32_t Server::ConnectionToClient::running_connections_ = 0;
 
@@ -76,7 +75,8 @@ void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error
 
 void Server::ConnectionToClient::readFromSocket() {
     if (!running_connections_) return;
-    async_read(sock_, buffer(read_buffer_),
+    reader_.flushBuffer();
+    async_read(sock_, buffer(reader_.read_buffer_),
                BIND_FN2(checkReadComplete, std::placeholders::_1, std::placeholders::_2),
                BIND_FN2(handleReadFromSocket, std::placeholders::_1, std::placeholders::_2));
 }
@@ -109,7 +109,12 @@ void Server::ConnectionToClient::writeToSocket() {
     gs_lock_.lock();
     writeGStoBuffer();
     gs_lock_.unlock();
-    sock_.async_write_some(buffer(write_buffer_, MSG_FROM_SERVER_SIZE),
+    writer_.flushBuffer();
+  //  for (int i = 0; i < 48; ++i)
+  //      std::cout << (int) writer_.write_buffer_[i] << " ";
+  //  std::cout << '\n';
+ //   std::cout<<std::endl;
+    sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -121,8 +126,9 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
     }
     if (running_connections_ == PLAYERS_REQUIRED) {
         running_ = true;
-        BufferIO::writeUInt8(1, 0, write_buffer_);
-        sock_.write_some(buffer(write_buffer_, MSG_WAIT_FROM_SERVER_SIZE));
+        writer_.flushBuffer();
+        writer_.writeUInt8(1);
+        sock_.write_some(buffer(writer_.write_buffer_, MSG_WAIT_FROM_SERVER_SIZE));
         timer_.expires_from_now(boost::posix_time::milliseconds(TICK_TIME_SEND_GS));
         timer_.wait();
         writeToSocket();
@@ -130,22 +136,24 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
     } else {
         timer_.expires_from_now(boost::posix_time::milliseconds(TICK_TIME_SEND_GS));
         timer_.wait();
-        BufferIO::writeUInt8(0, 0, write_buffer_);
-        sock_.async_write_some(buffer(write_buffer_, MSG_WAIT_FROM_SERVER_SIZE),
+        writer_.flushBuffer();
+        writer_.writeUInt8(0);
+        sock_.async_write_some(buffer(writer_.write_buffer_, MSG_WAIT_FROM_SERVER_SIZE),
                                BIND_FN2(waitForAllConnections, std::placeholders::_1, std::placeholders::_2));
     }
 }
 
 void Server::ConnectionToClient::updateGSbyPlayer() {
-    uint8_t actionId = BufferIO::readUInt8(0, read_buffer_);
+    reader_.flushBuffer();
+    uint8_t actionId = reader_.readUInt8();
     EventName eventName = static_cast<EventName>(actionId);
     Player player = player_id_ == 0 ? Player::First : Player::Second;
 
     Event event(eventName, player);
 
     if (event.eventName_ == EventName::move) {
-        event.x_ = BufferIO::readDouble(1, read_buffer_);
-        event.y_ = BufferIO::readDouble(9, read_buffer_);
+        event.x_ = reader_.readDouble();
+        event.y_ = reader_.readDouble();
     }
 
     gameState.applyEvent(event);
@@ -163,19 +171,21 @@ void Server::ConnectionToClient::writeGStoBuffer() {
     Point firstDest = gameState.getDestination(first);
     Point secondDest = gameState.getDestination(second);
 
+    writer_.flushBuffer();
+
     // my: {hp, x, y}
-    BufferIO::writeDouble(gameState.getHealthPoints(first), 0, write_buffer_);
-    BufferIO::writeDouble(firstPos.x_, 8, write_buffer_);
-    BufferIO::writeDouble(firstPos.y_, 16, write_buffer_);
-    BufferIO::writeDouble(firstDest.x_, 24, write_buffer_);
-    BufferIO::writeDouble(firstDest.y_, 32, write_buffer_);
+    writer_.writeDouble(gameState.getHealthPoints(first));
+    writer_.writeDouble(firstPos.x_);
+    writer_.writeDouble(firstPos.y_);
+    writer_.writeDouble(firstDest.x_);
+    writer_.writeDouble(firstDest.y_);
 
     // his: {hp, x, y}
-    BufferIO::writeDouble(gameState.getHealthPoints(second), 40, write_buffer_);
-    BufferIO::writeDouble(secondPos.x_, 48, write_buffer_);
-    BufferIO::writeDouble(secondPos.y_, 56, write_buffer_);
-    BufferIO::writeDouble(secondDest.x_, 64, write_buffer_);
-    BufferIO::writeDouble(secondDest.y_, 72, write_buffer_);
+    writer_.writeDouble(gameState.getHealthPoints(second));
+    writer_.writeDouble(secondPos.x_);
+    writer_.writeDouble(secondPos.y_);
+    writer_.writeDouble(secondDest.x_);
+    writer_.writeDouble(secondDest.y_);
 }
 
 void Server::ConnectionToClient::connectionChecker() {
