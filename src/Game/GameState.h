@@ -8,11 +8,12 @@ enum class Player {
 #include <optional>
 #include "Hero.h"
 #include "StatsBuilder.h"
+#include "Events/Events.h"
 
 class Hero;
 
 
-class GameState {
+class GameState : MoveEventHandler {
 public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
@@ -43,6 +44,9 @@ public:
     void regenMana(double amount, Player player);
     void spendMana(double amount, Player player);
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
+
+private:
+    void handle(MoveEvent &event) override;
 
 private:
     [[nodiscard]] Hero *getHero(Player player) const;
