@@ -3,6 +3,8 @@
 
 extern bool exit_flag;
 
+extern boost::lockfree::queue<EventName> othersEvents;
+
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
                                                                        timer_{service_},
                                                                        stop_timer_{service_},
@@ -171,36 +173,11 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 
 void Client::ConnectionToServer::parseEventsFromBuffer() {
     size_t sz = reader_.readInt32();
-    Hero *hero = gameState_.getHero(Player::First);
     assert(sz <= 5);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();
         auto eventName = static_cast<EventName>(actionId);
-        switch (eventName) {
-            case EventName::ShortCoilUse: {
-                auto e = new ShortCoilUseEvent(*hero);
-                e->need_send_ = false;
-                EventHandler<ShortCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            case EventName::MidCoilUse: {
-                auto e = new MidCoilUseEvent(*hero);
-                e->need_send_ = false;
-                EventHandler<MidCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            case EventName::LongCoilUse: {
-                auto e = new LongCoilUseEvent(*hero);
-                e->need_send_ = false;
-                EventHandler<LongCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            default: {
-                assert(false);
-                break;
-            }
-
-        }
+        othersEvents.push(eventName);
     }
 }
 
