@@ -39,11 +39,12 @@ private:
 
     public:
 
-        ConnectionToClient(io_service& service, GameState& gs, bool& running, bool& stopped, ip::tcp::acceptor& ac, std::mutex& lock);
+        ConnectionToClient(io_service &service, GameState &gs, bool &running, bool &stopped, ip::tcp::acceptor &ac,
+                           std::mutex &lock);
 
         void startConnection();
 
-        static int32_t connectionsNumber() ;
+        static int32_t connectionsNumber();
 
         void stopConnection();
 
@@ -82,11 +83,11 @@ private:
         void startChecker();
 
     private:
-        GameState& gameState;
-        bool& running_;
-        bool& stopped_;
-        ip::tcp::acceptor& acceptor_;
-        std::mutex& gs_lock_;
+        GameState &gameState;
+        bool &running_;
+        bool &stopped_;
+        ip::tcp::acceptor &acceptor_;
+        std::mutex &gs_lock_;
         static int32_t running_connections_;
         bool is_connected_{false};
         int player_id_{};

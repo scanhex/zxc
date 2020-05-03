@@ -1,7 +1,7 @@
 #pragma once
 
-
 #include "Events/Events.h"
+
 class GameState;
 
 
@@ -10,7 +10,7 @@ class GameStateHandler : public EventHandler<MoveEvent>,
                          public EventHandler<MidCoilUseEvent>,
                          public EventHandler<LongCoilUseEvent> {
 public:
-    explicit GameStateHandler(GameState& gameState);
+    explicit GameStateHandler(GameState &gameState);
 
     void handle(MoveEvent &event) override;
     void handle(ShortCoilUseEvent &event) override;
@@ -18,6 +18,5 @@ public:
     void handle(LongCoilUseEvent &event) override;
 
 private:
-    GameState& gameState_;
+    GameState &gameState_;
 };
-

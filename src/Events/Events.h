@@ -5,11 +5,11 @@
 #include "Game/Hero.h"
 
 enum class EventName : uint8_t {
-    None         = 0,
+    None = 0,
     ShortCoilUse = 1,
-    MidCoilUse   = 2,
-    LongCoilUse  = 3,
-    Move         = 4
+    MidCoilUse = 2,
+    LongCoilUse = 3,
+    Move = 4
 };
 
 template<class Event>
@@ -46,7 +46,7 @@ class Event {
 public:
     static const EventName name_ = EventName::None;
 
-    virtual void serialize(BufferIO::BufferWriter& writer) = 0;
+    virtual void serialize(BufferIO::BufferWriter &writer) = 0;
 };
 
 class MoveEvent : public Event {
@@ -57,7 +57,7 @@ public:
     double x_, y_;
 
     MoveEvent(Hero &hero, double x, double y);
-    void serialize(BufferIO::BufferWriter& writer) override;
+    void serialize(BufferIO::BufferWriter &writer) override;
 };
 
 class SkillUseEvent : public Event {
@@ -65,7 +65,7 @@ public:
     Hero &hero_;
 
     explicit SkillUseEvent(Hero &hero);
-    void serialize(BufferIO::BufferWriter& writer) override = 0;
+    void serialize(BufferIO::BufferWriter &writer) override = 0;
 };
 
 class ShortCoilUseEvent : public SkillUseEvent {
@@ -73,7 +73,7 @@ public:
     static const EventName name_ = EventName::ShortCoilUse;
 
     explicit ShortCoilUseEvent(Hero &hero);
-    void serialize(BufferIO::BufferWriter& writer) override;
+    void serialize(BufferIO::BufferWriter &writer) override;
 };
 
 class MidCoilUseEvent : public SkillUseEvent {
@@ -81,7 +81,7 @@ public:
     static const EventName name_ = EventName::MidCoilUse;
 
     explicit MidCoilUseEvent(Hero &hero);
-    void serialize(BufferIO::BufferWriter& writer) override;
+    void serialize(BufferIO::BufferWriter &writer) override;
 };
 
 class LongCoilUseEvent : public SkillUseEvent {
@@ -89,5 +89,5 @@ public:
     static const EventName name_ = EventName::LongCoilUse;
 
     explicit LongCoilUseEvent(Hero &hero);
-    void serialize(BufferIO::BufferWriter& writer) override;
+    void serialize(BufferIO::BufferWriter &writer) override;
 };
