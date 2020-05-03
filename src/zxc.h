@@ -26,7 +26,6 @@ using namespace Corrade;
 using namespace Math::Literals;
 
 
-boost::lockfree::queue<Event *> events{100};
 bool exit_flag = false;
 
 class ZxcApplication : public Platform::Application {
