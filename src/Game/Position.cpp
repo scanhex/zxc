@@ -86,3 +86,11 @@ void Position::changeAngle(double delta) {
     if (currentAngle_ >= 2 * M_PI) currentAngle_ -= 2 * M_PI;
     if (currentAngle_ <= 0) currentAngle_ += 2 * M_PI;
 }
+
+bool Position::inRadius(double x, double y, double r) const {
+    return current_.inRadius(x, y, r);
+}
+
+bool Position::inRadius(const Point &point, double r) const {
+    return current_.inRadius(point, r);
+}

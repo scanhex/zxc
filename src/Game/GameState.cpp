@@ -1,4 +1,7 @@
+#define _USE_MATH_DEFINES
+
 #include "GameState.h"
+#include <cmath>
 #include <algorithm>
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
@@ -117,27 +120,42 @@ void GameState::handle(const MoveEvent &event) {
 
 void GameState::handle(const ShortCoilUseEvent &event) {
     // TODO now loops over 2 heroes
+    constexpr double len = 2;
+    constexpr double radius = 2.5;
+    constexpr double damage = 10;
+
+    Point coilCenter = event.hero_.shiftUnitPosition(len);
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_) {
-            hero->applyDamage(10);
+        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
+            hero->applyDamage(damage);
         }
     }
 }
 
 void GameState::handle(const MidCoilUseEvent &event) {
     // TODO now loops over 2 heroes
+    constexpr double len = 4.5;
+    constexpr double radius = 2.5;
+    constexpr double damage = 20;
+
+    Point coilCenter = event.hero_.shiftUnitPosition(len);
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_) {
-            hero->applyDamage(20);
+        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
+            hero->applyDamage(damage);
         }
     }
 }
 
 void GameState::handle(const LongCoilUseEvent &event) {
     // TODO now loops over 2 heroes
+    constexpr double len = 7;
+    constexpr double radius = 2.5;
+    constexpr double damage = 30;
+
+    Point coilCenter = event.hero_.shiftUnitPosition(len);
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_) {
-            hero->applyDamage(30);
+        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
+            hero->applyDamage(damage);
         }
     }
 }

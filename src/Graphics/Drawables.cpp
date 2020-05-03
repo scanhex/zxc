@@ -47,8 +47,7 @@ void FlatDrawable::draw(const Matrix4 &transformation, SceneGraph::Camera3D &cam
 }
 
 void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    shader_
-            .setDiffuseColor(color_)
+    shader_.setDiffuseColor(color_)
             .setLightPosition(camera.cameraMatrix().translation())
             .setLightColor(Color4(255, 255, 255, 255))
             .setTransformationMatrix(transformationMatrix)
@@ -59,8 +58,7 @@ void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Came
 }
 
 void TexturedDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    shader_
-            .setLightPosition({0, 0, 10})
+    shader_.setLightPosition({0, 0, 10})
             .setLightColor(Color4(1.f, 1.f, 1.f))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
@@ -76,8 +74,7 @@ void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
 //        delete &object_;
         return;
     }
-    shader_
-            .setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
+    shader_.setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
             .setLightPosition({0, 0, 10})
             .setLightColor(Color4(1.f, 1.f, 1.f))
             .setTransformationMatrix(transformationMatrix)

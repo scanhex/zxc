@@ -57,7 +57,11 @@ public:
 
     void updateUnit(double elapsedTimeInSeconds);
 
-    bool isDead();
+
+    [[nodiscard]] Point shiftUnitPosition(double len) const;
+    [[nodiscard]] bool inRadius(double x, double y, double r) const;
+    [[nodiscard]] bool inRadius(const Point& point, double r) const;
+    [[nodiscard]] bool isDead() const;
 
 
     // getters and setters
