@@ -17,7 +17,7 @@ class EventHandler {
 private:
     static std::vector<EventHandler<Event> *> allHandlers;
 public:
-    static void fireEvent(Event &event) {
+    static void fireEvent(const Event &event) {
         for (auto &h : allHandlers) {
             h->handle(event);
         }
@@ -36,7 +36,7 @@ public:
         }
     }
 
-    virtual void handle(Event &event) = 0;
+    virtual void handle(const Event &event) = 0;
 };
 
 template<class Event>

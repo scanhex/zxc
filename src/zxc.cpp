@@ -168,6 +168,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
         double x = newPosition.x(), y = newPosition.y();
 
         auto *moveEvent = new MoveEvent(firstHero_, x, y);
+#warning "memleak"
         events.push(moveEvent);
         EventHandler<MoveEvent>::fireEvent(*moveEvent);
 
@@ -266,6 +267,7 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
         auto *shortCoilUseEvent = new ShortCoilUseEvent(firstHero_);
+#warning "memleak"
         events.push(shortCoilUseEvent);
         EventHandler<ShortCoilUseEvent>::fireEvent(*shortCoilUseEvent);
 
@@ -275,6 +277,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
         auto *midCoilUseEvent = new MidCoilUseEvent(firstHero_);
+#warning "memleak"
         events.push(midCoilUseEvent);
         EventHandler<MidCoilUseEvent>::fireEvent(*midCoilUseEvent);
 
@@ -284,6 +287,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
         auto *longCoilUseEvent = new LongCoilUseEvent(firstHero_);
+#warning "memleak"
         events.push(longCoilUseEvent);
         EventHandler<LongCoilUseEvent>::fireEvent(*longCoilUseEvent);
 
