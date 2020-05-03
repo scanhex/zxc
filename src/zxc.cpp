@@ -85,9 +85,8 @@ void ZxcApplication::initHandlers() {
     graphicsHandler_ = std::make_unique<GraphicsHandler>(scene_, drawables_, timeline_);
 }
 
-void ZxcApplication::initNetwork()
-{
-	networkThread_ = std::thread(runClient, std::ref(gameState_));
+void ZxcApplication::initNetwork() {
+    networkThread_ = std::thread(runClient, std::ref(gameState_));
 }
 
 ZxcApplication::ZxcApplication(const Arguments &arguments) :
@@ -106,7 +105,6 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     initNetwork();
 
     timeline_.start();
-
 
 
 }
@@ -178,7 +176,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
 
         double x = newPosition.x(), y = newPosition.y();
 
-        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_,x,y));
+        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_, x, y));
 
         redraw();
     }

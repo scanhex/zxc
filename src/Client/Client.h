@@ -24,7 +24,10 @@ using namespace boost::asio;
 #define BIND_FN2(x, y, z)    std::bind(&ConnectionToServer ::x, shared_from_this(),y,z)
 #define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToServer ::x, shared_from_this(),y,z,w)
 
-class Client final : EventHandler<MoveEvent>, EventHandler<ShortCoilUseEvent>, EventHandler<MidCoilUseEvent>, EventHandler<LongCoilUseEvent> {
+class Client final : EventHandler<MoveEvent>,
+                     EventHandler<ShortCoilUseEvent>,
+                     EventHandler<MidCoilUseEvent>,
+                     EventHandler<LongCoilUseEvent> {
 public:
 
     explicit Client(GameState &gameState);
@@ -100,17 +103,17 @@ private:
         GameState &gameState_;
 
     public:
-		boost::lockfree::queue<Event*> events_{ 100 };
+        boost::lockfree::queue<Event *> events_{100};
     };
 
 private:
 
     void checkServerResponse();
 
-    void handle(const MoveEvent& event) override;
-    void handle(const ShortCoilUseEvent& event) override;
-    void handle(const MidCoilUseEvent& event) override;
-    void handle(const LongCoilUseEvent& event) override;
+    void handle(const MoveEvent &event) override;
+    void handle(const ShortCoilUseEvent &event) override;
+    void handle(const MidCoilUseEvent &event) override;
+    void handle(const LongCoilUseEvent &event) override;
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;

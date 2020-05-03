@@ -2,10 +2,9 @@
 #include <algorithm>
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
-                                                          secondHero_{&secondHero},
-                                                          handler_{*this} {}
+                                                          secondHero_{&secondHero} {}
 
-GameState::GameState() : handler_{*this} {
+GameState::GameState() {
     // 2 default heros
     firstHero_ = new Hero(Player::First);
     secondHero_ = new Hero(Player::Second);
@@ -110,4 +109,35 @@ bool GameState::canSpendMana(double amount, Player player) const {
 bool GameState::isDead(Player player) const {
     Hero *hero = getHero(player);
     return hero->isDead();
+}
+
+void GameState::handle(const MoveEvent &event) {
+    event.hero_.setDestination(event.x_, event.y_);
+}
+
+void GameState::handle(const ShortCoilUseEvent &event) {
+    // TODO now loops over 2 heroes
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if (hero != &event.hero_) {
+            hero->applyDamage(10);
+        }
+    }
+}
+
+void GameState::handle(const MidCoilUseEvent &event) {
+    // TODO now loops over 2 heroes
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if (hero != &event.hero_) {
+            hero->applyDamage(20);
+        }
+    }
+}
+
+void GameState::handle(const LongCoilUseEvent &event) {
+    // TODO now loops over 2 heroes
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if (hero != &event.hero_) {
+            hero->applyDamage(30);
+        }
+    }
 }
