@@ -114,7 +114,7 @@ public:
               creationTime_(timeline_.previousFrameTime()) {
         Debug{} << "Coil create";
     }
-    ~CoilDrawable() {
+    ~CoilDrawable() override {
         Debug{} << "Coil delete";
     }
 private:

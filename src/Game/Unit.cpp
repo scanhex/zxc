@@ -108,7 +108,24 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
     position_.update(turnDelta, moveDelta);
 }
 
-bool Unit::isDead() { return stats_.getHealthPoints() == 0.0; }
+Point Unit::shiftUnitPosition(double len) const {
+    double angle = position_.getAngle();
+    double xShift = std::abs(sin(angle) * len);
+    double yShift = std::abs(cos(angle) * len);
+    if (angle < M_PI) xShift = -xShift;
+    if (angle > M_PI / 2 && angle < 3 * M_PI / 2) yShift = -yShift;
+    return position_.getPosition() + Point(xShift, yShift);
+}
+
+bool Unit::inRadius(double x, double y, double r) const {
+    return position_.inRadius(x, y, r);
+}
+
+bool Unit::inRadius(const Point &point, double r) const {
+    return position_.inRadius(point, r);
+}
+
+bool Unit::isDead() const { return stats_.getHealthPoints() == 0.0; }
 
 
 // setters and getters

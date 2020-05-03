@@ -57,6 +57,10 @@ bool Point::inRadius(double x, double y, double r) const {
     return ((x - x_) * (x - x_) + (y - y_) * (y - y_) <= r * r);
 }
 
+bool Point::inRadius(const Point& point, double r) const {
+    return inRadius(point.x_, point.y_, r);
+}
+
 double Point::normSqr() const {
     return x_ * x_ + y_ * y_;
 }
