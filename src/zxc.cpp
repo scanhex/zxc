@@ -36,6 +36,8 @@
 
 #include "zxc.h"
 
+boost::lockfree::queue<EventName> othersEvents{100}; //TODO to class?
+
 
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
@@ -151,7 +153,34 @@ void ZxcApplication::drawEvent() {
     GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
     updateGameState();
-
+    while (!othersEvents.empty()) {
+        EventName eventName;
+        othersEvents.pop(eventName);
+        switch (eventName) {
+            case EventName::ShortCoilUse: {
+                auto e = new ShortCoilUseEvent(secondHero_);
+                e->need_send_ = false;
+                EventHandler<ShortCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            case EventName::MidCoilUse: {
+                auto e = new MidCoilUseEvent(secondHero_);
+                e->need_send_ = false;
+                EventHandler<MidCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            case EventName::LongCoilUse: {
+                auto e = new LongCoilUseEvent(secondHero_);
+                e->need_send_ = false;
+                EventHandler<LongCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            default: {
+                assert(false);
+                break;
+            }
+        }
+    }
 //  Fps counter in console
 //	Debug{} << 1 / timeline_.previousFrameDuration();
 

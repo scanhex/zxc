@@ -76,6 +76,8 @@ public:
 
     explicit ShortCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+
+    bool need_send_{true};
 };
 
 class MidCoilUseEvent : public SkillUseEvent {
@@ -84,6 +86,8 @@ public:
 
     explicit MidCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+
+    bool need_send_{true};
 };
 
 class LongCoilUseEvent : public SkillUseEvent {
@@ -92,4 +96,6 @@ public:
 
     explicit LongCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+
+    bool need_send_{true};
 };
