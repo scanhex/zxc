@@ -12,7 +12,7 @@ enum class Player {
     Second
 };
 
-class GameState {
+class GameState : public GameStateHandler {
 public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
@@ -49,5 +49,4 @@ private:
     Hero *secondHero_;
 
     friend GameStateHandler;
-    GameStateHandler handler_;
 };

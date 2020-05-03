@@ -1,11 +1,11 @@
 #include "GameState.h"
 #include <algorithm>
 
-GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
-                                                          secondHero_{&secondHero},
-                                                          handler_{*this} {}
+GameState::GameState(Hero &firstHero, Hero &secondHero) : GameStateHandler(*this),
+                                                          firstHero_{&firstHero},
+                                                          secondHero_{&secondHero} {}
 
-GameState::GameState() : handler_{*this} {
+GameState::GameState() : GameStateHandler(*this) {
     // 2 default heros
     firstHero_ = new Hero(Player::First);
     secondHero_ = new Hero(Player::Second);
