@@ -12,7 +12,7 @@
 #include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_SERVER_SIZE = 256;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
@@ -80,6 +80,8 @@ private:
          */
         void parseGSFromBuffer();
 
+        void parseEventsFromBuffer();
+
         void writeActionToBuffer();
 
         // TODO update GS by full copy
@@ -111,8 +113,11 @@ private:
     void checkServerResponse();
 
     void handle(const MoveEvent &event) override;
+
     void handle(const ShortCoilUseEvent &event) override;
+
     void handle(const MidCoilUseEvent &event) override;
+
     void handle(const LongCoilUseEvent &event) override;
 
 private:
