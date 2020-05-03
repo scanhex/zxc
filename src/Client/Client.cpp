@@ -148,6 +148,7 @@ void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_
 }
 
 void Client::ConnectionToServer::parseGSFromBuffer() {
+    // TODO pass all GS and copy ?
     double hp1 = reader_.readDouble();
     double pos_x1 = reader_.readDouble();
     double pos_y1 = reader_.readDouble();
@@ -167,7 +168,6 @@ void Client::ConnectionToServer::writeActionToBuffer() {
     Event *e;
     events_.pop(e);
     e->serialize(writer_);
-
     delete e;
 }
 
