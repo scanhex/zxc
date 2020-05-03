@@ -16,6 +16,7 @@
 
 #include "Graphics/Types.h"
 #include "Graphics/ModelLoader.h"
+#include "Graphics/GraphicsHandler.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
 
@@ -54,6 +55,8 @@ private:
     void initGrid();
     void initScene();
     void initGame();
+    void initHandlers();
+    void initNetwork();
 
     Float depthAt(const Vector2i &position) const;
     Vector3 unproject(const Vector2i &position, Float depth) const;
@@ -79,4 +82,5 @@ private:
 
     GL::Mesh grid_;
     Magnum::Timeline timeline_;
+    std::unique_ptr<GraphicsHandler> graphicsHandler_;
 };
