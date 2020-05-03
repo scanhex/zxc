@@ -24,7 +24,7 @@ using namespace Corrade;
 using namespace Math::Literals;
 
 
-boost::lockfree::queue<Event> events{ 100 };
+boost::lockfree::queue<Event*> events{ 100 };
 bool exit_flag = false;
 
 class ZxcApplication : public Platform::Application {
@@ -60,9 +60,10 @@ private:
 
 	ShaderLibrary shaderLibrary_;
 	ModelLoader modelLoader_;
-    std::optional<GameState> gameState_;
-	std::optional<Hero> firstHero_;
-	std::optional<Hero> secondHero_;
+
+	Hero firstHero_;
+	Hero secondHero_;
+    GameState gameState_;
 
 	std::thread networkThread_;
 

@@ -2,12 +2,20 @@
 
 #include <vector>
 #include "Utils/BufferIO.h"
-#include "Game/Event.h"
+#include "Game/Hero.h"
 
-template <class Event>
+enum class EventName : uint8_t {
+    None         = 0,
+    ShortCoilUse = 1,
+    MidCoilUse   = 2,
+    LongCoilUse  = 3,
+    Move         = 4
+};
+
+template<class Event>
 class EventHandler {
 private:
-    static std::vector<EventHandler<Event>*> allHandlers;
+    static std::vector<EventHandler<Event> *> allHandlers;
 public:
     static void fireEvent(Event &event) {
         for (auto &h : allHandlers) {
@@ -20,7 +28,7 @@ public:
     }
 
     ~EventHandler() {
-        for (unsigned i = 0; i < allHandlers.size(); i++) {
+        for (size_t i = 0; i < allHandlers.size(); i++) {
             if (allHandlers[i] == this) {
                 allHandlers[i] = allHandlers[allHandlers.size() - 1];
                 if (!allHandlers.empty()) allHandlers.pop_back();
@@ -31,21 +39,47 @@ public:
     virtual void handle(Event &event) = 0;
 };
 
-// TODO rename to Event
-class NewEvent {
+
+class Event {
+public:
+    static const EventName name_ = EventName::None;
+
     virtual void serialize(BufferIO::BufferWriter& writer) = 0;
 };
 
-class MoveEvent : NewEvent {
+class MoveEvent : public Event {
 public:
-    static const EventName name = EventName::move;
+    static const EventName name_ = EventName::Move;
+
+    Hero &hero_;
     double x_, y_;
 
-    MoveEvent(double x, double y) : x_(x), y_(y) {}
+    MoveEvent(Hero &hero, double x, double y);
+    void serialize(BufferIO::BufferWriter& writer) override;
+};
 
-    void serialize(BufferIO::BufferWriter& writer) override {
-        writer.writeUInt8(static_cast<uint8_t>(name));
-        writer.writeDouble(x_);
-        writer.writeDouble(y_);
-    }
+class SkillUseEvent : public Event {
+public:
+    Hero &hero_;
+
+    explicit SkillUseEvent(Hero &hero);
+    void serialize(BufferIO::BufferWriter& writer) override;
+};
+
+class ShortCoilUseEvent : public SkillUseEvent {
+public:
+    explicit ShortCoilUseEvent(Hero &hero);
+    static const EventName name_ = EventName::ShortCoilUse;
+};
+
+class MidCoilUseEvent : public SkillUseEvent {
+public:
+    explicit MidCoilUseEvent(Hero &hero);
+    static const EventName name_ = EventName::MidCoilUse;
+};
+
+class LongCoilUseEvent : public SkillUseEvent {
+public:
+    explicit LongCoilUseEvent(Hero &hero);
+    static const EventName name_ = EventName::LongCoilUse;
 };

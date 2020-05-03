@@ -75,24 +75,22 @@ void ZxcApplication::initScene() {
 	initCamera();
 	initRenderer();
 	/* Setup shaders */
-	
+
 	initGrid();
 }
 
 void ZxcApplication::initGame(){
-    firstHero_ = Hero(Player::First);
-    secondHero_ = Hero(Player::Second);
-
-    gameState_ = GameState(*firstHero_, *secondHero_);
-
-    addUnit(*firstHero_);
-    addUnit(*secondHero_);
+    addUnit(firstHero_);
+    addUnit(secondHero_);
 }
 
 ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	Platform::Application{ arguments, Configuration{}
 		.setTitle("ZXC")
-		.setWindowFlags(Configuration::WindowFlag::Resizable) }
+		.setWindowFlags(Configuration::WindowFlag::Resizable) },
+    firstHero_{Hero(Player::First)},
+    secondHero_{Hero(Player::Second)},
+    gameState_(GameState(firstHero_, secondHero_))
 
 {
 
@@ -101,7 +99,7 @@ ZxcApplication::ZxcApplication(const Arguments& arguments) :
 	initScene();
     initGame();
 
-    networkThread_ = std::thread(runClient, std::ref(gameState_.value()));
+    networkThread_ = std::thread(runClient, std::ref(gameState_));
 
 
 }
@@ -112,21 +110,21 @@ void ZxcApplication::addUnit(Unit& u) {
 }
 
 void ZxcApplication::updateGameState(){
-    double myAngle = gameState_->getAngle(Player::First);
-    double otherAngle = gameState_->getAngle(Player::Second);
+    double myAngle = gameState_.getAngle(Player::First);
+    double otherAngle = gameState_.getAngle(Player::Second);
 
-	gameState_->update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
+	gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
-    Point myPosition = gameState_->getPosition(Player::First);
-    Point otherPosition = gameState_->getPosition(Player::Second);
+    Point myPosition = gameState_.getPosition(Player::First);
+    Point otherPosition = gameState_.getPosition(Player::Second);
     Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
     Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
 
     unitObjects_[0]->translate(myVectorPosition - unitObjects_[0]->transformation().translation());
     unitObjects_[1]->translate(otherVectorPosition - unitObjects_[1]->transformation().translation());
 
-    double myNewAngle = gameState_->getAngle(Player::First);
-    double otherNewAngle = gameState_->getAngle(Player::Second);
+    double myNewAngle = gameState_.getAngle(Player::First);
+    double otherNewAngle = gameState_.getAngle(Player::Second);
 
     if (myNewAngle != myAngle) {
         double delta = myNewAngle - myAngle;
@@ -172,9 +170,9 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
 
 		double x = newPosition.x(), y = newPosition.y();
 
-		Event curEvent(EventName::move, Player::First, x, y);
-		events.push(curEvent);
-		gameState_->applyEvent(curEvent);
+		auto* moveEvent = new MoveEvent(firstHero_, x, y);
+		events.push(moveEvent);
+		EventHandler<MoveEvent>::fireEvent(*moveEvent);
 
 		redraw();
 	}
@@ -267,29 +265,29 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent& event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        Event curEvent(EventName::firstSkill, Player::First);
+        auto* shortCoilUseEvent = new ShortCoilUseEvent(firstHero_);
+        events.push(shortCoilUseEvent);
+        EventHandler<ShortCoilUseEvent>::fireEvent(*shortCoilUseEvent);
 
-        events.push(curEvent);
-        gameState_->applyEvent(curEvent);
-		handleSkill(*firstHero_, SkillNum::first, scene_, drawables_, timeline_);
+		// handleSkill(*firstHero_, SkillNum::first, scene_, drawables_, timeline_); TODO
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        Event curEvent(EventName::secondSkill, Player::First);
+        auto* midCoilUseEvent = new MidCoilUseEvent(firstHero_);
+        events.push(midCoilUseEvent);
+        EventHandler<MidCoilUseEvent>::fireEvent(*midCoilUseEvent);
 
-        events.push(curEvent);
-        gameState_->applyEvent(curEvent);
-		handleSkill(*firstHero_, SkillNum::second, scene_, drawables_, timeline_);
+		// handleSkill(*firstHero_, SkillNum::second, scene_, drawables_, timeline_); TODO
         // draw skill use
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        Event curEvent(EventName::thirdSkill, Player::First);
+        auto* longCoilUseEvent = new LongCoilUseEvent(firstHero_);
+        events.push(longCoilUseEvent);
+        EventHandler<LongCoilUseEvent>::fireEvent(*longCoilUseEvent);
 
-        events.push(curEvent);
-        gameState_->applyEvent(curEvent);
-		handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_);
+		// handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_); TODO
         // draw skill use
         redraw();
     }

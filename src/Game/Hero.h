@@ -1,12 +1,9 @@
 #pragma once
 
 #include "Unit.h"
-#include "Skill.h"
 #include "StatsBuilder.h"
 
-
-class GameState;
-class Skill;
+enum class Player;
 
 
 constexpr uint32_t NUM_SKILLS = 3;
@@ -22,8 +19,6 @@ private:
     uint32_t gold_;
     uint32_t level_;
     uint32_t experience_;
-
-    Skill skills_[NUM_SKILLS];
 
     static StatsBuilder defaultHeroStatsBuilder_;
     static Position firstHeroStartingPosition_;
@@ -41,8 +36,6 @@ public:
     void levelUp(uint32_t delta);
     void incrementLevel();
     void changeExperience(uint32_t delta);
-
-    void useSkill(SkillNum skillNum, GameState &gameState);
 
     // getters and setters
 
