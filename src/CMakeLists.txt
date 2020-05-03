@@ -32,7 +32,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTOR
 
 include_directories(".")
 
-file(GLOB zxc_sources "Game/*.cpp" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Client/*.cpp" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h" "Game/*.h")
+file(GLOB zxc_sources "Game/*.cpp" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Client/*.cpp" "Client/*.h" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h" "Game/*.h")
 
 file(GLOB server_sources "Server/main.cpp" "Server/Server.cpp" "Server/Server.h" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Game/*.cpp" "Game/*.h")
 
