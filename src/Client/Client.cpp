@@ -1,7 +1,5 @@
 #include "Client.h"
-#include <boost/lockfree/queue.hpp>
 
-extern boost::lockfree::queue<Event *> events;
 extern bool exit_flag;
 
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
@@ -163,10 +161,10 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 
 void Client::ConnectionToServer::writeActionToBuffer() {
     Event *e;
-    events.pop(e);
+    events_.pop(e);
     e->serialize(writer_);
 
-    // delete e;
+    delete e;
 }
 
 void Client::ConnectionToServer::waitForAction() {
@@ -174,7 +172,7 @@ void Client::ConnectionToServer::waitForAction() {
         stopConnection();
         return;
     }
-    if (events.empty()) {
+    if (events_.empty()) {
         timer_.expires_from_now(boost::posix_time::millisec(1));
         timer_.async_wait(BIND_FN(waitForAction));
     } else {
@@ -195,6 +193,22 @@ void Client::checkServerResponse() {
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     now_ = boost::posix_time::microsec_clock::local_time();
+}
+
+void Client::handle(const MoveEvent& event) {
+    connection_->events_.push(new MoveEvent(event));
+}
+
+void Client::handle(const ShortCoilUseEvent& event) {
+    connection_->events_.push(new ShortCoilUseEvent(event));
+}
+
+void Client::handle(const MidCoilUseEvent& event) {
+    connection_->events_.push(new MidCoilUseEvent(event));
+}
+
+void Client::handle(const LongCoilUseEvent& event) {
+    connection_->events_.push(new LongCoilUseEvent(event));
 }
 
 void Client::run() {

@@ -178,10 +178,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
 
         double x = newPosition.x(), y = newPosition.y();
 
-        auto *moveEvent = new MoveEvent(firstHero_, x, y);
-        // TODO: fix memory leak
-        events.push(moveEvent);
-        EventHandler<MoveEvent>::fireEvent(*moveEvent);
+        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_,x,y));
 
         redraw();
     }
@@ -277,33 +274,15 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        auto *shortCoilUseEvent = new ShortCoilUseEvent(firstHero_);
-        // TODO: remove memory leak
-        events.push(shortCoilUseEvent);
-        EventHandler<ShortCoilUseEvent>::fireEvent(*shortCoilUseEvent);
-
-        // handleSkill(*firstHero_, SkillNum::first, scene_, drawables_, timeline_); TODO
-        // draw skill use
+        EventHandler<ShortCoilUseEvent>::fireEvent(ShortCoilUseEvent(firstHero_));
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        auto *midCoilUseEvent = new MidCoilUseEvent(firstHero_);
-        // TODO: remove memory leak
-        events.push(midCoilUseEvent);
-        EventHandler<MidCoilUseEvent>::fireEvent(*midCoilUseEvent);
-
-        // handleSkill(*firstHero_, SkillNum::second, scene_, drawables_, timeline_); TODO
-        // draw skill use
+        EventHandler<MidCoilUseEvent>::fireEvent(MidCoilUseEvent(firstHero_));
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        auto *longCoilUseEvent = new LongCoilUseEvent(firstHero_);
-        // TODO: remove memory leak
-        events.push(longCoilUseEvent);
-        EventHandler<LongCoilUseEvent>::fireEvent(*longCoilUseEvent);
-
-        // handleSkill(*firstHero_, SkillNum::third, scene_, drawables_, timeline_); TODO
-        // draw skill use
+        EventHandler<LongCoilUseEvent>::fireEvent(LongCoilUseEvent(firstHero_));
         redraw();
     }
 }

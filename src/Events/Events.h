@@ -46,6 +46,8 @@ class Event {
 public:
     static const EventName name_ = EventName::None;
 
+    virtual ~Event() = default;
+
     virtual void serialize(BufferIO::BufferWriter &writer) = 0;
 };
 
