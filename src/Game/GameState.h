@@ -3,7 +3,7 @@
 #include <optional>
 #include "StatsBuilder.h"
 #include "Point.h"
-#include "GameStateHandler.h"
+#include "Events/Events.h"
 
 class Hero;
 
@@ -12,7 +12,10 @@ enum class Player {
     Second
 };
 
-class GameState : public GameStateHandler {
+class GameState : public EventHandler<MoveEvent>,
+                  public EventHandler<ShortCoilUseEvent>,
+                  public EventHandler<MidCoilUseEvent>,
+                  public EventHandler<LongCoilUseEvent> {
 public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
@@ -43,10 +46,13 @@ public:
 
     [[nodiscard]] Hero *getHero(Player player) const;
 
+    void handle(const MoveEvent &event) override;
+    void handle(const ShortCoilUseEvent &event) override;
+    void handle(const MidCoilUseEvent &event) override;
+    void handle(const LongCoilUseEvent &event) override;
+
 private:
 
     Hero *firstHero_;
     Hero *secondHero_;
-
-    friend GameStateHandler;
 };
