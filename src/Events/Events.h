@@ -39,6 +39,8 @@ public:
     virtual void handle(Event &event) = 0;
 };
 
+template<class Event>
+std::vector<EventHandler<Event> *> EventHandler<Event>::allHandlers{};
 
 class Event {
 public:
@@ -63,23 +65,29 @@ public:
     Hero &hero_;
 
     explicit SkillUseEvent(Hero &hero);
-    void serialize(BufferIO::BufferWriter& writer) override;
+    void serialize(BufferIO::BufferWriter& writer) override = 0;
 };
 
 class ShortCoilUseEvent : public SkillUseEvent {
 public:
-    explicit ShortCoilUseEvent(Hero &hero);
     static const EventName name_ = EventName::ShortCoilUse;
+
+    explicit ShortCoilUseEvent(Hero &hero);
+    void serialize(BufferIO::BufferWriter& writer) override;
 };
 
 class MidCoilUseEvent : public SkillUseEvent {
 public:
-    explicit MidCoilUseEvent(Hero &hero);
     static const EventName name_ = EventName::MidCoilUse;
+
+    explicit MidCoilUseEvent(Hero &hero);
+    void serialize(BufferIO::BufferWriter& writer) override;
 };
 
 class LongCoilUseEvent : public SkillUseEvent {
 public:
-    explicit LongCoilUseEvent(Hero &hero);
     static const EventName name_ = EventName::LongCoilUse;
+
+    explicit LongCoilUseEvent(Hero &hero);
+    void serialize(BufferIO::BufferWriter& writer) override;
 };

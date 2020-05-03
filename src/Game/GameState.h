@@ -41,8 +41,9 @@ public:
     void spendMana(double amount, Player player);
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
-private:
     [[nodiscard]] Hero *getHero(Player player) const;
+
+private:
 
     Hero *firstHero_;
     Hero *secondHero_;

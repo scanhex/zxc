@@ -187,7 +187,7 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent& event) {
 	if (!event.offset().y()) return;
 
 	/* Distance to origin */
-	const Float distance = cameraObject_.transformation().translation().z();
+	// const Float distance = cameraObject_.transformation().translation().z();
 
 	/* Move 15% of the distance back or forward */
 	cameraObject_.translate(-cameraObject_.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1) );
