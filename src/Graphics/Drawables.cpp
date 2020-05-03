@@ -14,40 +14,43 @@
 
 PluginManager::Manager<Text::AbstractFont> manager;
 Containers::Pointer<Text::AbstractFont> font;
-UnitDrawable::UnitDrawable(Object3D& object, SceneGraph::DrawableGroup3D& group, const Unit& unit) : SceneGraph::Drawable3D(object, &group), unit_(unit)
-{
+UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Unit &unit)
+        : SceneGraph::Drawable3D(object, &group), unit_(unit) {
     if (!font) {
         font = manager.loadAndInstantiate("StbTrueTypeFont");
     }
-	if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
-		Fatal{} << "Cannot open font file";
-	else std::cout << "Font loaded" << std::endl;
-	font->fillGlyphCache(cache, "0123456789.");
-    hpRenderer_.reset(new Text::Renderer2D{*font, cache, 0.5f, Text::Alignment::LineCenter });
+    if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
+        Fatal{} << "Cannot open font file";
+    else std::cout << "Font loaded" << std::endl;
+    font->fillGlyphCache(cache, "0123456789.");
+    hpRenderer_.reset(new Text::Renderer2D{*font, cache, 0.5f, Text::Alignment::LineCenter});
     hpRenderer_->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
 }
 
-void UnitDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     hpShader_.setColor(0x00ff00_rgbf)
-        .setTransformationProjectionMatrix(camera.projectionMatrix()  * Matrix4::translation(transformationMatrix.translation()) * Matrix4::translation({ 0.f, 1.f, 5.f }))
-        .bindVectorTexture(cache.texture());
+            .setTransformationProjectionMatrix(
+                    camera.projectionMatrix() *
+                    Matrix4::translation(transformationMatrix.translation()) *
+                    Matrix4::translation({0.f, 1.f, 5.f}))
+            .bindVectorTexture(cache.texture());
     int32_t myHP = ceil(unit_.getHealthPoints());
     hpRenderer_->render(std::to_string(myHP));
     hpRenderer_->mesh().draw(hpShader_);
 }
 
 
-void FlatDrawable::draw(const Matrix4& transformation, SceneGraph::Camera3D& camera) {
+void FlatDrawable::draw(const Matrix4 &transformation, SceneGraph::Camera3D &camera) {
     shader_.setColor(0x747474_rgbf)
-            .setTransformationProjectionMatrix(camera.projectionMatrix()*transformation);
+            .setTransformationProjectionMatrix(camera.projectionMatrix() * transformation);
     mesh_.draw(shader_);
 }
 
-void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     shader_
             .setDiffuseColor(color_)
             .setLightPosition(camera.cameraMatrix().translation())
-            .setLightColor(Color4(255,255,255,255))
+            .setLightColor(Color4(255, 255, 255, 255))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
@@ -55,31 +58,31 @@ void ColoredDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Came
     mesh_.draw(shader_);
 }
 
-void TexturedDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+void TexturedDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     shader_
-        .setLightPosition({ 0, 0, 10 })
-		.setLightColor(Color4(1.f, 1.f, 1.f))
-		.setTransformationMatrix(transformationMatrix)
-		.setNormalMatrix(transformationMatrix.normalMatrix())
-		.setProjectionMatrix(camera.projectionMatrix())
-		.bindDiffuseTexture(texture_);
+            .setLightPosition({0, 0, 10})
+            .setLightColor(Color4(1.f, 1.f, 1.f))
+            .setTransformationMatrix(transformationMatrix)
+            .setNormalMatrix(transformationMatrix.normalMatrix())
+            .setProjectionMatrix(camera.projectionMatrix())
+            .bindDiffuseTexture(texture_);
 
     mesh_.draw(shader_);
 }
 
-void CoilDrawable::draw(const Matrix4& transformationMatrix, SceneGraph::Camera3D& camera) {
+void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     if (timeline_.previousFrameTime() >= creationTime_ + COIL_ANIMATION_DURATION) {
 // We can't delete self, because Magnum is currently iterating over the DrawableGroup and it can cause RE
 //        delete &object_;
         return;
     }
     shader_
-        .setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
-		.setLightPosition({0, 0, 10})
-		.setLightColor(Color4(1.f, 1.f, 1.f))
-		.setTransformationMatrix(transformationMatrix)
-		.setNormalMatrix(transformationMatrix.normalMatrix())
-		.setProjectionMatrix(camera.projectionMatrix());
+            .setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
+            .setLightPosition({0, 0, 10})
+            .setLightColor(Color4(1.f, 1.f, 1.f))
+            .setTransformationMatrix(transformationMatrix)
+            .setNormalMatrix(transformationMatrix.normalMatrix())
+            .setProjectionMatrix(camera.projectionMatrix());
 
     mesh_.draw(shader_);
 }

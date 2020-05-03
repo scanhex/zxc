@@ -150,29 +150,29 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
     switch (eventName) {
         // a kak inache zdes' ??
-        case EventName::ShortCoilUse:{
+        case EventName::ShortCoilUse: {
             ShortCoilUseEvent shortCoilUse(hero);
             EventHandler<ShortCoilUseEvent>::fireEvent(shortCoilUse);
             break;
         }
-        case EventName::MidCoilUse:{
+        case EventName::MidCoilUse: {
             MidCoilUseEvent midCoilUse(hero);
             EventHandler<MidCoilUseEvent>::fireEvent(midCoilUse);
             break;
         }
-        case EventName::LongCoilUse:{
+        case EventName::LongCoilUse: {
             LongCoilUseEvent longCoilUse(hero);
             EventHandler<LongCoilUseEvent>::fireEvent(longCoilUse);
             break;
         }
-        case EventName::Move:{
+        case EventName::Move: {
             double x = reader_.readDouble();
             double y = reader_.readDouble();
             MoveEvent moveEvent(hero, x, y);
             EventHandler<MoveEvent>::fireEvent(moveEvent);
             break;
         }
-        case EventName::None:{
+        case EventName::None: {
             assert(false);
             break;
         }

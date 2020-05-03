@@ -11,11 +11,11 @@ public:
     void updateAngle(double deltaTurn);
     void updatePoint(double deltaMove);
 
-    [[nodiscard]] const Point& getPosition() const;
+    [[nodiscard]] const Point &getPosition() const;
     void setPosition(const Point &current);
     void setPosition(double x, double y);
 
-    [[nodiscard]] const Point& getDestination() const;
+    [[nodiscard]] const Point &getDestination() const;
     void setDestination(const Point &destination);
     void setDestination(double x, double y);
 
@@ -30,4 +30,3 @@ private:
     double currentAngle_;
     double destAngle_;
 };
-

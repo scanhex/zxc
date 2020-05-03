@@ -1,7 +1,7 @@
 #include "Client.h"
 #include <boost/lockfree/queue.hpp>
 
-extern boost::lockfree::queue<Event*> events;
+extern boost::lockfree::queue<Event *> events;
 extern bool exit_flag;
 
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
@@ -162,7 +162,7 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 }
 
 void Client::ConnectionToServer::writeActionToBuffer() {
-    Event* e;
+    Event *e;
     events.pop(e);
     e->serialize(writer_);
 
@@ -213,5 +213,3 @@ void runClient(GameState &gameState) {
     Client client(gameState);
     client.run();
 }
-
-//TODO refactor

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Corrade/PluginManager/Manager.h>
 #include <Magnum/ImageView.h>
 #include <Magnum/Math/Math.h>
@@ -24,58 +25,58 @@ using namespace Corrade;
 using namespace Math::Literals;
 
 
-boost::lockfree::queue<Event*> events{ 100 };
+boost::lockfree::queue<Event *> events{100};
 bool exit_flag = false;
 
 class ZxcApplication : public Platform::Application {
 public:
-	explicit ZxcApplication(const Arguments& arguments);
+    explicit ZxcApplication(const Arguments &arguments);
 
 private:
 
-	void drawEvent() override;
-	void viewportEvent(ViewportEvent& event) override;
-	void mousePressEvent(MouseEvent& event) override;
-	void mouseReleaseEvent(MouseEvent& event) override;
-	void mouseMoveEvent(MouseMoveEvent& event) override;
-	void mouseScrollEvent(MouseScrollEvent& event) override;
-	void exitEvent(ExitEvent& event) override;
+    void drawEvent() override;
+    void viewportEvent(ViewportEvent &event) override;
+    void mousePressEvent(MouseEvent &event) override;
+    void mouseReleaseEvent(MouseEvent &event) override;
+    void mouseMoveEvent(MouseMoveEvent &event) override;
+    void mouseScrollEvent(MouseScrollEvent &event) override;
+    void exitEvent(ExitEvent &event) override;
 
-	void keyPressEvent(KeyEvent& event) override;
+    void keyPressEvent(KeyEvent &event) override;
 
-	Vector3 positionOnSphere(const Vector2i& position) const;
+    Vector3 positionOnSphere(const Vector2i &position) const;
 
     void updateGameState();
 
-	void addUnit(Unit& u);
-	void initCamera();
-	void initRenderer();
-	void initGrid();
-	void initScene();
-	void initGame();
+    void addUnit(Unit &u);
+    void initCamera();
+    void initRenderer();
+    void initGrid();
+    void initScene();
+    void initGame();
 
-	Float depthAt(const Vector2i& position) const;
-	Vector3 unproject(const Vector2i& position, Float depth) const;
-	Vector3 intersectWithPlane(const Vector2i& windowPosition, const Vector3& planeNormal) const;
+    Float depthAt(const Vector2i &position) const;
+    Vector3 unproject(const Vector2i &position, Float depth) const;
+    Vector3 intersectWithPlane(const Vector2i &windowPosition, const Vector3 &planeNormal) const;
 
-	ShaderLibrary shaderLibrary_;
-	ModelLoader modelLoader_;
+    ShaderLibrary shaderLibrary_;
+    ModelLoader modelLoader_;
 
-	Hero firstHero_;
-	Hero secondHero_;
+    Hero firstHero_;
+    Hero secondHero_;
     GameState gameState_;
 
-	std::thread networkThread_;
+    std::thread networkThread_;
 
-	std::vector<Object3D*> unitObjects_;
+    std::vector<Object3D *> unitObjects_;
 
-	Scene3D scene_;
-	Object3D cameraObject_;
-	SceneGraph::Camera3D* camera_ = nullptr;
-	Object3D mapObject_;
-	SceneGraph::DrawableGroup3D drawables_;
-	Vector3 previousPosition_;
+    Scene3D scene_;
+    Object3D cameraObject_;
+    SceneGraph::Camera3D *camera_ = nullptr;
+    Object3D mapObject_;
+    SceneGraph::DrawableGroup3D drawables_;
+    Vector3 previousPosition_;
 
-	GL::Mesh grid_;
-	Magnum::Timeline timeline_;
+    GL::Mesh grid_;
+    Magnum::Timeline timeline_;
 };
