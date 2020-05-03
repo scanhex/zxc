@@ -294,7 +294,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
 }
 
 void ZxcApplication::exitEvent(ExitEvent &event) {
-    static_cast<void>(event);
+    event.setAccepted();
     exit_flag = true;
     std::cout << "Vi v adekvate?" << '\n';
     std::cout << "net" << std::endl;
