@@ -60,6 +60,7 @@ ip::tcp::socket &Server::ConnectionToClient::sock() {
 }
 
 void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
+    static_cast<void>(bytes); // TODO Ruslan why is bytes an argument?
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -93,6 +94,7 @@ size_t Server::ConnectionToClient::checkReadComplete(const boost::system::error_
 }
 
 void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
+    static_cast<void>(bytes); // TODO Ruslan why is bytes an argument?
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -115,6 +117,7 @@ void Server::ConnectionToClient::writeToSocket() {
 }
 
 void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err, size_t bytes) {
+    static_cast<void>(bytes); // TODO Ruslan why is bytes an argument?
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -142,17 +145,38 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
 void Server::ConnectionToClient::updateGSbyPlayer() {
     reader_.flushBuffer();
     uint8_t actionId = reader_.readUInt8();
-    EventName eventName = static_cast<EventName>(actionId);
-    Player player = player_id_ == 0 ? Player::First : Player::Second;
+    auto eventName = static_cast<EventName>(actionId);
+    Hero &hero = player_id_ == 0 ? *gameState.getHero(Player::First) : *gameState.getHero(Player::Second);
 
-    Event event(eventName, player);
-
-    if (event.eventName_ == EventName::move) {
-        event.x_ = reader_.readDouble();
-        event.y_ = reader_.readDouble();
+    switch (eventName) {
+        // a kak inache zdes' ??
+        case EventName::ShortCoilUse:{
+            ShortCoilUseEvent shortCoilUse(hero);
+            EventHandler<ShortCoilUseEvent>::fireEvent(shortCoilUse);
+            break;
+        }
+        case EventName::MidCoilUse:{
+            MidCoilUseEvent midCoilUse(hero);
+            EventHandler<MidCoilUseEvent>::fireEvent(midCoilUse);
+            break;
+        }
+        case EventName::LongCoilUse:{
+            LongCoilUseEvent longCoilUse(hero);
+            EventHandler<LongCoilUseEvent>::fireEvent(longCoilUse);
+            break;
+        }
+        case EventName::Move:{
+            double x = reader_.readDouble();
+            double y = reader_.readDouble();
+            MoveEvent moveEvent(hero, x, y);
+            EventHandler<MoveEvent>::fireEvent(moveEvent);
+            break;
+        }
+        case EventName::None:{
+            assert(false);
+            break;
+        }
     }
-
-    gameState.applyEvent(event);
 
     std::cout << "ME: " << gameState.getHealthPoints(Player::First) << '\n';
     std::cout << "SASHKA: " << gameState.getHealthPoints(Player::Second) << '\n';
