@@ -146,7 +146,6 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
     Hero &hero = player_id_ == 0 ? *gameState.getHero(Player::First) : *gameState.getHero(Player::Second);
 
     switch (eventName) {
-        // a kak inache zdes' ??
         case EventName::ShortCoilUse: {
             EventHandler<ShortCoilUseEvent>::fireEvent(ShortCoilUseEvent(hero));
             break;
@@ -177,6 +176,7 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 }
 
 void Server::ConnectionToClient::writeGStoBuffer() {
+    // TODO pass all GS and copy ?
     Player first = Player::First, second = Player::Second;
     if (player_id_ == 1) std::swap(first, second);
     Point firstPos = gameState.getPosition(first);
