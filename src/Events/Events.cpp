@@ -1,11 +1,5 @@
 #include "Events.h"
 
-template<> std::vector<EventHandler<MoveEvent> *> EventHandler<MoveEvent>::allHandlers{};
-template<> std::vector<EventHandler<ShortCoilUseEvent> *> EventHandler<ShortCoilUseEvent>::allHandlers{};
-template<> std::vector<EventHandler<MidCoilUseEvent> *> EventHandler<MidCoilUseEvent>::allHandlers{};
-template<> std::vector<EventHandler<LongCoilUseEvent> *> EventHandler<LongCoilUseEvent>::allHandlers{};
-
-
 MoveEvent::MoveEvent(Hero &hero, double x, double y) : hero_{hero}, x_{x}, y_{y} {}
 
 void MoveEvent::serialize(BufferIO::BufferWriter &writer) {

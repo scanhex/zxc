@@ -12,10 +12,10 @@ class GameStateHandler : public EventHandler<MoveEvent>,
 public:
     explicit GameStateHandler(GameState &gameState);
 
-    void handle(MoveEvent &event) override;
-    void handle(ShortCoilUseEvent &event) override;
-    void handle(MidCoilUseEvent &event) override;
-    void handle(LongCoilUseEvent &event) override;
+    void handle(const MoveEvent &event) override;
+    void handle(const ShortCoilUseEvent &event) override;
+    void handle(const MidCoilUseEvent &event) override;
+    void handle(const LongCoilUseEvent &event) override;
 
 private:
     GameState &gameState_;
