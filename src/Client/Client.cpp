@@ -87,7 +87,7 @@ size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::er
     return done ? 0 : 1;
 }
 
-void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err,  size_t bytes) {
+void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err, size_t bytes) {
     ignore(bytes);
     if (err || exit_flag) {
         stopConnection();
@@ -107,6 +107,10 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
         stopConnection();
         return;
     }
+    reader_.flushBuffer();
+    parseEventsFromBuffer();
+    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
+    timer_.wait();
     parseGSFromBuffer();
     if (gameState_.gameIsFinished()) {
         //TODO handle game result
@@ -165,6 +169,41 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
     updateGS(hp1, pos_x1, pos_y1, dest_x1, dest_y1, hp2, pos_x2, pos_y2, dest_x2, dest_y2);
 }
 
+void Client::ConnectionToServer::parseEventsFromBuffer() {
+    size_t sz = reader_.readInt32();
+    Hero *hero = gameState_.getHero(Player::First);
+    assert(sz <= 5);
+    for (size_t i = 0; i < sz; ++i) {
+        uint8_t actionId = reader_.readUInt8();
+        auto eventName = static_cast<EventName>(actionId);
+        switch (eventName) {
+            case EventName::ShortCoilUse: {
+                auto e = new ShortCoilUseEvent(*hero);
+                e->need_send_ = false;
+                EventHandler<ShortCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            case EventName::MidCoilUse: {
+                auto e = new MidCoilUseEvent(*hero);
+                e->need_send_ = false;
+                EventHandler<MidCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            case EventName::LongCoilUse: {
+                auto e = new LongCoilUseEvent(*hero);
+                e->need_send_ = false;
+                EventHandler<LongCoilUseEvent>::fireEvent(*e);
+                break;
+            }
+            default: {
+                assert(false);
+                break;
+            }
+
+        }
+    }
+}
+
 void Client::ConnectionToServer::writeActionToBuffer() {
     Event *e;
     events_.pop(e);
@@ -205,15 +244,18 @@ void Client::handle(const MoveEvent &event) {
 }
 
 void Client::handle(const ShortCoilUseEvent &event) {
-    connection_->events_.push(new ShortCoilUseEvent(event));
+    if (event.need_send_)
+        connection_->events_.push(new ShortCoilUseEvent(event));
 }
 
 void Client::handle(const MidCoilUseEvent &event) {
-    connection_->events_.push(new MidCoilUseEvent(event));
+    if (event.need_send_)
+        connection_->events_.push(new MidCoilUseEvent(event));
 }
 
 void Client::handle(const LongCoilUseEvent &event) {
-    connection_->events_.push(new LongCoilUseEvent(event));
+    if (event.need_send_)
+        connection_->events_.push(new LongCoilUseEvent(event));
 }
 
 void Client::run() {

@@ -3,7 +3,9 @@
 int32_t Server::ConnectionToClient::running_connections_ = 0;
 
 Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &gs,
-                                               bool &running, bool &stopped, ip::tcp::acceptor &ac, std::mutex &lock) :
+                                               bool &running, bool &stopped, ip::tcp::acceptor &ac, std::mutex &lock,
+                                               boost::lockfree::queue<Event *> &myEvents,
+                                               boost::lockfree::queue<Event *> &othersEvents) :
         gameState(gs),
         running_(running),
         stopped_(stopped),
@@ -12,7 +14,9 @@ Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &g
         is_connected_(false),
         sock_(service),
         timer_(service),
-        stop_timer_(service) {}
+        stop_timer_(service),
+        myEvents_(myEvents),
+        othersEvents_(othersEvents) {}
 
 void Server::ConnectionToClient::startConnection() {
     is_connected_ = true;
@@ -27,9 +31,17 @@ void Server::ConnectionToClient::startConnection() {
 }
 
 std::shared_ptr<Server::ConnectionToClient> Server::newClient() {
-    std::shared_ptr<ConnectionToClient> new_client(
-            new ConnectionToClient(service_, gameState, running_, stopped_, acceptor_, gs_lock_));
-    return new_client;
+    if (ConnectionToClient::connectionsNumber() == 0) {
+        std::shared_ptr<ConnectionToClient> new_client(
+                new ConnectionToClient(service_, gameState, running_, stopped_, acceptor_,
+                                       gs_lock_, firstPlayerEvents_, secondPlayerEvents_));
+        return new_client;
+    } else {
+        std::shared_ptr<ConnectionToClient> new_client(
+                new ConnectionToClient(service_, gameState, running_, stopped_, acceptor_,
+                                       gs_lock_, secondPlayerEvents_, firstPlayerEvents_));
+        return new_client;
+    }
 }
 
 int Server::ConnectionToClient::connectionsNumber() {
@@ -59,7 +71,8 @@ ip::tcp::socket &Server::ConnectionToClient::sock() {
     return sock_;
 }
 
-void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err, __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err,
+                                                      __attribute__ ((unused)) size_t bytes) {
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -92,7 +105,8 @@ size_t Server::ConnectionToClient::checkReadComplete(const boost::system::error_
     return done ? 0 : 1;
 }
 
-void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err, __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err,
+                                                     __attribute__ ((unused)) size_t bytes) {
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -107,6 +121,8 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
 
 void Server::ConnectionToClient::writeToSocket() {
     gs_lock_.lock();
+    writer_.flushBuffer();
+    writeEventsToBuffer();
     writeGStoBuffer();
     gs_lock_.unlock();
     writer_.flushBuffer();
@@ -114,7 +130,8 @@ void Server::ConnectionToClient::writeToSocket() {
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
-void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err, __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err,
+                                                       __attribute__ ((unused)) size_t bytes) {
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -147,15 +164,21 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
     switch (eventName) {
         case EventName::ShortCoilUse: {
-            EventHandler<ShortCoilUseEvent>::fireEvent(ShortCoilUseEvent(hero));
+            auto e = new ShortCoilUseEvent(hero);
+            EventHandler<ShortCoilUseEvent>::fireEvent(*e);
+            myEvents_.push(e);
             break;
         }
         case EventName::MidCoilUse: {
-            EventHandler<MidCoilUseEvent>::fireEvent(MidCoilUseEvent(hero));
+            auto e = new MidCoilUseEvent(hero);
+            EventHandler<MidCoilUseEvent>::fireEvent(*e);
+            myEvents_.push(e);
             break;
         }
         case EventName::LongCoilUse: {
-            EventHandler<LongCoilUseEvent>::fireEvent(LongCoilUseEvent(hero));
+            auto e = new LongCoilUseEvent(hero);
+            EventHandler<LongCoilUseEvent>::fireEvent(*e);
+            myEvents_.push(e);
             break;
         }
         case EventName::Move: {
@@ -184,8 +207,6 @@ void Server::ConnectionToClient::writeGStoBuffer() {
     Point firstDest = gameState.getDestination(first);
     Point secondDest = gameState.getDestination(second);
 
-    writer_.flushBuffer();
-
     // my: {hp, x, y}
     writer_.writeDouble(gameState.getHealthPoints(first));
     writer_.writeDouble(firstPos.x_);
@@ -199,6 +220,21 @@ void Server::ConnectionToClient::writeGStoBuffer() {
     writer_.writeDouble(secondPos.y_);
     writer_.writeDouble(secondDest.x_);
     writer_.writeDouble(secondDest.y_);
+}
+
+void Server::ConnectionToClient::writeEventsToBuffer() {
+    std::vector<Event *> events;
+    size_t cnt = 0;
+    while (!othersEvents_.empty() && cnt < 5) {
+        ++cnt;
+        Event *e;
+        othersEvents_.pop(e);
+        events.push_back(e);
+    }
+    writer_.writeInt32(cnt);
+    for (auto e:events) {
+        e->serialize(writer_);
+    }
 }
 
 void Server::ConnectionToClient::connectionChecker() {
@@ -216,8 +252,8 @@ void Server::ConnectionToClient::startChecker() {
     conn_checker_ = std::thread(&ConnectionToClient::connectionChecker, this);
 }
 
-void
-Server::handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err) {
+void Server::handleNewConnection(const std::shared_ptr<ConnectionToClient> &client,
+                                 const boost::system::error_code &err) {
     client->startConnection(); //to stop checker if needed
     if (err || stopped_) {
         client->stopConnection();
