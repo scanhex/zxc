@@ -1,7 +1,7 @@
 #include "Client.h"
 #include <boost/lockfree/queue.hpp>
 
-extern boost::lockfree::queue<Event> events;
+extern boost::lockfree::queue<Event*> events;
 extern bool exit_flag;
 
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
@@ -162,15 +162,11 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 }
 
 void Client::ConnectionToServer::writeActionToBuffer() {
-    Event e;
+    Event* e;
     events.pop(e);
+    e->serialize(writer_);
 
-    writer_.writeUInt8(static_cast<uint8_t>(e.eventName_));
-
-    if (e.eventName_ == EventName::move) {
-        writer_.writeDouble(e.x_);
-        writer_.writeDouble(e.y_);
-    }
+    // delete e;
 }
 
 void Client::ConnectionToServer::waitForAction() {
@@ -219,4 +215,3 @@ void runClient(GameState &gameState) {
 }
 
 //TODO refactor
-

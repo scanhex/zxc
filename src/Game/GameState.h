@@ -1,16 +1,16 @@
 #pragma once
 
+#include <optional>
+#include "StatsBuilder.h"
+#include "Point.h"
+#include "GameStateHandler.h"
+
+class Hero;
+
 enum class Player {
     First,
     Second
 };
-
-#include <optional>
-#include "Hero.h"
-#include "StatsBuilder.h"
-
-class Hero;
-
 
 class GameState {
 public:
@@ -27,9 +27,6 @@ public:
     [[nodiscard]] bool isDead(Player player) const;
 
     void update(double elapsedTime); // time in milliseconds
-
-    void applyMove(Player player, double x, double y);
-    void applyEvent(Event event);
 
     void setHealthPoints(double amount, Player player);
     void setPosition(Point pos, Player player);
@@ -49,4 +46,7 @@ private:
 
     Hero *firstHero_;
     Hero *secondHero_;
+
+    friend GameStateHandler;
+    GameStateHandler handler_;
 };

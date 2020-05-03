@@ -1,13 +1,11 @@
-#define _USE_MATH_DEFINES
-
 #include "GameState.h"
-#include <cmath>
 #include <algorithm>
 
 GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
-                                                          secondHero_{&secondHero} {}
+                                                          secondHero_{&secondHero},
+                                                          handler_{*this} {}
 
-GameState::GameState() {
+GameState::GameState() : handler_{*this} {
     // 2 default heros
     firstHero_ = new Hero(Player::First);
     secondHero_ = new Hero(Player::Second);
@@ -76,32 +74,6 @@ void GameState::update(double elapsedTime) { // time in milliseconds
         if (!hero->isDead()) {
             hero->updateUnit(elapsedTimeInSeconds);
         }
-    }
-}
-
-void GameState::applyMove(Player player, double x, double y) {
-    Hero *hero = getHero(player);
-    hero->setDestination(x, y);
-}
-
-void GameState::applyEvent(Event event) {
-    Hero *hero = getHero(event.player_);
-
-    switch (event.eventName_) {
-        case EventName::firstSkill:
-            hero->useSkill(SkillNum::first, *this);
-            break;
-        case EventName::secondSkill:
-            hero->useSkill(SkillNum::second, *this);
-            break;
-        case EventName::thirdSkill:
-            hero->useSkill(SkillNum::third, *this);
-            break;
-        case EventName::move:
-            applyMove(event.player_, event.x_, event.y_);
-            break;
-        default:
-            assert(false);
     }
 }
 

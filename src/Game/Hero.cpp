@@ -1,8 +1,9 @@
 #define _USE_MATH_DEFINES
+
 #include "Hero.h"
+#include "GameState.h"
 #include <algorithm>
 #include <cmath>
-#include "GameState.h"
 
 StatsBuilder Hero::defaultHeroStatsBuilder_ =
         StatsBuilder()
@@ -28,19 +29,13 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                             player_{player},
                             gold_{START_GOLD},
                             level_{1},
-                            experience_{0},
-                            skills_{Skill(player_, SkillNum::first),
-                                    Skill(player_, SkillNum::second),
-                                    Skill(player_, SkillNum::third)} {}
+                            experience_{0} {}
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
                                                player_{player},
                                                gold_{START_GOLD},
                                                level_{1},
-                                               experience_{0},
-                                               skills_{Skill(player_, SkillNum::first),
-                                                       Skill(player_, SkillNum::second),
-                                                       Skill(player_, SkillNum::third)} {}
+                                               experience_{0} {}
 
 Hero::Hero(Player player, Position position, Stats stats) : Hero(player, position) {
     stats_ = stats;
@@ -71,10 +66,6 @@ void Hero::changeExperience(uint32_t delta) {
         experience_ -= EXP_PER_LEVEL;
         incrementLevel();
     }
-}
-
-void Hero::useSkill(SkillNum skillNum, GameState &gameState) {
-    skills_[static_cast<uint8_t>(skillNum)].handleEvent(gameState);
 }
 
 
