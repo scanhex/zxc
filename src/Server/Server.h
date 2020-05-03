@@ -8,15 +8,17 @@
 #include "../Utils/BufferIO.h"
 #include <cstdio>
 #include <iostream>
+#include <vector>
 #include <thread>
 #include <mutex>
 #include <boost/asio.hpp>
+#include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
-static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_SERVER_SIZE = 256;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32;
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
@@ -40,7 +42,8 @@ private:
     public:
 
         ConnectionToClient(io_service &service, GameState &gs, bool &running, bool &stopped, ip::tcp::acceptor &ac,
-                           std::mutex &lock);
+                           std::mutex &lock, boost::lockfree::queue<Event *> &myEvents,
+                           boost::lockfree::queue<Event *> &othersEvents);
 
         void startConnection();
 
@@ -74,6 +77,8 @@ private:
 
         void writeGStoBuffer();
 
+        void writeEventsToBuffer();
+
     private:
 
         void connectionChecker();
@@ -96,6 +101,8 @@ private:
         BufferIO::BufferWriter writer_{};
         deadline_timer timer_;
         deadline_timer stop_timer_;
+        boost::lockfree::queue<Event *>& myEvents_;
+        boost::lockfree::queue<Event *>& othersEvents_;
 
     public:
         std::thread conn_checker_;
@@ -112,12 +119,14 @@ private:
     std::shared_ptr<ConnectionToClient> newClient();
 
 private:
+
     GameState gameState{};
     bool running_{false};
     bool stopped_{false};
     boost::posix_time::ptime last_tick{};
     boost::posix_time::ptime now{};
-
+    boost::lockfree::queue<Event *> firstPlayerEvents_{20};
+    boost::lockfree::queue<Event *> secondPlayerEvents_{20};
     io_service service_{};
     ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8001)};
     std::mutex gs_lock_{};
