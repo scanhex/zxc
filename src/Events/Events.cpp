@@ -1,5 +1,7 @@
 #include "Events.h"
 
+Event::Event() : need_send_{true} {}
+
 MoveEvent::MoveEvent(Hero &hero, double x, double y) : hero_{hero}, x_{x}, y_{y} {}
 
 void MoveEvent::serialize(BufferIO::BufferWriter &writer) {
