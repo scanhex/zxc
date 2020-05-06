@@ -8,6 +8,12 @@ void MoveEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeDouble(y_);
 }
 
+StopEvent::StopEvent(Hero &hero) : hero_{hero} {}
+
+void StopEvent::serialize(BufferIO::BufferWriter &writer) {
+    writer.writeUInt8(static_cast<uint8_t>(name_));
+}
+
 
 SkillUseEvent::SkillUseEvent(Hero &hero) : hero_{hero} {}
 

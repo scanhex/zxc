@@ -13,6 +13,7 @@ enum class Player {
 };
 
 class GameState : public EventHandler<MoveEvent>,
+                  public EventHandler<StopEvent>,
                   public EventHandler<ShortCoilUseEvent>,
                   public EventHandler<MidCoilUseEvent>,
                   public EventHandler<LongCoilUseEvent> {
@@ -47,6 +48,7 @@ public:
     [[nodiscard]] Hero *getHero(Player player) const;
 
     void handle(const MoveEvent &event) override;
+    void handle(const StopEvent &event) override;
     void handle(const ShortCoilUseEvent &event) override;
     void handle(const MidCoilUseEvent &event) override;
     void handle(const LongCoilUseEvent &event) override;
