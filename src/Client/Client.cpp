@@ -179,20 +179,20 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
         uint8_t actionId = reader_.readUInt8();
         auto eventName = static_cast<EventName>(actionId);
         switch (eventName) {
-            case EventName::ShortCoilUse: {
-                auto e = new ShortCoilUseEvent(*hero);
+            case EventName::FirstSkillUse: {
+                auto e = new FirstSkillUseEvent(*hero);
                 e->need_send_ = false;
                 othersEvents.push(e);
                 break;
             }
-            case EventName::MidCoilUse: {
-                auto e = new MidCoilUseEvent(*hero);
+            case EventName::SecondSkillUse: {
+                auto e = new SecondSkillUseEvent(*hero);
                 e->need_send_ = false;
                 othersEvents.push(e);
                 break;
             }
-            case EventName::LongCoilUse: {
-                auto e = new LongCoilUseEvent(*hero);
+            case EventName::ThirdSkillUse: {
+                auto e = new ThirdSkillUseEvent(*hero);
                 e->need_send_ = false;
                 othersEvents.push(e);
                 break;
@@ -262,19 +262,19 @@ void Client::handle(const StopEvent &event) {
     connection_->events_.push(new StopEvent(event));
 }
 
-void Client::handle(const ShortCoilUseEvent &event) {
+void Client::handle(const FirstSkillUseEvent &event) {
     if (event.need_send_)
-        connection_->events_.push(new ShortCoilUseEvent(event));
+        connection_->events_.push(new FirstSkillUseEvent(event));
 }
 
-void Client::handle(const MidCoilUseEvent &event) {
+void Client::handle(const SecondSkillUseEvent &event) {
     if (event.need_send_)
-        connection_->events_.push(new MidCoilUseEvent(event));
+        connection_->events_.push(new SecondSkillUseEvent(event));
 }
 
-void Client::handle(const LongCoilUseEvent &event) {
+void Client::handle(const ThirdSkillUseEvent &event) {
     if (event.need_send_)
-        connection_->events_.push(new LongCoilUseEvent(event));
+        connection_->events_.push(new ThirdSkillUseEvent(event));
 }
 
 void Client::run() {

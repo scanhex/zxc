@@ -163,21 +163,21 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
     Hero &hero = player_id_ == 0 ? *gameState.getHero(Player::First) : *gameState.getHero(Player::Second);
 
     switch (eventName) {
-        case EventName::ShortCoilUse: {
-            auto e = new ShortCoilUseEvent(hero);
-            EventHandler<ShortCoilUseEvent>::fireEvent(*e);
+        case EventName::FirstSkillUse: {
+            auto e = new FirstSkillUseEvent(hero);
+            EventHandler<FirstSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::MidCoilUse: {
-            auto e = new MidCoilUseEvent(hero);
-            EventHandler<MidCoilUseEvent>::fireEvent(*e);
+        case EventName::SecondSkillUse: {
+            auto e = new SecondSkillUseEvent(hero);
+            EventHandler<SecondSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::LongCoilUse: {
-            auto e = new LongCoilUseEvent(hero);
-            EventHandler<LongCoilUseEvent>::fireEvent(*e);
+        case EventName::ThirdSkillUse: {
+            auto e = new ThirdSkillUseEvent(hero);
+            EventHandler<ThirdSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }

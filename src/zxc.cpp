@@ -278,15 +278,15 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        EventHandler<ShortCoilUseEvent>::fireEvent(ShortCoilUseEvent(firstHero_));
+        EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        EventHandler<MidCoilUseEvent>::fireEvent(MidCoilUseEvent(firstHero_));
+        EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        EventHandler<LongCoilUseEvent>::fireEvent(LongCoilUseEvent(firstHero_));
+        EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
         redraw();
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {

@@ -20,18 +20,18 @@ void StopEvent::serialize(BufferIO::BufferWriter &writer) {
 SkillUseEvent::SkillUseEvent(Hero &hero) : hero_{hero} {}
 
 
-ShortCoilUseEvent::ShortCoilUseEvent(Hero &hero) : SkillUseEvent(hero) {}
-MidCoilUseEvent::MidCoilUseEvent(Hero &hero) : SkillUseEvent(hero) {}
-LongCoilUseEvent::LongCoilUseEvent(Hero &hero) : SkillUseEvent(hero) {}
+FirstSkillUseEvent::FirstSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
+SecondSkillUseEvent::SecondSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
+ThirdSkillUseEvent::ThirdSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
 
-void ShortCoilUseEvent::serialize(BufferIO::BufferWriter &writer) {
+void FirstSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeUInt8(static_cast<uint8_t>(name_));
 }
 
-void MidCoilUseEvent::serialize(BufferIO::BufferWriter &writer) {
+void SecondSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeUInt8(static_cast<uint8_t>(name_));
 }
 
-void LongCoilUseEvent::serialize(BufferIO::BufferWriter &writer) {
+void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeUInt8(static_cast<uint8_t>(name_));
 }

@@ -14,9 +14,9 @@ enum class Player {
 
 class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<StopEvent>,
-                  public EventHandler<ShortCoilUseEvent>,
-                  public EventHandler<MidCoilUseEvent>,
-                  public EventHandler<LongCoilUseEvent> {
+                  public EventHandler<FirstSkillUseEvent>,
+                  public EventHandler<SecondSkillUseEvent>,
+                  public EventHandler<ThirdSkillUseEvent> {
 public:
     GameState();
     GameState(Hero &firstHero_, Hero &secondHero_);
@@ -49,9 +49,9 @@ public:
 
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
-    void handle(const ShortCoilUseEvent &event) override;
-    void handle(const MidCoilUseEvent &event) override;
-    void handle(const LongCoilUseEvent &event) override;
+    void handle(const FirstSkillUseEvent &event) override;
+    void handle(const SecondSkillUseEvent &event) override;
+    void handle(const ThirdSkillUseEvent &event) override;
 
 private:
 

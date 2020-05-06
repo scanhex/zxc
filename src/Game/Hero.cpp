@@ -19,6 +19,7 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ =
                 .setArmor(3)
                 .setResist(0.25);
 
+
 Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), -M_PI);
 Position Hero::secondHeroStartingPosition_ = Position(Point(6, 6), M_PI);
 
@@ -29,13 +30,19 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                             player_{player},
                             gold_{START_GOLD},
                             level_{1},
-                            experience_{0} {}
+                            experience_{0},
+                            skills_{ShortCoil(*this),
+                                    MidCoil(*this),
+                                    LongCoil(*this)} {}
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
                                                player_{player},
                                                gold_{START_GOLD},
                                                level_{1},
-                                               experience_{0} {}
+                                               experience_{0},
+                                               skills_{ShortCoil(*this),
+                                                       MidCoil(*this),
+                                                       LongCoil(*this)} {}
 
 Hero::Hero(Player player, Position position, Stats stats) : Hero(player, position) {
     stats_ = stats;
@@ -66,6 +73,10 @@ void Hero::changeExperience(uint32_t delta) {
         experience_ -= EXP_PER_LEVEL;
         incrementLevel();
     }
+}
+
+void Hero::useSkill(SkillName skillName, GameState &gameState) {
+    skills_[static_cast<uint8_t>(skillName)].use(gameState);
 }
 
 
