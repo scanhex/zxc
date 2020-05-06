@@ -123,44 +123,14 @@ void GameState::handle(const StopEvent &event) {
     event.hero_.setDestination(curPosition);
 }
 
-void GameState::handle(const ShortCoilUseEvent &event) {
-    // TODO now loops over 2 heroes
-    constexpr double len = 2;
-    constexpr double radius = 1.5;
-    constexpr double damage = 10;
-
-    Point coilCenter = event.hero_.shiftUnitPosition(len);
-    for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
-            hero->applyDamage(damage);
-        }
-    }
+void GameState::handle(const FirstSkillUseEvent &event) {
+    event.hero_.useSkill(SkillName::FirstSkill, *this);
 }
 
-void GameState::handle(const MidCoilUseEvent &event) {
-    // TODO now loops over 2 heroes
-    constexpr double len = 4.5;
-    constexpr double radius = 1.5;
-    constexpr double damage = 20;
-
-    Point coilCenter = event.hero_.shiftUnitPosition(len);
-    for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
-            hero->applyDamage(damage);
-        }
-    }
+void GameState::handle(const SecondSkillUseEvent &event) {
+    event.hero_.useSkill(SkillName::SecondSkill, *this);
 }
 
-void GameState::handle(const LongCoilUseEvent &event) {
-    // TODO now loops over 2 heroes
-    constexpr double len = 7;
-    constexpr double radius = 1.5;
-    constexpr double damage = 30;
-
-    Point coilCenter = event.hero_.shiftUnitPosition(len);
-    for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero != &event.hero_ && hero->inRadius(coilCenter, radius)) {
-            hero->applyDamage(damage);
-        }
-    }
+void GameState::handle(const ThirdSkillUseEvent &event) {
+    event.hero_.useSkill(SkillName::ThirdSkill, *this);
 }

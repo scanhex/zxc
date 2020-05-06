@@ -26,9 +26,9 @@ using namespace boost::asio;
 
 class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
-                     EventHandler<ShortCoilUseEvent>,
-                     EventHandler<MidCoilUseEvent>,
-                     EventHandler<LongCoilUseEvent> {
+                     EventHandler<FirstSkillUseEvent>,
+                     EventHandler<SecondSkillUseEvent>,
+                     EventHandler<ThirdSkillUseEvent> {
 public:
 
     explicit Client(GameState &gameState);
@@ -115,9 +115,9 @@ private:
 
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
-    void handle(const ShortCoilUseEvent &event) override;
-    void handle(const MidCoilUseEvent &event) override;
-    void handle(const LongCoilUseEvent &event) override;
+    void handle(const FirstSkillUseEvent &event) override;
+    void handle(const SecondSkillUseEvent &event) override;
+    void handle(const ThirdSkillUseEvent &event) override;
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;

@@ -20,13 +20,13 @@ void GraphicsHandler::handleCoil(const SkillUseEvent &event, double dist) {
     new CoilDrawable(*obj, drawables_, timeline_);
 }
 
-void GraphicsHandler::handle(const ShortCoilUseEvent &event) {
+void GraphicsHandler::handle(const FirstSkillUseEvent &event) {
     handleCoil(event, 200);
 }
-void GraphicsHandler::handle(const MidCoilUseEvent &event) {
+void GraphicsHandler::handle(const SecondSkillUseEvent &event) {
     handleCoil(event, 450);
 }
-void GraphicsHandler::handle(const LongCoilUseEvent &event) {
+void GraphicsHandler::handle(const ThirdSkillUseEvent &event) {
     handleCoil(event, 700);
 }
 

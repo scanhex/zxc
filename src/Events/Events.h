@@ -6,9 +6,9 @@
 
 enum class EventName : uint8_t {
     None = 0,
-    ShortCoilUse = 1,
-    MidCoilUse = 2,
-    LongCoilUse = 3,
+    FirstSkillUse = 1,
+    SecondSkillUse = 2,
+    ThirdSkillUse = 3,
     Move = 4,
     Stop = 5
 };
@@ -84,26 +84,26 @@ public:
     void serialize(BufferIO::BufferWriter &writer) override = 0;
 };
 
-class ShortCoilUseEvent : public SkillUseEvent {
+class FirstSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::ShortCoilUse;
+    static const EventName name_ = EventName::FirstSkillUse;
 
-    explicit ShortCoilUseEvent(Hero &hero);
+    explicit FirstSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
 };
 
-class MidCoilUseEvent : public SkillUseEvent {
+class SecondSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::MidCoilUse;
+    static const EventName name_ = EventName::SecondSkillUse;
 
-    explicit MidCoilUseEvent(Hero &hero);
+    explicit SecondSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
 };
 
-class LongCoilUseEvent : public SkillUseEvent {
+class ThirdSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::LongCoilUse;
+    static const EventName name_ = EventName::ThirdSkillUse;
 
-    explicit LongCoilUseEvent(Hero &hero);
+    explicit ThirdSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
 };
