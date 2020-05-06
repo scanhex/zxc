@@ -47,9 +47,12 @@ class Event {
 public:
     static const EventName name_ = EventName::None;
 
+    Event();
     virtual ~Event() = default;
 
     virtual void serialize(BufferIO::BufferWriter &writer) = 0;
+
+    bool need_send_;
 };
 
 class MoveEvent : public Event {
@@ -61,8 +64,6 @@ public:
 
     MoveEvent(Hero &hero, double x, double y);
     void serialize(BufferIO::BufferWriter &writer) override;
-
-    bool need_send_{true};
 };
 
 class StopEvent : public Event {
@@ -73,8 +74,6 @@ public:
 
     explicit StopEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
-
-    bool need_send_{true};
 };
 
 class SkillUseEvent : public Event {
@@ -91,8 +90,6 @@ public:
 
     explicit ShortCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
-
-    bool need_send_{true};
 };
 
 class MidCoilUseEvent : public SkillUseEvent {
@@ -101,8 +98,6 @@ public:
 
     explicit MidCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
-
-    bool need_send_{true};
 };
 
 class LongCoilUseEvent : public SkillUseEvent {
@@ -111,6 +106,4 @@ public:
 
     explicit LongCoilUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
-
-    bool need_send_{true};
 };
