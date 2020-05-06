@@ -187,6 +187,12 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
             EventHandler<MoveEvent>::fireEvent(MoveEvent(hero, x, y));
             break;
         }
+        case EventName::Stop: {
+            auto e = new StopEvent(hero);
+            EventHandler<StopEvent>::fireEvent(*e);
+            myEvents_.push(e);
+            break;
+        }
         case EventName::None: {
             assert(false);
             break;

@@ -36,7 +36,7 @@
 
 #include "zxc.h"
 
-boost::lockfree::queue<EventName> othersEvents{100}; //TODO to class?
+boost::lockfree::queue<Event *> othersEvents{100}; //TODO to class? DA
 
 
 void ZxcApplication::initCamera() {
@@ -154,32 +154,9 @@ void ZxcApplication::drawEvent() {
 
     updateGameState();
     while (!othersEvents.empty()) {
-        EventName eventName;
-        othersEvents.pop(eventName);
-        switch (eventName) {
-            case EventName::ShortCoilUse: {
-                auto e = new ShortCoilUseEvent(secondHero_);
-                e->need_send_ = false;
-                EventHandler<ShortCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            case EventName::MidCoilUse: {
-                auto e = new MidCoilUseEvent(secondHero_);
-                e->need_send_ = false;
-                EventHandler<MidCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            case EventName::LongCoilUse: {
-                auto e = new LongCoilUseEvent(secondHero_);
-                e->need_send_ = false;
-                EventHandler<LongCoilUseEvent>::fireEvent(*e);
-                break;
-            }
-            default: {
-                assert(false);
-                break;
-            }
-        }
+        Event *event;
+        othersEvents.pop(event);
+        EventHandler<Event>::fireEvent(*event);
     }
 //  Fps counter in console
 //	Debug{} << 1 / timeline_.previousFrameDuration();
@@ -310,6 +287,10 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
         EventHandler<LongCoilUseEvent>::fireEvent(LongCoilUseEvent(firstHero_));
+        redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
+        EventHandler<StopEvent>::fireEvent(StopEvent(firstHero_));
         redraw();
     }
 }

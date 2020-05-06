@@ -3,7 +3,7 @@
 
 extern bool exit_flag;
 
-extern boost::lockfree::queue<EventName> othersEvents;
+extern boost::lockfree::queue<Event *> othersEvents; // TODO plz
 
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
                                                                        timer_{service_},
@@ -174,10 +174,48 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 void Client::ConnectionToServer::parseEventsFromBuffer() {
     size_t sz = reader_.readInt32();
     assert(sz <= 5);
+    Hero *hero = gameState_.getHero(Player::Second);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();
         auto eventName = static_cast<EventName>(actionId);
-        othersEvents.push(eventName);
+        switch (eventName) {
+            case EventName::ShortCoilUse: {
+                auto e = new ShortCoilUseEvent(*hero);
+                e->need_send_ = false;
+                othersEvents.push(e);
+                break;
+            }
+            case EventName::MidCoilUse: {
+                auto e = new MidCoilUseEvent(*hero);
+                e->need_send_ = false;
+                othersEvents.push(e);
+                break;
+            }
+            case EventName::LongCoilUse: {
+                auto e = new LongCoilUseEvent(*hero);
+                e->need_send_ = false;
+                othersEvents.push(e);
+                break;
+            }
+            case EventName::Move: {
+                double x = reader_.readDouble();
+                double y = reader_.readDouble();
+                auto e = new MoveEvent(*hero, x, y);
+                e->need_send_ = false;
+                othersEvents.push(e);
+                break;
+            }
+            case EventName::Stop: {
+                auto e = new StopEvent(*hero);
+                e->need_send_ = false;
+                othersEvents.push(e);
+                break;
+            }
+            default: {
+                assert(false);
+                break;
+            }
+        }
     }
 }
 
@@ -218,6 +256,10 @@ void Client::checkServerResponse() {
 
 void Client::handle(const MoveEvent &event) {
     connection_->events_.push(new MoveEvent(event));
+}
+
+void Client::handle(const StopEvent &event) {
+    connection_->events_.push(new StopEvent(event));
 }
 
 void Client::handle(const ShortCoilUseEvent &event) {

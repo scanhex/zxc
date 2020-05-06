@@ -25,6 +25,7 @@ using namespace boost::asio;
 #define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToServer ::x, shared_from_this(),y,z,w)
 
 class Client final : EventHandler<MoveEvent>,
+                     EventHandler<StopEvent>,
                      EventHandler<ShortCoilUseEvent>,
                      EventHandler<MidCoilUseEvent>,
                      EventHandler<LongCoilUseEvent> {
@@ -113,11 +114,9 @@ private:
     void checkServerResponse();
 
     void handle(const MoveEvent &event) override;
-
+    void handle(const StopEvent &event) override;
     void handle(const ShortCoilUseEvent &event) override;
-
     void handle(const MidCoilUseEvent &event) override;
-
     void handle(const LongCoilUseEvent &event) override;
 
 private:

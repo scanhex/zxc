@@ -118,10 +118,15 @@ void GameState::handle(const MoveEvent &event) {
     event.hero_.setDestination(event.x_, event.y_);
 }
 
+void GameState::handle(const StopEvent &event) {
+    Point curPosition = event.hero_.getPosition();
+    event.hero_.setDestination(curPosition);
+}
+
 void GameState::handle(const ShortCoilUseEvent &event) {
     // TODO now loops over 2 heroes
     constexpr double len = 2;
-    constexpr double radius = 2.5;
+    constexpr double radius = 1.5;
     constexpr double damage = 10;
 
     Point coilCenter = event.hero_.shiftUnitPosition(len);
@@ -135,7 +140,7 @@ void GameState::handle(const ShortCoilUseEvent &event) {
 void GameState::handle(const MidCoilUseEvent &event) {
     // TODO now loops over 2 heroes
     constexpr double len = 4.5;
-    constexpr double radius = 2.5;
+    constexpr double radius = 1.5;
     constexpr double damage = 20;
 
     Point coilCenter = event.hero_.shiftUnitPosition(len);
@@ -149,7 +154,7 @@ void GameState::handle(const MidCoilUseEvent &event) {
 void GameState::handle(const LongCoilUseEvent &event) {
     // TODO now loops over 2 heroes
     constexpr double len = 7;
-    constexpr double radius = 2.5;
+    constexpr double radius = 1.5;
     constexpr double damage = 30;
 
     Point coilCenter = event.hero_.shiftUnitPosition(len);

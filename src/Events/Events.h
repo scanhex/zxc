@@ -9,7 +9,8 @@ enum class EventName : uint8_t {
     ShortCoilUse = 1,
     MidCoilUse = 2,
     LongCoilUse = 3,
-    Move = 4
+    Move = 4,
+    Stop = 5
 };
 
 template<class Event>
@@ -60,6 +61,20 @@ public:
 
     MoveEvent(Hero &hero, double x, double y);
     void serialize(BufferIO::BufferWriter &writer) override;
+
+    bool need_send_{true};
+};
+
+class StopEvent : public Event {
+public:
+    static const EventName name_ = EventName::Stop;
+
+    Hero &hero_;
+
+    explicit StopEvent(Hero &hero);
+    void serialize(BufferIO::BufferWriter &writer) override;
+
+    bool need_send_{true};
 };
 
 class SkillUseEvent : public Event {

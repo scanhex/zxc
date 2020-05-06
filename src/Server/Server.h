@@ -101,8 +101,8 @@ private:
         BufferIO::BufferWriter writer_{};
         deadline_timer timer_;
         deadline_timer stop_timer_;
-        boost::lockfree::queue<Event *>& myEvents_;
-        boost::lockfree::queue<Event *>& othersEvents_;
+        boost::lockfree::queue<Event *> &myEvents_;
+        boost::lockfree::queue<Event *> &othersEvents_;
 
     public:
         std::thread conn_checker_;
