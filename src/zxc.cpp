@@ -156,7 +156,7 @@ void ZxcApplication::drawEvent() {
     while (!othersEvents.empty()) {
         Event *event;
         othersEvents.pop(event);
-        EventHandler<Event>::fireEvent(*event);
+        event->fire(); // ??
     }
 //  Fps counter in console
 //	Debug{} << 1 / timeline_.previousFrameDuration();
