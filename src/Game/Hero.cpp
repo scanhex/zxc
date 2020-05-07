@@ -75,6 +75,10 @@ void Hero::changeExperience(uint32_t delta) {
     }
 }
 
+bool Hero::isSkillReady(SkillName skillName) {
+    return skills_[static_cast<uint8_t>(skillName)].isReady();
+}
+
 void Hero::useSkill(SkillName skillName, GameState &gameState) {
     skills_[static_cast<uint8_t>(skillName)].use(gameState);
 }

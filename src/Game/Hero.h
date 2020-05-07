@@ -40,6 +40,7 @@ public:
     void incrementLevel();
     void changeExperience(uint32_t delta);
 
+    bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
     void updateUnit(double elapsedTimeInSeconds) override;

@@ -10,7 +10,7 @@ Coil::Coil(Hero &hero, double len, double radius, double damage) : Skill(hero),
                                                                    damage_{damage} {}
 
 void Coil::use(GameState &gameState) {
-    if (coolDown_ > 0) return;
+    assert(coolDown_ == 0.0); // ok
 
     Point coilCenter = hero_.shiftUnitPosition(len_);
     for (Hero *hero : {gameState.getHero(Player::First), gameState.getHero(Player::Second)}) {
@@ -25,6 +25,10 @@ void Coil::use(GameState &gameState) {
 
 void Coil::update(double elapsedTimeInSeconds) {
     coolDown_ = std::max(0.0, coolDown_ - elapsedTimeInSeconds);
+}
+
+bool Coil::isReady() const {
+    return coolDown_ == 0.0;
 }
 
 ShortCoil::ShortCoil(Hero &hero) : Coil(hero, LEN, RADIUS, DAMAGE) {}
