@@ -29,6 +29,7 @@ public:
 
     void use(GameState &gameState) override;
     virtual void update(double elapsedTimeInSeconds);
+    [[nodiscard]] bool isReady() const;
 
 protected:
     double coolDown_;

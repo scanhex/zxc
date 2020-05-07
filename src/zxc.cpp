@@ -278,16 +278,22 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
-        redraw();
+        if (firstHero_.isSkillReady(SkillName::FirstSkill)) {
+            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
+            redraw();
+        }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
-        redraw();
+        if (firstHero_.isSkillReady(SkillName::SecondSkill)) {
+            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
+            redraw();
+        }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
-        redraw();
+        if (firstHero_.isSkillReady(SkillName::ThirdSkill)) {
+            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
+            redraw();
+        }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
         EventHandler<StopEvent>::fireEvent(StopEvent(firstHero_));
