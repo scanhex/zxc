@@ -51,6 +51,7 @@ public:
     virtual ~Event() = default;
 
     virtual void serialize(BufferIO::BufferWriter &writer) = 0;
+    virtual void fire() = 0;
 
     bool need_send_;
 };
@@ -64,6 +65,7 @@ public:
 
     MoveEvent(Hero &hero, double x, double y);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
 };
 
 class StopEvent : public Event {
@@ -74,6 +76,7 @@ public:
 
     explicit StopEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
 };
 
 class SkillUseEvent : public Event {
@@ -82,6 +85,7 @@ public:
 
     explicit SkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override = 0;
+    void fire() override = 0;
 };
 
 class FirstSkillUseEvent : public SkillUseEvent {
@@ -90,6 +94,7 @@ public:
 
     explicit FirstSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
 };
 
 class SecondSkillUseEvent : public SkillUseEvent {
@@ -98,6 +103,7 @@ public:
 
     explicit SecondSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
 };
 
 class ThirdSkillUseEvent : public SkillUseEvent {
@@ -106,4 +112,5 @@ public:
 
     explicit ThirdSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
 };
