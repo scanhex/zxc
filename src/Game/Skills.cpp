@@ -19,6 +19,12 @@ void Coil::use(GameState &gameState) {
             hero->applyDamage(damage_);
         }
     }
+
+    coolDown_ = COOL_DOWN;
+}
+
+void Coil::update(double elapsedTimeInSeconds) {
+    coolDown_ = std::max(0.0, coolDown_ - elapsedTimeInSeconds);
 }
 
 ShortCoil::ShortCoil(Hero &hero) : Coil(hero, LEN, RADIUS, DAMAGE) {}

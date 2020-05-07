@@ -55,7 +55,7 @@ public:
     void changeArmor(int32_t delta);
     void changeResist(double delta);
 
-    void updateUnit(double elapsedTimeInSeconds);
+    virtual void updateUnit(double elapsedTimeInSeconds);
 
 
     [[nodiscard]] Point shiftUnitPosition(double len) const;
