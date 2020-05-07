@@ -42,6 +42,8 @@ public:
 
     void useSkill(SkillName skillName, GameState &gameState);
 
+    void updateUnit(double elapsedTimeInSeconds) override;
+
     // getters and setters
 
     [[nodiscard]] uint32_t getGold() const;

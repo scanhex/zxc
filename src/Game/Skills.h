@@ -26,7 +26,9 @@ public:
     constexpr static double COOL_DOWN = 2;
 
     Coil(Hero &hero, double len, double radius, double damage);
+
     void use(GameState &gameState) override;
+    virtual void update(double elapsedTimeInSeconds);
 
 protected:
     double coolDown_;
