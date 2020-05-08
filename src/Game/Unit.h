@@ -117,4 +117,5 @@ public:
     void setDestination(double x, double y);
 
     [[nodiscard]] double getAngle() const;
+    void setAngle(double angle);
 };

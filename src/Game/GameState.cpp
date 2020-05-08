@@ -64,6 +64,11 @@ void GameState::setDestination(double x, double y, Player player) const {
     hero->setDestination(x, y);
 }
 
+void GameState::setAngle(double angle, Player player) const {
+    Hero *hero = getHero(player);
+    hero->setAngle(angle);
+}
+
 bool GameState::gameIsFinished() const {
     return firstHero_->isDead() || secondHero_->isDead();
 }
@@ -117,13 +122,13 @@ bool GameState::isDead(Player player) const {
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
     // first serialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ == player){
+        if (hero->player_ == player) {
             hero->serialize(writer);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ != player){
+        if (hero->player_ != player) {
             hero->serialize(writer);
         }
     }
@@ -132,13 +137,13 @@ void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
     // first deserialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ == player){
+        if (hero->player_ == player) {
             hero->deserialize(reader);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ != player){
+        if (hero->player_ != player) {
             hero->deserialize(reader);
         }
     }

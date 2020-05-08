@@ -95,6 +95,10 @@ void Position::setDestination(double x, double y) {
 }
 
 double Position::getAngle() const { return currentAngle_; }
+void Position::setAngle(double angle) {
+    currentAngle_ = angle;
+    destAngle_ = angle;
+}
 
 void Position::changeAngle(double delta) {
     currentAngle_ += delta;

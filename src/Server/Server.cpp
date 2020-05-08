@@ -210,24 +210,6 @@ void Server::ConnectionToClient::writeGStoBuffer() {
     if (player_id_ == 1) std::swap(current, second);
 
     gameState.serialize(writer_, current);
-//    Point firstPos = gameState.getPosition(first);
-//    Point secondPos = gameState.getPosition(second);
-//    Point firstDest = gameState.getDestination(first);
-//    Point secondDest = gameState.getDestination(second);
-//
-//    // my: {hp, x, y}
-//    writer_.writeDouble(gameState.getHealthPoints(first));
-//    writer_.writeDouble(firstPos.x_);
-//    writer_.writeDouble(firstPos.y_);
-//    writer_.writeDouble(firstDest.x_);
-//    writer_.writeDouble(firstDest.y_);
-//
-//    // his: {hp, x, y}
-//    writer_.writeDouble(gameState.getHealthPoints(second));
-//    writer_.writeDouble(secondPos.x_);
-//    writer_.writeDouble(secondPos.y_);
-//    writer_.writeDouble(secondDest.x_);
-//    writer_.writeDouble(secondDest.y_);
 }
 
 void Server::ConnectionToClient::writeEventsToBuffer() {
@@ -277,7 +259,7 @@ void Server::handleNewConnection(const std::shared_ptr<ConnectionToClient> &clie
 }
 
 void Server::updateGS() {
-    // Максим -- худший
+    // Максим -- хорош
     gameState.update(TICK_TIME_GS_UPDATE);
 }
 

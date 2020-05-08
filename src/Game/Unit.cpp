@@ -190,3 +190,6 @@ void Unit::setDestination(const Point &destination) { position_.setDestination(d
 void Unit::setDestination(double x, double y) { position_.setDestination(x, y); }
 
 double Unit::getAngle() const { return position_.getAngle(); }
+void Unit::setAngle(double angle){
+    position_.setAngle(angle);
+}
