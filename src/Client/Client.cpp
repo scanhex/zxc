@@ -42,6 +42,7 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 }
 
 void Client::ConnectionToServer::runGame() {
+  //  gameState_.refreshAllUnits();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -111,11 +112,8 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
         return;
     }
     reader_.flushBuffer();
-    parseEventsFromBuffer();
-    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
-    timer_.wait();
-    parseGSFromBuffer();
-    if (gameState_.gameIsFinished()) {
+    char gameIsRunning = reader_.readUInt8();
+    if (!gameIsRunning) {
         //TODO handle game result
         if (gameState_.getHealthPoints(Player::First) == 0)
             std::cout << "I lost :(" << std::endl; //
@@ -123,7 +121,12 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
             std::cout << "I won :)" << std::endl;
 
         stopConnection();
+        return;
     }
+    parseEventsFromBuffer();
+    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
+    timer_.wait();
+    parseGSFromBuffer();
     readFromSocket();
 }
 

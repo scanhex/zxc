@@ -30,6 +30,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                             gold_{START_GOLD},
                             level_{1},
                             experience_{0},
+                            deathCounter_{0},
                             skills_{ShortCoil(*this),
                                     MidCoil(*this),
                                     LongCoil(*this)},
@@ -48,7 +49,7 @@ Hero::Hero(Player player, Position position, Stats stats) : Hero(player, positio
     stats_ = stats;
 }
 
-bool Hero::canSpendGold(uint32_t amount) {
+bool Hero::canSpendGold(uint32_t amount) const {
     return gold_ >= amount;
 }
 
@@ -83,10 +84,21 @@ void Hero::useSkill(SkillName skillName, GameState &gameState) {
     skills_[static_cast<uint8_t>(skillName)].use(gameState);
 }
 
+void Hero::increaseDeathCounter() {
+    ++deathCounter_;
+}
+
 void Hero::updateUnit(double elapsedTimeInSeconds) {
     Unit::updateUnit(elapsedTimeInSeconds);
     for (Coil &coil : skills_) {
         coil.update(elapsedTimeInSeconds);
+    }
+}
+
+void Hero::refreshUnit() {
+    Unit::refreshUnit();
+    for (Coil &coil : skills_) {
+        coil.refreshCoolDown();
     }
 }
 
@@ -116,4 +128,12 @@ uint32_t Hero::getExperience() const { return experience_; }
 void Hero::setExperience(uint32_t experience) {
     assert(experience < EXP_PER_LEVEL && "Wrong new experience!");
     experience_ = experience;
+}
+
+uint32_t Hero::getDeathCounter() const {
+    return deathCounter_;
+}
+
+void Hero::setDeathCounter(uint32_t number) {
+    deathCounter_ = number;
 }
