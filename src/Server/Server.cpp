@@ -113,15 +113,26 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
         return;
     }
     if (!running_connections_) return;
-    if (gameState.gameIsFinished()) stopConnection(); //if game is finished
-
+    if (gameState.gameIsFinished()) {
+        sendEndGameMessage();
+        return;
+    }
     timer_.expires_from_now(boost::posix_time::millisec(TICK_TIME_SEND_GS));
     timer_.async_wait(BIND_FN(writeToSocket));
+}
+
+void Server::ConnectionToClient::sendEndGameMessage() {
+    assert(gameState.gameIsFinished());
+    writer_.flushBuffer();
+    writer_.writeUInt8(!gameState.gameIsFinished());
+    sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE),
+                           BIND_FN(stopConnection));
 }
 
 void Server::ConnectionToClient::writeToSocket() {
     g_lock_.lock();
     writer_.flushBuffer();
+    writer_.writeUInt8(!gameState.gameIsFinished()); //Game is running flag
     writeEventsToBuffer();
     writeGStoBuffer();
     g_lock_.unlock();

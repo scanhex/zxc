@@ -5,8 +5,11 @@
 #include <cmath>
 
 Unit::Unit(Stats stats, Position position) : stats_{stats},
-                                             position_{position} {
+                                             startStats_{stats},
+                                             position_{position},
+                                             startPosition_{position} {
     stats_.refreshStats();
+    startStats_.refreshStats();
 }
 
 
@@ -106,6 +109,13 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
     double turnDelta = getTurnRate() * (elapsedTimeInSeconds / 0.03);
     double moveDelta = (getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
     position_.update(turnDelta, moveDelta);
+}
+#include <iostream>
+void Unit::refreshUnit() {
+    stats_ = startStats_;
+    position_ = startPosition_;
+    std::cout<<"suka blyat"<<std::endl;
+    std::cout<<position_.getAngle()<<std::endl;
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {

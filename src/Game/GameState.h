@@ -32,6 +32,8 @@ public:
 
     void update(double elapsedTime); // time in milliseconds
 
+    void refreshAllUnits();
+
     void setHealthPoints(double amount, Player player) const;
     void setPosition(Point pos, Player player) const;
     void setPosition(double x, double y, Player player) const;

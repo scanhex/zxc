@@ -21,6 +21,8 @@ private:
     uint32_t level_;
     uint32_t experience_;
 
+    int32_t deathCounter_;
+
     Coil skills_[NUM_SKILLS];
 
     static StatsBuilder defaultHeroStatsBuilder_;
@@ -34,7 +36,7 @@ public:
     Hero(Player player, Position position);
     Hero(Player player, Position position, Stats stats);
 
-    bool canSpendGold(uint32_t amount);
+    bool canSpendGold(uint32_t amount) const;
     void addGold(uint32_t amount);
     void spendGold(uint32_t amount);
 
@@ -45,7 +47,11 @@ public:
     bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
+    void increaseDeathCounter();
+
     void updateUnit(double elapsedTimeInSeconds) override;
+
+    void refreshUnit() override;
 
     void serialize(BufferIO::BufferWriter &writer) override;
     void deserialize(BufferIO::BufferReader &reader) override;
@@ -60,4 +66,7 @@ public:
 
     [[nodiscard]] uint32_t getExperience() const;
     void setExperience(uint32_t experience);
+
+    [[nodiscard]] uint32_t getDeathCounter() const;
+    void setDeathCounter(uint32_t number);
 };

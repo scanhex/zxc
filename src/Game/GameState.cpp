@@ -65,7 +65,7 @@ void GameState::setDestination(double x, double y, Player player) const {
 }
 
 bool GameState::gameIsFinished() const {
-    return firstHero_->isDead() || secondHero_->isDead();
+    return firstHero_->getDeathCounter() >= 2 || secondHero_->getDeathCounter() >= 2;
 }
 
 void GameState::update(double elapsedTime) { // time in milliseconds
@@ -75,9 +75,22 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     for (Hero *hero : {firstHero_, secondHero_}) {
         if (!hero->isDead()) {
             hero->updateUnit(elapsedTimeInSeconds);
+        } else {
+            if (hero->getDeathCounter() < 1) {
+                hero->increaseDeathCounter();
+                hero->refreshUnit();
+            }
         }
     }
 }
+
+void GameState::refreshAllUnits() {
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        hero->setDeathCounter(0);
+        hero->refreshUnit();
+    }
+}
+
 
 void GameState::applyDamage(double amount, Player player) const {
     Hero *hero = getHero(player);
@@ -117,13 +130,13 @@ bool GameState::isDead(Player player) const {
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
     // first serialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ == player){
+        if (hero->player_ == player) {
             hero->serialize(writer);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ != player){
+        if (hero->player_ != player) {
             hero->serialize(writer);
         }
     }
@@ -132,13 +145,13 @@ void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
     // first deserialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ == player){
+        if (hero->player_ == player) {
             hero->deserialize(reader);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if(hero->player_ != player){
+        if (hero->player_ != player) {
             hero->deserialize(reader);
         }
     }
