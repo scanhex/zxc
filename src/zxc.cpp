@@ -107,8 +107,6 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     initNetwork();
 
     timeline_.start();
-
-
 }
 
 void ZxcApplication::addUnit(Unit &u) {

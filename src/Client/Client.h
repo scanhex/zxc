@@ -85,11 +85,6 @@ private:
 
         void writeActionToBuffer();
 
-        // TODO update GS by full copy
-        // poka tak
-        void updateGS(double hp1, double pos_x1, double pos_y1, double dest_x1, double dest_y1,
-                      double hp2, double pos_x2, double pos_y2, double dest_x2, double dest_y2);
-
         void clearEvents();
 
     public:

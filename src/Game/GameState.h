@@ -47,6 +47,9 @@ public:
 
     [[nodiscard]] Hero *getHero(Player player) const;
 
+    void serialize(BufferIO::BufferWriter &writer, Player player);
+    void deserialize(BufferIO::BufferReader &reader, Player player);
+
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
     void handle(const FirstSkillUseEvent &event) override;

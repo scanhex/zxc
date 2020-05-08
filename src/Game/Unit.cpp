@@ -108,6 +108,18 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
     position_.update(turnDelta, moveDelta);
 }
 
+void Unit::serialize(BufferIO::BufferWriter &writer) {
+    // items, buffs?
+    stats_.serialize(writer);
+    position_.serialize(writer);
+}
+
+void Unit::deserialize(BufferIO::BufferReader &reader) {
+    // items, buffs?
+    stats_.deserialize(reader);
+    position_.deserialize(reader);
+}
+
 Point Unit::shiftUnitPosition(double len) const {
     double angle = position_.getAngle();
     double xShift = std::abs(sin(angle) * len);

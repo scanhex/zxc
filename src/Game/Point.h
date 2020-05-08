@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils/BufferIO.h"
+
 class Point final {
 public:
     double x_, y_, z_;
@@ -26,4 +28,7 @@ public:
     [[nodiscard]] double normSqr() const;
     [[nodiscard]] double norm() const;
     [[nodiscard]] bool normLessThan(double v) const;
+
+    void serialize(BufferIO::BufferWriter &writer);
+    void deserialize(BufferIO::BufferReader &reader);
 };

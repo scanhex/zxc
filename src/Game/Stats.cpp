@@ -30,6 +30,18 @@ void Stats::refreshStats() {
     healthPoints_ = maxHP_;
 }
 
+void Stats::serialize(BufferIO::BufferWriter &writer) {
+    // damage, attackRange, moveSpeed, attackSpeed, turnRate?
+    // maxHP, maxMP, manaPoints, hpRegen, mpRegen, armor, resist?
+    writer.writeDouble(healthPoints_);
+}
+
+void Stats::deserialize(BufferIO::BufferReader &reader) {
+    // damage, attackRange, moveSpeed, attackSpeed, turnRate?
+    // maxHP, maxMP, manaPoints, hpRegen, mpRegen, armor, resist?
+    healthPoints_ = reader.readDouble();
+}
+
 
 // setters and getters
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "Utils/BufferIO.h"
 
 class Stats {
 private:
@@ -39,6 +40,9 @@ public:
     void changeResist(double delta);
 
     void refreshStats();
+
+    void serialize(BufferIO::BufferWriter &writer);
+    void deserialize(BufferIO::BufferReader &reader);
 
     // getters and setters
 

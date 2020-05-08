@@ -2,6 +2,7 @@
 
 #include "Unit.h"
 #include "Skills.h"
+#include "Utils/BufferIO.h"
 #include "StatsBuilder.h"
 
 enum class Player;
@@ -15,7 +16,6 @@ constexpr uint32_t EXP_PER_LEVEL = 1000;
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
-    Player player_;
 
     uint32_t gold_;
     uint32_t level_;
@@ -28,6 +28,8 @@ private:
     static Position secondHeroStartingPosition_;
 
 public:
+    Player player_;
+
     explicit Hero(Player player);
     Hero(Player player, Position position);
     Hero(Player player, Position position, Stats stats);
@@ -44,6 +46,9 @@ public:
     void useSkill(SkillName skillName, GameState &gameState);
 
     void updateUnit(double elapsedTimeInSeconds) override;
+
+    void serialize(BufferIO::BufferWriter &writer) override;
+    void deserialize(BufferIO::BufferReader &reader) override;
 
     // getters and setters
 

@@ -206,26 +206,28 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
 void Server::ConnectionToClient::writeGStoBuffer() {
     // TODO pass all GS and copy ?
-    Player first = Player::First, second = Player::Second;
-    if (player_id_ == 1) std::swap(first, second);
-    Point firstPos = gameState.getPosition(first);
-    Point secondPos = gameState.getPosition(second);
-    Point firstDest = gameState.getDestination(first);
-    Point secondDest = gameState.getDestination(second);
+    Player current = Player::First, second = Player::Second;
+    if (player_id_ == 1) std::swap(current, second);
 
-    // my: {hp, x, y}
-    writer_.writeDouble(gameState.getHealthPoints(first));
-    writer_.writeDouble(firstPos.x_);
-    writer_.writeDouble(firstPos.y_);
-    writer_.writeDouble(firstDest.x_);
-    writer_.writeDouble(firstDest.y_);
-
-    // his: {hp, x, y}
-    writer_.writeDouble(gameState.getHealthPoints(second));
-    writer_.writeDouble(secondPos.x_);
-    writer_.writeDouble(secondPos.y_);
-    writer_.writeDouble(secondDest.x_);
-    writer_.writeDouble(secondDest.y_);
+    gameState.serialize(writer_, current);
+//    Point firstPos = gameState.getPosition(first);
+//    Point secondPos = gameState.getPosition(second);
+//    Point firstDest = gameState.getDestination(first);
+//    Point secondDest = gameState.getDestination(second);
+//
+//    // my: {hp, x, y}
+//    writer_.writeDouble(gameState.getHealthPoints(first));
+//    writer_.writeDouble(firstPos.x_);
+//    writer_.writeDouble(firstPos.y_);
+//    writer_.writeDouble(firstDest.x_);
+//    writer_.writeDouble(firstDest.y_);
+//
+//    // his: {hp, x, y}
+//    writer_.writeDouble(gameState.getHealthPoints(second));
+//    writer_.writeDouble(secondPos.x_);
+//    writer_.writeDouble(secondPos.y_);
+//    writer_.writeDouble(secondDest.x_);
+//    writer_.writeDouble(secondDest.y_);
 }
 
 void Server::ConnectionToClient::writeEventsToBuffer() {

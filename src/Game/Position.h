@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Point.h"
+#include "Utils/BufferIO.h"
 
 
 class Position {
@@ -22,6 +23,9 @@ public:
     [[nodiscard]] double getAngle() const;
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
     [[nodiscard]] bool inRadius(const Point& point, double r) const;
+
+    void serialize(BufferIO::BufferWriter &writer);
+    void deserialize(BufferIO::BufferReader &reader);
 
 private:
     void updateDestinationAngle();
