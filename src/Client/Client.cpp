@@ -96,6 +96,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
         return;
     }
     uint8_t status = reader_.readUInt8();
+    clearEvents();
     if (status) {
         runGame();
     } else {
@@ -143,8 +144,10 @@ size_t Client::ConnectionToServer::checkReadComplete(const boost::system::error_
     return done ? 0 : 1;
 }
 
-void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_y1, double dest_x1, double dest_y1,
-                                          double hp2, double pos_x2, double pos_y2, double dest_x2, double dest_y2) {
+void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_y1,
+                                          double dest_x1, double dest_y1,
+                                          double hp2, double pos_x2, double pos_y2,
+                                          double dest_x2, double dest_y2) {
     gameState_.setHealthPoints(hp1, Player::First);
     gameState_.setPosition(pos_x1, pos_y1, Player::First);
     gameState_.setDestination(dest_x1, dest_y1, Player::First);
@@ -241,6 +244,13 @@ void Client::ConnectionToServer::waitForAction() {
 
 void Client::ConnectionToServer::runService() {
     service_.run();
+}
+
+void Client::ConnectionToServer::clearEvents() {
+    Event *e;
+    while (!events_.empty()) {
+        events_.pop(e);
+    }
 }
 
 void Client::checkServerResponse() {
