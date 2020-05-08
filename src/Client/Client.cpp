@@ -144,34 +144,8 @@ size_t Client::ConnectionToServer::checkReadComplete(const boost::system::error_
     return done ? 0 : 1;
 }
 
-void Client::ConnectionToServer::updateGS(double hp1, double pos_x1, double pos_y1,
-                                          double dest_x1, double dest_y1,
-                                          double hp2, double pos_x2, double pos_y2,
-                                          double dest_x2, double dest_y2) {
-    gameState_.setHealthPoints(hp1, Player::First);
-    gameState_.setPosition(pos_x1, pos_y1, Player::First);
-    gameState_.setDestination(dest_x1, dest_y1, Player::First);
-
-    gameState_.setHealthPoints(hp2, Player::Second);
-    gameState_.setPosition(pos_x2, pos_y2, Player::Second);
-    gameState_.setDestination(dest_x2, dest_y2, Player::Second);
-}
-
 void Client::ConnectionToServer::parseGSFromBuffer() {
-    // TODO pass all GS and copy ?
-    double hp1 = reader_.readDouble();
-    double pos_x1 = reader_.readDouble();
-    double pos_y1 = reader_.readDouble();
-    double dest_x1 = reader_.readDouble();
-    double dest_y1 = reader_.readDouble();
-
-    double hp2 = reader_.readDouble();
-    double pos_x2 = reader_.readDouble();
-    double pos_y2 = reader_.readDouble();
-    double dest_x2 = reader_.readDouble();
-    double dest_y2 = reader_.readDouble();
-
-    updateGS(hp1, pos_x1, pos_y1, dest_x1, dest_y1, hp2, pos_x2, pos_y2, dest_x2, dest_y2);
+    gameState_.deserialize(reader_, Player::First);
 }
 
 void Client::ConnectionToServer::parseEventsFromBuffer() {

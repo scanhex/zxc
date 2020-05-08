@@ -8,6 +8,7 @@
 #include "Item.h"
 #include "Buff.h"
 #include "Position.h"
+#include "Utils/BufferIO.h"
 
 constexpr size_t MAX_ITEMS = 6;
 
@@ -57,6 +58,8 @@ public:
 
     virtual void updateUnit(double elapsedTimeInSeconds);
 
+    virtual void serialize(BufferIO::BufferWriter &writer);
+    virtual void deserialize(BufferIO::BufferReader &reader);
 
     [[nodiscard]] Point shiftUnitPosition(double len) const;
     [[nodiscard]] bool inRadius(double x, double y, double r) const;

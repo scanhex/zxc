@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 
 namespace BufferIO {
 
@@ -30,7 +31,7 @@ namespace BufferIO {
         uint8_t write_buffer_[MAX_BUF]{};
 
     private:
-        size_t idx_{0};
+        std::size_t idx_{0};
     };
 
     class BufferReader final {

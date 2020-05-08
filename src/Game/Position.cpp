@@ -47,10 +47,25 @@ void Position::updatePoint(double deltaMove) {
 
 void Position::updateDestinationAngle() {
     Point vector = destination_ - current_;
+    if(vector == Point{0, 0}) return;
     destAngle_ = std::acos(vector.y_ / vector.norm());
     if (vector.x_ > 0) {
         destAngle_ = 2 * M_PI - destAngle_;
     }
+}
+
+void Position::serialize(BufferIO::BufferWriter &writer){
+    current_.serialize(writer);
+    destination_.serialize(writer);
+    writer.writeDouble(currentAngle_);
+    writer.writeDouble(destAngle_);
+}
+
+void Position::deserialize(BufferIO::BufferReader &reader){
+    current_.deserialize(reader);
+    destination_.deserialize(reader);
+    currentAngle_ = reader.readDouble();
+    destAngle_ = reader.readDouble();
 }
 
 

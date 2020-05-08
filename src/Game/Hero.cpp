@@ -1,9 +1,9 @@
 #define _USE_MATH_DEFINES
 
-#include "Hero.h"
-#include "GameState.h"
 #include <algorithm>
 #include <cmath>
+#include "Hero.h"
+#include "GameState.h"
 
 StatsBuilder Hero::defaultHeroStatsBuilder_ =
         StatsBuilder()
@@ -27,22 +27,22 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                                  player == Player::First ?
                                  firstHeroStartingPosition_ :
                                  secondHeroStartingPosition_),
-                            player_{player},
                             gold_{START_GOLD},
                             level_{1},
                             experience_{0},
                             skills_{ShortCoil(*this),
                                     MidCoil(*this),
-                                    LongCoil(*this)} {}
+                                    LongCoil(*this)},
+                            player_{player} {}
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
-                                               player_{player},
                                                gold_{START_GOLD},
                                                level_{1},
                                                experience_{0},
                                                skills_{ShortCoil(*this),
                                                        MidCoil(*this),
-                                                       LongCoil(*this)} {}
+                                                       LongCoil(*this)},
+                                               player_{player} {}
 
 Hero::Hero(Player player, Position position, Stats stats) : Hero(player, position) {
     stats_ = stats;
@@ -88,6 +88,17 @@ void Hero::updateUnit(double elapsedTimeInSeconds) {
     for (Coil &coil : skills_) {
         coil.update(elapsedTimeInSeconds);
     }
+}
+
+void Hero::serialize(BufferIO::BufferWriter &writer) {
+    Unit::serialize(writer);
+    // gold, lvl, exp?
+
+}
+
+void Hero::deserialize(BufferIO::BufferReader &reader) {
+    Unit::deserialize(reader);
+    // gold, lvl, exp?
 }
 
 // setters and getters

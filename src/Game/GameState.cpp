@@ -114,6 +114,36 @@ bool GameState::isDead(Player player) const {
     return hero->isDead();
 }
 
+void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
+    // first serialize player
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if(hero->player_ == player){
+            hero->serialize(writer);
+        }
+    }
+    // then every other unit
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if(hero->player_ != player){
+            hero->serialize(writer);
+        }
+    }
+}
+
+void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
+    // first deserialize player
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if(hero->player_ == player){
+            hero->deserialize(reader);
+        }
+    }
+    // then every other unit
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        if(hero->player_ != player){
+            hero->deserialize(reader);
+        }
+    }
+}
+
 void GameState::handle(const MoveEvent &event) {
     event.hero_.setDestination(event.x_, event.y_);
 }

@@ -72,3 +72,15 @@ double Point::norm() const {
 bool Point::normLessThan(double v) const {
     return (normSqr() < v * v);
 }
+
+void Point::serialize(BufferIO::BufferWriter &writer) {
+    // z?
+    writer.writeDouble(x_);
+    writer.writeDouble(y_);
+}
+
+void Point::deserialize(BufferIO::BufferReader &reader) {
+    // z?
+    x_ = reader.readDouble();
+    y_ = reader.readDouble();
+}
