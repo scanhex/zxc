@@ -92,7 +92,7 @@ private:
         bool &running_;
         bool &stopped_;
         ip::tcp::acceptor &acceptor_;
-        std::mutex &gs_lock_;
+        std::mutex &g_lock_;
         static int32_t running_connections_;
         bool is_connected_{false};
         int player_id_{};

@@ -10,7 +10,7 @@ Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &g
         running_(running),
         stopped_(stopped),
         acceptor_(ac),
-        gs_lock_(lock),
+        g_lock_(lock),
         is_connected_(false),
         sock_(service),
         timer_(service),
@@ -80,9 +80,9 @@ void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error
     }
     if (!running_) return;
     if (!running_connections_) return;
-    gs_lock_.lock();
+    g_lock_.lock();
     updateGSbyPlayer();
-    gs_lock_.unlock();
+    g_lock_.unlock();
     readFromSocket();
 }
 
@@ -120,11 +120,11 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
 }
 
 void Server::ConnectionToClient::writeToSocket() {
-    gs_lock_.lock();
+    g_lock_.lock();
     writer_.flushBuffer();
     writeEventsToBuffer();
     writeGStoBuffer();
-    gs_lock_.unlock();
+    g_lock_.unlock();
     writer_.flushBuffer();
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
@@ -304,7 +304,7 @@ void runServer() {
     server.run();
 }
 
-Server::Server() {}
+Server::Server() = default;
 
 void Server::run() {
     std::shared_ptr<ConnectionToClient> client = newClient();

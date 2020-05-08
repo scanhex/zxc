@@ -10,8 +10,12 @@ Coil::Coil(Hero &hero, double len, double radius, double damage) : Skill(hero),
                                                                    damage_{damage} {}
 
 void Coil::use(GameState &gameState) {
-    assert(coolDown_ == 0.0); // ok
-
+    //assert(coolDown_ == 0.0);
+    /*
+     * Мы решили пока что доверять клиенту, что кд прошел,
+     * иначе даже минимальную рассинхонизацию подсчета времени контролировать сложно,
+     * и могут возникнуть проблемы с отрисовкой того, что не произошло.
+     */
     Point coilCenter = hero_.shiftUnitPosition(len_);
     for (Hero *hero : {gameState.getHero(Player::First), gameState.getHero(Player::Second)}) {
         // TODO loop over all units
