@@ -36,6 +36,7 @@ public:
     void setPosition(Point pos, Player player) const;
     void setPosition(double x, double y, Player player) const;
     void setDestination(double x, double y, Player player) const;
+    void setAngle(double angle, Player player) const;
 
     void applyDamage(double amount, Player player) const;
     void applyDamagePhys(double amount, Player player) const;
