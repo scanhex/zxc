@@ -32,17 +32,17 @@ public:
 
     void update(double elapsedTime); // time in milliseconds
 
-    void setHealthPoints(double amount, Player player);
-    void setPosition(Point pos, Player player);
-    void setPosition(double x, double y, Player player);
-    void setDestination(double x, double y, Player player);
+    void setHealthPoints(double amount, Player player) const;
+    void setPosition(Point pos, Player player) const;
+    void setPosition(double x, double y, Player player) const;
+    void setDestination(double x, double y, Player player) const;
 
-    void applyDamage(double amount, Player player);
-    void applyDamagePhys(double amount, Player player);
-    void applyDamageMagic(double amount, Player player);
+    void applyDamage(double amount, Player player) const;
+    void applyDamagePhys(double amount, Player player) const;
+    void applyDamageMagic(double amount, Player player) const;
 
-    void regenMana(double amount, Player player);
-    void spendMana(double amount, Player player);
+    void regenMana(double amount, Player player) const;
+    void spendMana(double amount, Player player) const;
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
     [[nodiscard]] Hero *getHero(Player player) const;

@@ -44,22 +44,22 @@ Point GameState::getDestination(Player player) const {
     return hero->getDestination();
 }
 
-void GameState::setPosition(Point pos, Player player) {
+void GameState::setPosition(Point pos, Player player) const {
     Hero *hero = getHero(player);
     hero->setPosition(pos);
 }
 
-void GameState::setPosition(double x, double y, Player player) {
+void GameState::setPosition(double x, double y, Player player) const {
     Hero *hero = getHero(player);
     hero->setPosition(x, y);
 }
 
-void GameState::setHealthPoints(double amount, Player player) {
+void GameState::setHealthPoints(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->setHealthPoints(amount);
 }
 
-void GameState::setDestination(double x, double y, Player player) {
+void GameState::setDestination(double x, double y, Player player) const {
     Hero *hero = getHero(player);
     hero->setDestination(x, y);
 }
@@ -79,27 +79,27 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     }
 }
 
-void GameState::applyDamage(double amount, Player player) {
+void GameState::applyDamage(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->applyDamage(amount);
 }
 
-void GameState::applyDamagePhys(double amount, Player player) {
+void GameState::applyDamagePhys(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->applyDamagePhys(amount);
 }
 
-void GameState::applyDamageMagic(double amount, Player player) {
+void GameState::applyDamageMagic(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->applyDamageMagic(amount);
 }
 
-void GameState::regenMana(double amount, Player player) {
+void GameState::regenMana(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->regenMana(amount);
 }
 
-void GameState::spendMana(double amount, Player player) {
+void GameState::spendMana(double amount, Player player) const {
     Hero *hero = getHero(player);
     hero->spendMana(amount);
 }
