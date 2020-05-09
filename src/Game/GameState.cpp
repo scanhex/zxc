@@ -44,6 +44,10 @@ Point GameState::getDestination(Player player) const {
     return hero->getDestination();
 }
 
+bool GameState::gameIsStarted() const {
+    return gameIsStarted_;
+}
+
 void GameState::setPosition(Point pos, Player player) const {
     Hero *hero = getHero(player);
     hero->setPosition(pos);
@@ -176,4 +180,8 @@ void GameState::handle(const SecondSkillUseEvent &event) {
 
 void GameState::handle(const ThirdSkillUseEvent &event) {
     event.hero_.useSkill(SkillName::ThirdSkill, *this);
+}
+
+void GameState::startGame() {
+    gameIsStarted_ = true;
 }
