@@ -110,12 +110,10 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
     double moveDelta = (getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
     position_.update(turnDelta, moveDelta);
 }
-#include <iostream>
+
 void Unit::refreshUnit() {
     stats_ = startStats_;
     position_ = startPosition_;
-    std::cout<<"suka blyat"<<std::endl;
-    std::cout<<position_.getAngle()<<std::endl;
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {
