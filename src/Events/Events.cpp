@@ -39,7 +39,7 @@ void FirstSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void FirstSkillUseEvent::fire() {
-    EventHandler<FirstSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 void SecondSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
@@ -47,7 +47,7 @@ void SecondSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void SecondSkillUseEvent::fire() {
-    EventHandler<SecondSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
@@ -55,9 +55,9 @@ void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void ThirdSkillUseEvent::fire() {
-    EventHandler<ThirdSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 void DrawEvent::fire() {
-    EventHandler<DrawEvent>::fireEvent(*this);
+    Event::fire(this);
 }
