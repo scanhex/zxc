@@ -28,7 +28,8 @@ class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
                      EventHandler<FirstSkillUseEvent>,
                      EventHandler<SecondSkillUseEvent>,
-                     EventHandler<ThirdSkillUseEvent> {
+                     EventHandler<ThirdSkillUseEvent>,
+                     EventHandler<DrawEvent> {
 public:
 
     explicit Client(GameState &gameState);
@@ -48,6 +49,8 @@ private:
         void stopConnection();
 
         bool isConnected() const;
+
+        void fireOtherEvents();
 
     private:
         /*
@@ -101,9 +104,9 @@ private:
         deadline_timer timer_;
         deadline_timer stop_timer_;
         GameState &gameState_;
-
     public:
-        boost::lockfree::queue<Event *> events_{100};
+        boost::lockfree::queue<SerializedEvent *> othersEvents_{100};
+        boost::lockfree::queue<SerializedEvent *> events_{100};
     };
 
 private:
@@ -114,6 +117,7 @@ private:
     void handle(const FirstSkillUseEvent &event) override;
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
+    void handle(const DrawEvent &event) override;
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;

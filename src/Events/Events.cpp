@@ -1,5 +1,10 @@
 #include "Events.h"
 
+template<typename T>
+void Event::fire(T *event) {
+    EventHandler<T>::fireEvent(*event);
+}
+
 MoveEvent::MoveEvent(Hero &hero, double x, double y) : hero_{hero}, x_{x}, y_{y} {}
 
 void MoveEvent::serialize(BufferIO::BufferWriter &writer) {
@@ -9,9 +14,8 @@ void MoveEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void MoveEvent::fire() {
-    EventHandler<MoveEvent>::fireEvent(*this);
+    Event::fire(this);
 }
-
 
 StopEvent::StopEvent(Hero &hero) : hero_{hero} {}
 
@@ -20,7 +24,7 @@ void StopEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void StopEvent::fire() {
-    EventHandler<StopEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 
@@ -52,4 +56,8 @@ void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 
 void ThirdSkillUseEvent::fire() {
     EventHandler<ThirdSkillUseEvent>::fireEvent(*this);
+}
+
+void DrawEvent::fire() {
+    EventHandler<DrawEvent>::fireEvent(*this);
 }

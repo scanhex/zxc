@@ -159,42 +159,43 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
 void Server::ConnectionToClient::updateGSbyPlayer() {
     reader_.flushBuffer();
     uint8_t actionId = reader_.readUInt8();
-    auto eventName = static_cast<EventName>(actionId);
+    auto eventName = static_cast<SerializedEventName>(actionId);
     Hero &hero = player_id_ == 0 ? *gameState.getHero(Player::First) : *gameState.getHero(Player::Second);
 
+    assert(eventName != SerializedEventName::None);
+
     switch (eventName) {
-        case EventName::FirstSkillUse: {
+        case SerializedEventName::FirstSkillUse: {
             auto e = new FirstSkillUseEvent(hero);
             EventHandler<FirstSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::SecondSkillUse: {
+        case SerializedEventName::SecondSkillUse: {
             auto e = new SecondSkillUseEvent(hero);
             EventHandler<SecondSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::ThirdSkillUse: {
+        case SerializedEventName::ThirdSkillUse: {
             auto e = new ThirdSkillUseEvent(hero);
             EventHandler<ThirdSkillUseEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::Move: {
+        case SerializedEventName::Move: {
             double x = reader_.readDouble();
             double y = reader_.readDouble();
             EventHandler<MoveEvent>::fireEvent(MoveEvent(hero, x, y));
             break;
         }
-        case EventName::Stop: {
+        case SerializedEventName::Stop: {
             auto e = new StopEvent(hero);
             EventHandler<StopEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;
         }
-        case EventName::None: {
-            assert(false);
+        case SerializedEventName::None: {
             break;
         }
     }
@@ -213,11 +214,11 @@ void Server::ConnectionToClient::writeGStoBuffer() {
 }
 
 void Server::ConnectionToClient::writeEventsToBuffer() {
-    std::vector<Event *> events;
+    std::vector<SerializedEvent *> events;
     size_t cnt = 0;
     while (!othersEvents_.empty() && cnt < 5) {
         ++cnt;
-        Event *e;
+        SerializedEvent *e;
         othersEvents_.pop(e);
         events.push_back(e);
     }

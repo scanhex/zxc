@@ -3,8 +3,6 @@
 
 extern bool exit_flag;
 
-extern boost::lockfree::queue<Event *> othersEvents; // TODO plz
-
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
                                                                        timer_{service_},
                                                                        stop_timer_{service_},
@@ -154,7 +152,7 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
     Hero *hero = gameState_.getHero(Player::Second);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();
-        auto eventName = static_cast<EventName>(actionId);
+        auto eventName = static_cast<SerializedEventName>(actionId);
         switch (eventName) {
             case SerializedEventName::FirstSkillUse: {
                 othersEvents_.push(new FromServerFirstSkillUseEvent(*hero));
@@ -168,7 +166,7 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
                 othersEvents_.push(new FromServerThirdSkillUseEvent(*hero));
                 break;
             }
-            case EventName::Move: {
+            case SerializedEventName::Move: {
                 double x = reader_.readDouble();
                 double y = reader_.readDouble();
                 othersEvents_.push(new FromServerMoveEvent(*hero, x, y));
@@ -218,6 +216,14 @@ void Client::ConnectionToServer::clearEvents() {
     }
 }
 
+void Client::ConnectionToServer::fireOtherEvents() {
+    Event *e;
+    while (othersEvents_.pop(e)) {
+        e->fire();
+        delete e;
+    }
+}
+
 void Client::checkServerResponse() {
     if (!connection_->isConnected()) return;
     now_ = boost::posix_time::microsec_clock::local_time();
@@ -262,6 +268,10 @@ void Client::handle(const ThirdSkillUseEvent &event) {
     if (isNotFromServerEvent(event)) {
         connection_->events_.push(new ThirdSkillUseEvent(event));
     }
+}
+
+void Client::handle(const DrawEvent &event) {
+    connection_->fireOtherEvents();
 }
 
 void Client::run() {
