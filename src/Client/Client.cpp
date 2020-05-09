@@ -42,7 +42,8 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 }
 
 void Client::ConnectionToServer::runGame() {
-  //  gameState_.refreshAllUnits();
+    gameState_.refreshAllUnits();
+    gameState_.startGame();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -74,8 +75,8 @@ void Client::ConnectionToServer::writeToSocket() {
         return;
     }
     if (!isConnected()) return;
-    writeActionToBuffer();
     writer_.flushBuffer();
+    writeActionToBuffer();
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_CLIENT_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
@@ -97,7 +98,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
         return;
     }
     uint8_t status = reader_.readUInt8();
-    clearEvents();
+    // clearEvents();
     if (status) {
         runGame();
     } else {
@@ -228,6 +229,10 @@ void Client::ConnectionToServer::clearEvents() {
     while (!events_.empty()) {
         events_.pop(e);
     }
+}
+
+bool Client::ConnectionToServer::gameIsStarted() const {
+    return gameState_.gameIsStarted();
 }
 
 void Client::checkServerResponse() {

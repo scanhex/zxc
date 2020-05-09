@@ -49,6 +49,8 @@ private:
 
         bool isConnected() const;
 
+        bool gameIsStarted() const;
+
     private:
         /*
          * Functions for handling connection to client, e.g. reading/writing to socket

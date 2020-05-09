@@ -175,14 +175,16 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
     if (event.button() == MouseEvent::Button::Left)
         previousPosition_ = positionOnSphere(event.position());
     if (event.button() == MouseEvent::Button::Right) {
-        auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
+        if (gameState_.gameIsStarted()) {
+            auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
+            unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
 
-        double x = newPosition.x(), y = newPosition.y();
+            double x = newPosition.x(), y = newPosition.y();
 
-        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_, x, y));
+            EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_, x, y));
 
-        redraw();
+            redraw();
+        }
     }
 }
 
@@ -276,19 +278,19 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        if (firstHero_.isSkillReady(SkillName::FirstSkill)) {
+        if (gameState_.gameIsStarted() && firstHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
             redraw();
         }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        if (firstHero_.isSkillReady(SkillName::SecondSkill)) {
+        if (gameState_.gameIsStarted() && firstHero_.isSkillReady(SkillName::SecondSkill)) {
             EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
             redraw();
         }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        if (firstHero_.isSkillReady(SkillName::ThirdSkill)) {
+        if (gameState_.gameIsStarted() && firstHero_.isSkillReady(SkillName::ThirdSkill)) {
             EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
             redraw();
         }

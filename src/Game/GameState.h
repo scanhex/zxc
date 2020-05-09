@@ -27,12 +27,14 @@ public:
     [[nodiscard]] Point getPosition(Player player) const;
     [[nodiscard]] double getAngle(Player player) const;
     [[nodiscard]] Point getDestination(Player player) const;
+    [[nodiscard]] bool gameIsStarted() const;
 
     [[nodiscard]] bool isDead(Player player) const;
 
     void update(double elapsedTime); // time in milliseconds
 
     void refreshAllUnits();
+    void startGame();
 
     void setHealthPoints(double amount, Player player) const;
     void setPosition(Point pos, Player player) const;
@@ -60,6 +62,7 @@ public:
 
 private:
 
+    bool gameIsStarted_{false}; //TODO any other solution?
     Hero *firstHero_;
     Hero *secondHero_;
 };
