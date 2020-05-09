@@ -52,8 +52,6 @@ public:
 
     virtual void serialize(BufferIO::BufferWriter &writer) = 0;
     virtual void fire() = 0;
-
-    bool need_send_;
 };
 
 class MoveEvent : public Event {

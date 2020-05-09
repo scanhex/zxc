@@ -107,7 +107,6 @@ private:
     };
 
 private:
-
     void checkServerResponse();
 
     void handle(const MoveEvent &event) override;
@@ -119,6 +118,37 @@ private:
 private:
     std::shared_ptr<ConnectionToServer> connection_;
     boost::posix_time::ptime last_update_, now_;
+
+private:
+    template<typename T>
+    static bool isNotFromServerEvent(T &t);
+
+    class FromServerEvent {};
+
+    class FromServerMoveEvent : public MoveEvent, public FromServerEvent {
+    public:
+        explicit FromServerMoveEvent(Hero &hero, double x, double y) : MoveEvent(hero, x, y) {}
+    };
+
+    class FromServerStopEvent : public StopEvent, public FromServerEvent {
+    public:
+        explicit FromServerStopEvent(Hero &hero) : StopEvent(hero) {}
+    };
+
+    class FromServerFirstSkillUseEvent : public FirstSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerFirstSkillUseEvent(Hero &hero) : FirstSkillUseEvent(hero) {}
+    };
+
+    class FromServerSecondSkillUseEvent : public SecondSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerSecondSkillUseEvent(Hero &hero) : SecondSkillUseEvent(hero) {}
+    };
+
+    class FromServerThirdSkillUseEvent : public ThirdSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerThirdSkillUseEvent(Hero &hero) : ThirdSkillUseEvent(hero) {}
+    };
 };
 
 void runClient(GameState &gameState);
