@@ -247,25 +247,27 @@ void Client::checkServerResponse() {
 }
 
 void Client::handle(const MoveEvent &event) {
-    connection_->events_.push(new MoveEvent(event));
+    if (connection_->gameIsStarted())
+        connection_->events_.push(new MoveEvent(event));
 }
 
 void Client::handle(const StopEvent &event) {
-    connection_->events_.push(new StopEvent(event));
+    if (connection_->gameIsStarted())
+        connection_->events_.push(new StopEvent(event));
 }
 
 void Client::handle(const FirstSkillUseEvent &event) {
-    if (event.need_send_)
+    if (connection_->gameIsStarted() && event.need_send_)
         connection_->events_.push(new FirstSkillUseEvent(event));
 }
 
 void Client::handle(const SecondSkillUseEvent &event) {
-    if (event.need_send_)
+    if (connection_->gameIsStarted() && event.need_send_)
         connection_->events_.push(new SecondSkillUseEvent(event));
 }
 
 void Client::handle(const ThirdSkillUseEvent &event) {
-    if (event.need_send_)
+    if (connection_->gameIsStarted() && event.need_send_)
         connection_->events_.push(new ThirdSkillUseEvent(event));
 }
 
