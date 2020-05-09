@@ -36,9 +36,6 @@
 
 #include "zxc.h"
 
-boost::lockfree::queue<Event *> othersEvents{100}; //TODO to class? DA
-
-
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
@@ -151,12 +148,9 @@ void ZxcApplication::drawEvent() {
     GL::defaultFramebuffer.clear(GL::FramebufferClear::Color | GL::FramebufferClear::Depth);
 
     updateGameState();
-    while (!othersEvents.empty()) {
-        Event *event;
-        othersEvents.pop(event);
-        event->fire(); // ??
-    }
-//  Fps counter in console
+    EventHandler<DrawEvent>::fireEvent(DrawEvent());
+
+    //  Fps counter in console
 //	Debug{} << 1 / timeline_.previousFrameDuration();
 
     camera_->draw(drawables_);
