@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "Unit.h"
+#include "Utils/Utils.h"
 #include <algorithm>
 #include <cmath>
 
@@ -11,25 +12,12 @@ Unit::Unit(Stats stats, Position position) : stats_{stats},
 
 
 void Unit::addItem(Item &item, size_t slot) {
-    if (slot == -1) {
-        for (size_t i = 0; i < MAX_ITEMS; i++) {
-            if (items_[i].isEmpty()) {
-                slot = i;
-                break;
-            }
-        }
-        assert(slot != -1 && "No item slots available!");
-    } else {
-        assert(slot >= 0 && slot < MAX_ITEMS && "Wrong item slot");
-        assert(items_[slot].isEmpty() && "Item slot occupied");
-    }
-
+    // TODO add items??
     items_[slot] = item;
 }
 
 void Unit::deleteItem(size_t indexToDelete) {
-    assert(indexToDelete >= 0 && indexToDelete < MAX_ITEMS && "Wrong index for deleting item!");
-
+    // TODO add items??
     items_[indexToDelete] = Item();
 }
 
@@ -39,16 +27,14 @@ void Unit::clearItems() {
     }
 }
 
-void Unit::addBuff(Buff &buff) { buffs_.push_back(buff); }
+void Unit::addBuff(Buff &buff) {
+    // TODO add buffs??
+    buffs_.push_back(buff);
+}
 
 void Unit::deleteBuff(size_t indexToDelete) {
-    std::vector<Buff> newBuffs;
-    for (Buff &buff : buffs_) {
-        if (buff.index != indexToDelete) {
-            newBuffs.push_back(buff);
-        }
-    }
-    std::swap(buffs_, newBuffs);
+    // TODO add buffs??
+    unused_parameter(indexToDelete);
 }
 
 void Unit::clearBuffs() {
