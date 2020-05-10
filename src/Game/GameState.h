@@ -19,7 +19,7 @@ class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<ThirdSkillUseEvent> {
 public:
     GameState();
-    GameState(Hero &firstHero_, Hero &secondHero_);
+    explicit GameState(Hero heroes_[NUM_PLAYERS]);
 
     [[nodiscard]] bool gameIsFinished() const;
 
@@ -61,6 +61,5 @@ public:
 
 private:
 
-    Hero *firstHero_;
-    Hero *secondHero_;
+    Hero *heroes_[NUM_PLAYERS];
 };

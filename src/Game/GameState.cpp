@@ -1,27 +1,13 @@
-#define _USE_MATH_DEFINES
-
 #include "GameState.h"
-#include <cmath>
 #include <algorithm>
 
-GameState::GameState(Hero &firstHero, Hero &secondHero) : firstHero_{&firstHero},
-                                                          secondHero_{&secondHero} {}
+GameState::GameState(Hero heroes[NUM_PLAYERS]) : heroes_{&heroes[0], &heroes[1]} {}
 
-GameState::GameState() {
-    // 2 default heros
-    firstHero_ = new Hero(Player::First);
-    secondHero_ = new Hero(Player::Second);
-}
+GameState::GameState() : heroes_{new Hero(Player::First),
+                                 new Hero(Player::Second)} {} // 2 default heros
 
 Hero *GameState::getHero(Player player) const {
-    switch (player) {
-        case Player::First:
-            return firstHero_;
-        case Player::Second:
-            return secondHero_;
-        default:
-            assert(false);
-    }
+    return heroes_[static_cast<uint8_t >(player)];
 }
 
 double GameState::getHealthPoints(Player player) const {
@@ -70,14 +56,14 @@ void GameState::setAngle(double angle, Player player) const {
 }
 
 bool GameState::gameIsFinished() const {
-    return firstHero_->getDeathCounter() >= 2 || secondHero_->getDeathCounter() >= 2;
+    return heroes_[0]->getDeathCounter() >= 2 || heroes_[1]->getDeathCounter() >= 2;
 }
 
 void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         if (!hero->isDead()) {
             hero->updateUnit(elapsedTimeInSeconds);
         } else {
@@ -90,7 +76,7 @@ void GameState::update(double elapsedTime) { // time in milliseconds
 }
 
 void GameState::refreshAllUnits() {
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         hero->setDeathCounter(0);
         hero->refreshUnit();
     }
@@ -135,13 +121,13 @@ bool GameState::isDead(Player player) const {
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
     Team team = static_cast<Team>(player);
     // first serialize player
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         if (hero->getTeam() == team) {
             hero->serialize(writer);
         }
     }
     // then every other unit
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         if (hero->getTeam() != team) {
             hero->serialize(writer);
         }
@@ -151,13 +137,13 @@ void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
     Team team = static_cast<Team>(player);
     // first deserialize player
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         if (hero->getTeam() == team) {
             hero->deserialize(reader);
         }
     }
     // then every other unit
-    for (Hero *hero : {firstHero_, secondHero_}) {
+    for (Hero *hero : heroes_) {
         if (hero->getTeam() != team) {
             hero->deserialize(reader);
         }
