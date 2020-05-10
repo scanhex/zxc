@@ -20,7 +20,7 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ =
                 .setResist(0.25);
 
 
-Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), -M_PI);
+Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), 0);
 Position Hero::secondHeroStartingPosition_ = Position(Point(6, 6), M_PI);
 
 Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),

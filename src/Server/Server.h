@@ -4,8 +4,8 @@
 #include <algorithm>
 #endif
 
-#include "../Game/GameState.h"
-#include "../Utils/BufferIO.h"
+#include "Game/GameState.h"
+#include "Utils/BufferIO.h"
 #include <cstdio>
 #include <iostream>
 #include <vector>
