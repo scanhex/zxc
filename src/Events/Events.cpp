@@ -1,6 +1,9 @@
 #include "Events.h"
 
-Event::Event() : need_send_{true} {}
+template<typename T>
+void Event::fire(T *event) {
+    EventHandler<T>::fireEvent(*event);
+}
 
 MoveEvent::MoveEvent(Hero &hero, double x, double y) : hero_{hero}, x_{x}, y_{y} {}
 
@@ -11,9 +14,8 @@ void MoveEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void MoveEvent::fire() {
-    EventHandler<MoveEvent>::fireEvent(*this);
+    Event::fire(this);
 }
-
 
 StopEvent::StopEvent(Hero &hero) : hero_{hero} {}
 
@@ -22,7 +24,7 @@ void StopEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void StopEvent::fire() {
-    EventHandler<StopEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 
@@ -37,7 +39,7 @@ void FirstSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void FirstSkillUseEvent::fire() {
-    EventHandler<FirstSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 void SecondSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
@@ -45,7 +47,7 @@ void SecondSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void SecondSkillUseEvent::fire() {
-    EventHandler<SecondSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
 }
 
 void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
@@ -53,5 +55,9 @@ void ThirdSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
 }
 
 void ThirdSkillUseEvent::fire() {
-    EventHandler<ThirdSkillUseEvent>::fireEvent(*this);
+    Event::fire(this);
+}
+
+void DrawEvent::fire() {
+    Event::fire(this);
 }

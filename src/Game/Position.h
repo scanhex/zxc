@@ -23,6 +23,8 @@ public:
     void setDestination(double x, double y);
 
     [[nodiscard]] double getAngle() const;
+     void setAngle(double angle);
+
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
     [[nodiscard]] bool inRadius(const Point& point, double r) const;
 

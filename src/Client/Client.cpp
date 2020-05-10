@@ -3,8 +3,6 @@
 
 extern bool exit_flag;
 
-extern boost::lockfree::queue<Event *> othersEvents; // TODO plz
-
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
                                                                        timer_{service_},
                                                                        stop_timer_{service_},
@@ -158,38 +156,28 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
     Hero *hero = gameState_.getHero(Player::Second);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();
-        auto eventName = static_cast<EventName>(actionId);
+        auto eventName = static_cast<SerializedEventName>(actionId);
         switch (eventName) {
-            case EventName::FirstSkillUse: {
-                auto e = new FirstSkillUseEvent(*hero);
-                e->need_send_ = false;
-                othersEvents.push(e);
+            case SerializedEventName::FirstSkillUse: {
+                othersEvents_.push(new FromServerFirstSkillUseEvent(*hero));
                 break;
             }
-            case EventName::SecondSkillUse: {
-                auto e = new SecondSkillUseEvent(*hero);
-                e->need_send_ = false;
-                othersEvents.push(e);
+            case SerializedEventName::SecondSkillUse: {
+                othersEvents_.push(new FromServerSecondSkillUseEvent(*hero));
                 break;
             }
-            case EventName::ThirdSkillUse: {
-                auto e = new ThirdSkillUseEvent(*hero);
-                e->need_send_ = false;
-                othersEvents.push(e);
+            case SerializedEventName::ThirdSkillUse: {
+                othersEvents_.push(new FromServerThirdSkillUseEvent(*hero));
                 break;
             }
-            case EventName::Move: {
+            case SerializedEventName::Move: {
                 double x = reader_.readDouble();
                 double y = reader_.readDouble();
-                auto e = new MoveEvent(*hero, x, y);
-                e->need_send_ = false;
-                othersEvents.push(e);
+                othersEvents_.push(new FromServerMoveEvent(*hero, x, y));
                 break;
             }
-            case EventName::Stop: {
-                auto e = new StopEvent(*hero);
-                e->need_send_ = false;
-                othersEvents.push(e);
+            case SerializedEventName::Stop: {
+                othersEvents_.push(new FromServerStopEvent(*hero));
                 break;
             }
             default: {
@@ -201,10 +189,11 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
 }
 
 void Client::ConnectionToServer::writeActionToBuffer() {
-    Event *e;
-    events_.pop(e);
-    e->serialize(writer_);
-    delete e;
+    SerializedEvent *e;
+    if (events_.pop(e)) {
+        e->serialize(writer_);
+        delete e;
+    }
 }
 
 void Client::ConnectionToServer::waitForAction() {
@@ -226,8 +215,16 @@ void Client::ConnectionToServer::runService() {
 
 void Client::ConnectionToServer::clearEvents() {
     Event *e;
-    while (!events_.empty()) {
-        events_.pop(e);
+    while (events_.pop(e)) {
+        delete e;
+    }
+}
+
+void Client::ConnectionToServer::fireOtherEvents() {
+    Event *e;
+    while (othersEvents_.pop(e)) {
+        e->fire();
+        delete e;
     }
 }
 
@@ -246,29 +243,43 @@ void Client::checkServerResponse() {
     now_ = boost::posix_time::microsec_clock::local_time();
 }
 
+template<typename T>
+bool Client::isNotFromServerEvent(T &t) {
+    return dynamic_cast<const FromServerEvent*>(&t) == nullptr;
+}
+
 void Client::handle(const MoveEvent &event) {
-    if (connection_->gameIsStarted())
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new MoveEvent(event));
+    }
 }
 
 void Client::handle(const StopEvent &event) {
-    if (connection_->gameIsStarted())
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new StopEvent(event));
+    }
 }
 
 void Client::handle(const FirstSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && event.need_send_)
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new FirstSkillUseEvent(event));
+    }
 }
 
 void Client::handle(const SecondSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && event.need_send_)
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new SecondSkillUseEvent(event));
+    }
 }
 
 void Client::handle(const ThirdSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && event.need_send_)
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new ThirdSkillUseEvent(event));
+    }
+}
+
+void Client::handle(const DrawEvent &event) {
+    connection_->fireOtherEvents();
 }
 
 void Client::run() {
