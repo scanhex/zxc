@@ -113,9 +113,6 @@ void ZxcApplication::addUnit(Unit &u) {
 }
 
 void ZxcApplication::updateGameState() {
-    double myAngle = gameState_.getAngle(Player::First);
-    double otherAngle = gameState_.getAngle(Player::Second);
-
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
     Point myPosition = gameState_.getPosition(Player::First);
@@ -126,22 +123,13 @@ void ZxcApplication::updateGameState() {
     unitObjects_[0]->translate(myVectorPosition - unitObjects_[0]->transformation().translation());
     unitObjects_[1]->translate(otherVectorPosition - unitObjects_[1]->transformation().translation());
 
-    double myNewAngle = gameState_.getAngle(Player::First);
-    double otherNewAngle = gameState_.getAngle(Player::Second);
+    double myAngle = gameState_.getAngle(Player::First);
+    double otherAngle = gameState_.getAngle(Player::Second);
+    auto myPos = Matrix4::translation(unitObjects_[0]->transformationMatrix().translation());
+    auto otherPos = Matrix4::translation(unitObjects_[1]->transformationMatrix().translation());
 
-    if (myNewAngle != myAngle) {
-        double delta = myNewAngle - myAngle;
-        if (delta <= -M_PI) delta += 2 * M_PI;
-        if (delta >= M_PI) delta -= 2 * M_PI;
-        unitObjects_[0]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
-    }
-
-    if (otherNewAngle != otherAngle) {
-        double delta = otherNewAngle - otherAngle;
-        if (delta <= -M_PI) delta += 2 * M_PI;
-        if (delta >= M_PI) delta -= 2 * M_PI;
-        unitObjects_[1]->rotateLocal(Math::Rad<float>(delta), Math::Vector3{0.0f, 0.0f, 1.0f});
-    }
+    unitObjects_[0]->setTransformation(myPos * Matrix4::rotationZ(Magnum::Rad(M_PI + myAngle)));
+    unitObjects_[1]->setTransformation(otherPos * Matrix4::rotationZ(Magnum::Rad(M_PI + otherAngle)));
 }
 
 void ZxcApplication::drawEvent() {
@@ -151,7 +139,7 @@ void ZxcApplication::drawEvent() {
     EventHandler<DrawEvent>::fireEvent(DrawEvent());
 
     //  Fps counter in console
-//	Debug{} << 1 / timeline_.previousFrameDuration();
+    //	Debug{} << 1 / timeline_.previousFrameDuration();
 
     camera_->draw(drawables_);
 

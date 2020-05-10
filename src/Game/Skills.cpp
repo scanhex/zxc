@@ -34,6 +34,10 @@ void Coil::update(double elapsedTimeInSeconds) {
     coolDown_ = std::max(0.0, coolDown_ - elapsedTimeInSeconds);
 }
 
+void Coil::refreshCoolDown() {
+    coolDown_ = 0.0;
+}
+
 bool Coil::isReady() const {
     return coolDown_ == 0.0;
 }

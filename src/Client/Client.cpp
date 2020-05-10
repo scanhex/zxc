@@ -40,6 +40,8 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 }
 
 void Client::ConnectionToServer::runGame() {
+    gameState_.refreshAllUnits();
+    gameState_.startGame();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -57,7 +59,7 @@ void Client::ConnectionToServer::waitForGameStart() {
 }
 
 void Client::ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
@@ -71,14 +73,14 @@ void Client::ConnectionToServer::writeToSocket() {
         return;
     }
     if (!isConnected()) return;
-    writeActionToBuffer();
     writer_.flushBuffer();
+    writeActionToBuffer();
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_CLIENT_SIZE),
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
 size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return 0;
@@ -88,13 +90,13 @@ size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::er
 }
 
 void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
     }
     uint8_t status = reader_.readUInt8();
-    clearEvents();
+    // clearEvents();
     if (status) {
         runGame();
     } else {
@@ -103,17 +105,14 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
 }
 
 void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
     }
     reader_.flushBuffer();
-    parseEventsFromBuffer();
-    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
-    timer_.wait();
-    parseGSFromBuffer();
-    if (gameState_.gameIsFinished()) {
+    char gameIsRunning = reader_.readUInt8();
+    if (!gameIsRunning) {
         //TODO handle game result
         if (gameState_.getHealthPoints(Player::First) == 0)
             std::cout << "I lost :(" << std::endl; //
@@ -121,7 +120,12 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
             std::cout << "I won :)" << std::endl;
 
         stopConnection();
+        return;
     }
+    parseEventsFromBuffer();
+    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
+    timer_.wait();
+    parseGSFromBuffer();
     readFromSocket();
 }
 
@@ -224,6 +228,10 @@ void Client::ConnectionToServer::fireOtherEvents() {
     }
 }
 
+bool Client::ConnectionToServer::gameIsStarted() const {
+    return gameState_.gameIsStarted();
+}
+
 void Client::checkServerResponse() {
     if (!connection_->isConnected()) return;
     now_ = boost::posix_time::microsec_clock::local_time();
@@ -241,31 +249,31 @@ bool Client::isNotFromServerEvent(T &t) {
 }
 
 void Client::handle(const MoveEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new MoveEvent(event));
     }
 }
 
 void Client::handle(const StopEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new StopEvent(event));
     }
 }
 
 void Client::handle(const FirstSkillUseEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new FirstSkillUseEvent(event));
     }
 }
 
 void Client::handle(const SecondSkillUseEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new SecondSkillUseEvent(event));
     }
 }
 
 void Client::handle(const ThirdSkillUseEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
         connection_->events_.push(new ThirdSkillUseEvent(event));
     }
 }
