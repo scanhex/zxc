@@ -50,8 +50,6 @@ private:
 
         bool isConnected() const;
 
-        bool gameIsStarted() const;
-      
         void fireOtherEvents();
 
     private:
@@ -129,7 +127,8 @@ private:
     template<typename T>
     static bool isNotFromServerEvent(T &t);
 
-    class FromServerEvent {};
+    class FromServerEvent {
+    };
 
     class FromServerMoveEvent : public MoveEvent, public FromServerEvent {
     public:

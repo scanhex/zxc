@@ -48,7 +48,7 @@ private:
 
     void updateGameState();
 
-    void addUnit(Unit &u);
+    void addUnit(const Unit &u);
     void initCamera();
     void initRenderer();
     void initGrid();

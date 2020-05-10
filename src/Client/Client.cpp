@@ -41,7 +41,6 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 
 void Client::ConnectionToServer::runGame() {
     gameState_.refreshAllUnits();
-    gameState_.startGame();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -227,9 +226,6 @@ void Client::ConnectionToServer::fireOtherEvents() {
     }
 }
 
-bool Client::ConnectionToServer::gameIsStarted() const {
-    return gameState_.gameIsStarted();
-}
 
 void Client::checkServerResponse() {
     if (!connection_->isConnected()) return;
@@ -248,31 +244,31 @@ bool Client::isNotFromServerEvent(T &t) {
 }
 
 void Client::handle(const MoveEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new MoveEvent(event));
     }
 }
 
 void Client::handle(const StopEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new StopEvent(event));
     }
 }
 
 void Client::handle(const FirstSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new FirstSkillUseEvent(event));
     }
 }
 
 void Client::handle(const SecondSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new SecondSkillUseEvent(event));
     }
 }
 
 void Client::handle(const ThirdSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new ThirdSkillUseEvent(event));
     }
 }

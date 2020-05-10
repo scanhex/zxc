@@ -106,7 +106,7 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     timeline_.start();
 }
 
-void ZxcApplication::addUnit(Unit &u) {
+void ZxcApplication::addUnit(const Unit &u) {
     unitObjects_.push_back(
             modelLoader_.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", scene_, drawables_).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
