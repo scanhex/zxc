@@ -5,7 +5,7 @@
 #include "Utils/BufferIO.h"
 #include "StatsBuilder.h"
 
-enum class Player;
+enum class Player : uint8_t;
 
 
 constexpr uint32_t NUM_SKILLS = 3;
@@ -30,8 +30,6 @@ private:
     static Position secondHeroStartingPosition_;
 
 public:
-    Player player_;
-
     explicit Hero(Player player);
     Hero(Player player, Position position);
     Hero(Player player, Position position, Stats stats);

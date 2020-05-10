@@ -7,9 +7,9 @@
 
 class Hero;
 
-enum class Player {
-    First,
-    Second
+enum class Player : uint8_t {
+    First = 0,
+    Second = 1
 };
 
 class GameState : public EventHandler<MoveEvent>,
