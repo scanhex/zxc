@@ -19,14 +19,10 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ =
                 .setArmor(3)
                 .setResist(0.25);
 
+Position Hero::heroSpawns_[] = {Position(Point(-6, -6), 0), // First
+                                Position(Point(6, 6), M_PI)};     // Second
 
-Position Hero::firstHeroStartingPosition_ = Position(Point(-6, -6), 0);
-Position Hero::secondHeroStartingPosition_ = Position(Point(6, 6), M_PI);
-
-Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
-                                 player == Player::First ?
-                                 firstHeroStartingPosition_ :
-                                 secondHeroStartingPosition_),
+Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[static_cast<uint8_t>(player)]),
                             gold_{START_GOLD},
                             level_{1},
                             experience_{0},
@@ -99,7 +95,7 @@ void Hero::updateUnit(double elapsedTimeInSeconds) {
 }
 
 void Hero::refreshPosition() {
-    position_ = team_ == Team::Radiant ? firstHeroStartingPosition_ : secondHeroStartingPosition_;
+    position_ = heroSpawns_[static_cast<uint8_t>(team_)];
 }
 
 void Hero::refreshUnit() {
