@@ -19,11 +19,7 @@ protected:
 
     Stats stats_;
 
-    Stats startStats_;
-
     Position position_;
-
-    Position startPosition_;
 
 public:
     Unit(Stats stats, Position position);
@@ -69,7 +65,7 @@ public:
 
     [[nodiscard]] Point shiftUnitPosition(double len) const;
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
-    [[nodiscard]] bool inRadius(const Point& point, double r) const;
+    [[nodiscard]] bool inRadius(const Point &point, double r) const;
     [[nodiscard]] bool isDead() const;
 
 

@@ -5,11 +5,8 @@
 #include <cmath>
 
 Unit::Unit(Stats stats, Position position) : stats_{stats},
-                                             startStats_{stats},
-                                             position_{position},
-                                             startPosition_{position} {
+                                             position_{position} {
     stats_.refreshStats();
-    startStats_.refreshStats();
 }
 
 
@@ -112,8 +109,7 @@ void Unit::updateUnit(double elapsedTimeInSeconds) {
 }
 
 void Unit::refreshUnit() {
-    stats_ = startStats_;
-    position_ = startPosition_;
+    stats_.refreshStats();
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {
@@ -198,6 +194,6 @@ void Unit::setDestination(const Point &destination) { position_.setDestination(d
 void Unit::setDestination(double x, double y) { position_.setDestination(x, y); }
 
 double Unit::getAngle() const { return position_.getAngle(); }
-void Unit::setAngle(double angle){
+void Unit::setAngle(double angle) {
     position_.setAngle(angle);
 }

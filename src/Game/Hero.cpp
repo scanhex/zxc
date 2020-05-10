@@ -40,6 +40,7 @@ Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.cre
                                                gold_{START_GOLD},
                                                level_{1},
                                                experience_{0},
+                                               deathCounter_{0},
                                                skills_{ShortCoil(*this),
                                                        MidCoil(*this),
                                                        LongCoil(*this)},
@@ -95,8 +96,13 @@ void Hero::updateUnit(double elapsedTimeInSeconds) {
     }
 }
 
+void Hero::refreshPosition() {
+    position_ = player_ == Player::First ? firstHeroStartingPosition_ : secondHeroStartingPosition_;
+}
+
 void Hero::refreshUnit() {
     Unit::refreshUnit();
+    refreshPosition();
     for (Coil &coil : skills_) {
         coil.refreshCoolDown();
     }
