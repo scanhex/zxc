@@ -44,6 +44,10 @@ Point GameState::getDestination(Player player) const {
     return hero->getDestination();
 }
 
+bool GameState::gameIsStarted() const {
+    return gameIsStarted_;
+}
+
 void GameState::setPosition(Point pos, Player player) const {
     Hero *hero = getHero(player);
     hero->setPosition(pos);
@@ -70,7 +74,7 @@ void GameState::setAngle(double angle, Player player) const {
 }
 
 bool GameState::gameIsFinished() const {
-    return firstHero_->isDead() || secondHero_->isDead();
+    return firstHero_->getDeathCounter() >= 2 || secondHero_->getDeathCounter() >= 2;
 }
 
 void GameState::update(double elapsedTime) { // time in milliseconds
@@ -80,9 +84,22 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     for (Hero *hero : {firstHero_, secondHero_}) {
         if (!hero->isDead()) {
             hero->updateUnit(elapsedTimeInSeconds);
+        } else {
+            if (hero->getDeathCounter() < 1) {
+                hero->increaseDeathCounter();
+                hero->refreshUnit();
+            }
         }
     }
 }
+
+void GameState::refreshAllUnits() {
+    for (Hero *hero : {firstHero_, secondHero_}) {
+        hero->setDeathCounter(0);
+        hero->refreshUnit();
+    }
+}
+
 
 void GameState::applyDamage(double amount, Player player) const {
     Hero *hero = getHero(player);
@@ -168,4 +185,8 @@ void GameState::handle(const SecondSkillUseEvent &event) {
 
 void GameState::handle(const ThirdSkillUseEvent &event) {
     event.hero_.useSkill(SkillName::ThirdSkill, *this);
+}
+
+void GameState::startGame() {
+    gameIsStarted_ = true;
 }

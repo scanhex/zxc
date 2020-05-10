@@ -24,6 +24,7 @@ private:
 public:
     Stats() = default;
     Stats(const Stats &) = default;
+    Stats& operator=(const Stats &) = default;
 
     void changeDamage(int32_t delta);
     void changeAttackRange(int32_t delta);
@@ -41,7 +42,7 @@ public:
 
     void refreshStats();
 
-    void serialize(BufferIO::BufferWriter &writer);
+    void serialize(BufferIO::BufferWriter &writer) const;
     void deserialize(BufferIO::BufferReader &reader);
 
     // getters and setters

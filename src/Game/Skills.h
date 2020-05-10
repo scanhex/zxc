@@ -29,6 +29,7 @@ public:
 
     void use(GameState &gameState) override;
     virtual void update(double elapsedTimeInSeconds);
+    void refreshCoolDown();
     [[nodiscard]] bool isReady() const;
 
 protected:
@@ -42,7 +43,7 @@ public:
 
     constexpr static double LEN = 2;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 10;
+    constexpr static double DAMAGE = 50;
 };
 
 class MidCoil final : public Coil {
@@ -51,7 +52,7 @@ public:
 
     constexpr static double LEN = 4.5;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 20;
+    constexpr static double DAMAGE = 100;
 };
 
 class LongCoil final : public Coil {
@@ -60,6 +61,6 @@ public:
 
     constexpr static double LEN = 7;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 30;
+    constexpr static double DAMAGE = 150;
 };
 

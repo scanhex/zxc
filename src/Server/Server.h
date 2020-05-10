@@ -4,8 +4,8 @@
 #include <algorithm>
 #endif
 
-#include "../Game/GameState.h"
-#include "../Utils/BufferIO.h"
+#include "Game/GameState.h"
+#include "Utils/BufferIO.h"
 #include <cstdio>
 #include <iostream>
 #include <vector>
@@ -18,8 +18,8 @@ static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 10;
 static constexpr int PLAYERS_REQUIRED = 2;
-static constexpr int MSG_FROM_SERVER_SIZE = 512;
-static constexpr int MSG_FROM_CLIENT_SIZE = 128;
+static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_CLIENT_SIZE = 32;
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
 using namespace boost::asio;
@@ -68,6 +68,8 @@ private:
         void handleWriteToSocket(const boost::system::error_code &err, size_t bytes);
 
         void writeToSocket();
+
+        void sendEndGameMessage();
 
     private:
         /*

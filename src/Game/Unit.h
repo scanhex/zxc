@@ -19,7 +19,11 @@ protected:
 
     Stats stats_;
 
+    Stats startStats_;
+
     Position position_;
+
+    Position startPosition_;
 
 public:
     Unit(Stats stats, Position position);
@@ -57,6 +61,8 @@ public:
     void changeResist(double delta);
 
     virtual void updateUnit(double elapsedTimeInSeconds);
+
+    virtual void refreshUnit();
 
     virtual void serialize(BufferIO::BufferWriter &writer);
     virtual void deserialize(BufferIO::BufferReader &reader);
