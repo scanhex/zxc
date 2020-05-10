@@ -206,7 +206,6 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 }
 
 void Server::ConnectionToClient::writeGStoBuffer() {
-    // TODO pass all GS and copy ?
     Player current = Player::First, second = Player::Second;
     if (player_id_ == 1) std::swap(current, second);
 
