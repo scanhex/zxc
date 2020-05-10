@@ -36,7 +36,7 @@ public:
     Hero(Player player, Position position);
     Hero(Player player, Position position, Stats stats);
 
-    bool canSpendGold(uint32_t amount) const;
+    [[nodiscard]] bool canSpendGold(uint32_t amount) const;
     void addGold(uint32_t amount);
     void spendGold(uint32_t amount);
 
@@ -51,6 +51,7 @@ public:
 
     void updateUnit(double elapsedTimeInSeconds) override;
 
+    void refreshPosition();
     void refreshUnit() override;
 
     void serialize(BufferIO::BufferWriter &writer) override;
