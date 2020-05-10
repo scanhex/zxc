@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "Utils/Utils.h"
 
 int32_t Server::ConnectionToClient::running_connections_ = 0;
 
@@ -71,8 +72,8 @@ ip::tcp::socket &Server::ConnectionToClient::sock() {
     return sock_;
 }
 
-void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err,
-                                                      __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
+    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -105,8 +106,8 @@ size_t Server::ConnectionToClient::checkReadComplete(const boost::system::error_
     return done ? 0 : 1;
 }
 
-void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err,
-                                                     __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
+    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -141,8 +142,8 @@ void Server::ConnectionToClient::writeToSocket() {
                            BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
 }
 
-void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err,
-                                                       __attribute__ ((unused)) size_t bytes) {
+void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err, size_t bytes) {
+    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
@@ -270,7 +271,7 @@ void Server::handleNewConnection(const std::shared_ptr<ConnectionToClient> &clie
 }
 
 void Server::updateGS() {
-    // Максим -- хорош
+    // Максим -- плох
     gameState.update(TICK_TIME_GS_UPDATE);
 }
 

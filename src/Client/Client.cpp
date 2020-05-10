@@ -59,7 +59,7 @@ void Client::ConnectionToServer::waitForGameStart() {
 }
 
 void Client::ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
@@ -80,7 +80,7 @@ void Client::ConnectionToServer::writeToSocket() {
 }
 
 size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return 0;
@@ -90,7 +90,7 @@ size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::er
 }
 
 void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
@@ -105,7 +105,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
 }
 
 void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    ignore(bytes);
+    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
