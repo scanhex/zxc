@@ -4,7 +4,7 @@
 #include "Utils/BufferIO.h"
 #include "Game/Hero.h"
 
-enum class EventName : uint8_t {
+enum class SerializedEventName : uint8_t {
     None = 0,
     FirstSkillUse = 1,
     SecondSkillUse = 2,
@@ -45,20 +45,24 @@ std::vector<EventHandler<Event> *> EventHandler<Event>::allHandlers{};
 
 class Event {
 public:
-    static const EventName name_ = EventName::None;
-
-    Event();
     virtual ~Event() = default;
 
-    virtual void serialize(BufferIO::BufferWriter &writer) = 0;
     virtual void fire() = 0;
-
-    bool need_send_;
+protected:
+    template<typename T>
+    static void fire(T *event);
 };
 
-class MoveEvent : public Event {
+class SerializedEvent : public Event {
 public:
-    static const EventName name_ = EventName::Move;
+    static const SerializedEventName name_ = SerializedEventName::None;
+
+    virtual void serialize(BufferIO::BufferWriter &writer) = 0;
+};
+
+class MoveEvent : public SerializedEvent {
+public:
+    static const SerializedEventName name_ = SerializedEventName::Move;
 
     Hero &hero_;
     double x_, y_;
@@ -68,9 +72,9 @@ public:
     void fire() override;
 };
 
-class StopEvent : public Event {
+class StopEvent : public SerializedEvent {
 public:
-    static const EventName name_ = EventName::Stop;
+    static const SerializedEventName name_ = SerializedEventName::Stop;
 
     Hero &hero_;
 
@@ -79,7 +83,7 @@ public:
     void fire() override;
 };
 
-class SkillUseEvent : public Event {
+class SkillUseEvent : public SerializedEvent {
 public:
     Hero &hero_;
 
@@ -90,7 +94,7 @@ public:
 
 class FirstSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::FirstSkillUse;
+    static const SerializedEventName name_ = SerializedEventName::FirstSkillUse;
 
     explicit FirstSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
@@ -99,7 +103,7 @@ public:
 
 class SecondSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::SecondSkillUse;
+    static const SerializedEventName name_ = SerializedEventName::SecondSkillUse;
 
     explicit SecondSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
@@ -108,9 +112,14 @@ public:
 
 class ThirdSkillUseEvent : public SkillUseEvent {
 public:
-    static const EventName name_ = EventName::ThirdSkillUse;
+    static const SerializedEventName name_ = SerializedEventName::ThirdSkillUse;
 
     explicit ThirdSkillUseEvent(Hero &hero);
     void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
+};
+
+class DrawEvent : public Event {
+public:
     void fire() override;
 };

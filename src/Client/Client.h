@@ -12,8 +12,8 @@
 #include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 256;
-static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
+static constexpr int MSG_FROM_SERVER_SIZE = 512;
+static constexpr int MSG_FROM_CLIENT_SIZE = 128; //TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
 
@@ -28,7 +28,8 @@ class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
                      EventHandler<FirstSkillUseEvent>,
                      EventHandler<SecondSkillUseEvent>,
-                     EventHandler<ThirdSkillUseEvent> {
+                     EventHandler<ThirdSkillUseEvent>,
+                     EventHandler<DrawEvent> {
 public:
 
     explicit Client(GameState &gameState);
@@ -50,6 +51,8 @@ private:
         bool isConnected() const;
 
         bool gameIsStarted() const;
+      
+        void fireOtherEvents();
 
     private:
         /*
@@ -103,13 +106,12 @@ private:
         deadline_timer timer_;
         deadline_timer stop_timer_;
         GameState &gameState_;
-
     public:
-        boost::lockfree::queue<Event *> events_{100};
+        boost::lockfree::queue<SerializedEvent *> othersEvents_{100};
+        boost::lockfree::queue<SerializedEvent *> events_{100};
     };
 
 private:
-
     void checkServerResponse();
 
     void handle(const MoveEvent &event) override;
@@ -117,10 +119,42 @@ private:
     void handle(const FirstSkillUseEvent &event) override;
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
+    void handle(const DrawEvent &event) override;
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;
     boost::posix_time::ptime last_update_, now_;
+
+private:
+    template<typename T>
+    static bool isNotFromServerEvent(T &t);
+
+    class FromServerEvent {};
+
+    class FromServerMoveEvent : public MoveEvent, public FromServerEvent {
+    public:
+        explicit FromServerMoveEvent(Hero &hero, double x, double y) : MoveEvent(hero, x, y) {}
+    };
+
+    class FromServerStopEvent : public StopEvent, public FromServerEvent {
+    public:
+        explicit FromServerStopEvent(Hero &hero) : StopEvent(hero) {}
+    };
+
+    class FromServerFirstSkillUseEvent : public FirstSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerFirstSkillUseEvent(Hero &hero) : FirstSkillUseEvent(hero) {}
+    };
+
+    class FromServerSecondSkillUseEvent : public SecondSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerSecondSkillUseEvent(Hero &hero) : SecondSkillUseEvent(hero) {}
+    };
+
+    class FromServerThirdSkillUseEvent : public ThirdSkillUseEvent, public FromServerEvent {
+    public:
+        explicit FromServerThirdSkillUseEvent(Hero &hero) : ThirdSkillUseEvent(hero) {}
+    };
 };
 
 void runClient(GameState &gameState);

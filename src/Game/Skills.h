@@ -43,7 +43,7 @@ public:
 
     constexpr static double LEN = 2;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 100;
+    constexpr static double DAMAGE = 50;
 };
 
 class MidCoil final : public Coil {
@@ -52,7 +52,7 @@ public:
 
     constexpr static double LEN = 4.5;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 200;
+    constexpr static double DAMAGE = 100;
 };
 
 class LongCoil final : public Coil {
@@ -61,6 +61,6 @@ public:
 
     constexpr static double LEN = 7;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 300;
+    constexpr static double DAMAGE = 150;
 };
 

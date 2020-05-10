@@ -68,6 +68,11 @@ void GameState::setDestination(double x, double y, Player player) const {
     hero->setDestination(x, y);
 }
 
+void GameState::setAngle(double angle, Player player) const {
+    Hero *hero = getHero(player);
+    hero->setAngle(angle);
+}
+
 bool GameState::gameIsFinished() const {
     return firstHero_->getDeathCounter() >= 2 || secondHero_->getDeathCounter() >= 2;
 }
