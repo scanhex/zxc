@@ -17,6 +17,7 @@ enum class Team : uint8_t {
 };
 
 constexpr size_t MAX_ITEMS = 6;
+constexpr uint32_t NUM_TEAMS = 3;
 
 class Unit {
 protected:

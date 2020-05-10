@@ -9,6 +9,7 @@ enum class Player : uint8_t;
 
 
 constexpr uint32_t NUM_SKILLS = 3;
+constexpr uint32_t NUM_PLAYERS = 2;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
@@ -26,8 +27,7 @@ private:
     Coil skills_[NUM_SKILLS];
 
     static StatsBuilder defaultHeroStatsBuilder_;
-    static Position firstHeroStartingPosition_;
-    static Position secondHeroStartingPosition_;
+    static Position heroSpawns_[NUM_PLAYERS];
 
 public:
     explicit Hero(Player player);
