@@ -12,8 +12,8 @@
 #include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 512;
-static constexpr int MSG_FROM_CLIENT_SIZE = 128; //TODO change when add
+static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
 
