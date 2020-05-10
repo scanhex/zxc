@@ -50,6 +50,8 @@ private:
 
         bool isConnected() const;
 
+        bool gameIsStarted() const;
+      
         void fireOtherEvents();
 
     private:

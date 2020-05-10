@@ -69,6 +69,8 @@ private:
 
         void writeToSocket();
 
+        void sendEndGameMessage();
+
     private:
         /*
          * Functions for working with Game State
