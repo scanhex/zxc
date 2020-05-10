@@ -59,11 +59,11 @@ void Client::ConnectionToServer::waitForGameStart() {
 }
 
 void Client::ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
     }
+    assert(bytes == MSG_FROM_CLIENT_SIZE);
     waitForAction();
 }
 
@@ -80,7 +80,6 @@ void Client::ConnectionToServer::writeToSocket() {
 }
 
 size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return 0;
@@ -90,11 +89,11 @@ size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::er
 }
 
 void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
     }
+    assert(bytes == MSG_WAIT_FROM_SERVER_SIZE);
     uint8_t status = reader_.readUInt8();
     // clearEvents();
     if (status) {
@@ -105,11 +104,11 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
 }
 
 void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || exit_flag) {
         stopConnection();
         return;
     }
+    assert(bytes == MSG_FROM_SERVER_SIZE);
     reader_.flushBuffer();
     char gameIsRunning = reader_.readUInt8();
     if (!gameIsRunning) {
@@ -245,7 +244,7 @@ void Client::checkServerResponse() {
 
 template<typename T>
 bool Client::isNotFromServerEvent(T &t) {
-    return dynamic_cast<const FromServerEvent*>(&t) == nullptr;
+    return dynamic_cast<const FromServerEvent *>(&t) == nullptr;
 }
 
 void Client::handle(const MoveEvent &event) {
