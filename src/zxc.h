@@ -64,8 +64,8 @@ private:
     ShaderLibrary shaderLibrary_;
     ModelLoader modelLoader_;
 
-    Hero firstHero_;
-    Hero secondHero_;
+    Hero heroes_[NUM_PLAYERS];
+    Hero &myHero_; // just a ref to heroes[0]
     GameState gameState_;
 
     std::thread networkThread_;

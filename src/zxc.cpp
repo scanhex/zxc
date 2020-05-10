@@ -76,8 +76,8 @@ void ZxcApplication::initScene() {
 }
 
 void ZxcApplication::initGame() {
-    addUnit(firstHero_);
-    addUnit(secondHero_);
+    addUnit(heroes_[0]);
+    addUnit(heroes_[1]);
 }
 
 void ZxcApplication::initHandlers() {
@@ -92,9 +92,9 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        firstHero_{Hero(Player::First)},
-        secondHero_{Hero(Player::Second)},
-        gameState_(GameState(firstHero_, secondHero_)) {
+        heroes_{Hero(Player::First), Hero(Player::Second)},
+        myHero_{heroes_[0]},
+        gameState_(GameState(heroes_)) {
 
     setSwapInterval(1);
 
@@ -162,7 +162,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
 
         double x = newPosition.x(), y = newPosition.y();
 
-        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_, x, y));
+        EventHandler<MoveEvent>::fireEvent(MoveEvent(myHero_, x, y));
 
         redraw();
     }
@@ -258,25 +258,25 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        if (firstHero_.isSkillReady(SkillName::FirstSkill)) {
-            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
+        if (myHero_.isSkillReady(SkillName::FirstSkill)) {
+            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        if (firstHero_.isSkillReady(SkillName::SecondSkill)) {
-            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
+        if (myHero_.isSkillReady(SkillName::SecondSkill)) {
+            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        if (firstHero_.isSkillReady(SkillName::ThirdSkill)) {
-            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
+        if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
+            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
-        EventHandler<StopEvent>::fireEvent(StopEvent(firstHero_));
+        EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
         redraw();
     }
 }
