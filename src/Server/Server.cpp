@@ -28,7 +28,7 @@ void Server::ConnectionToClient::startConnection() {
     player_id_ = running_connections_;
     ++ConnectionToClient::running_connections_;
     timer_.expires_from_now(boost::posix_time::milliseconds(TICK_TIME_SEND_GS));
-    timer_.async_wait(BIND_FN2(waitForAllConnections, std::placeholders::_1, 0));
+    timer_.async_wait(BIND_FN2(waitForAllConnections, std::placeholders::_1, MSG_WAIT_FROM_SERVER_SIZE));
 }
 
 std::shared_ptr<Server::ConnectionToClient> Server::newClient() {
@@ -73,12 +73,12 @@ ip::tcp::socket &Server::ConnectionToClient::sock() {
 }
 
 void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return;
     }
+    assert(bytes == MSG_FROM_CLIENT_SIZE);
     if (!running_) return;
     if (!running_connections_) return;
     g_lock_.lock();
@@ -107,12 +107,12 @@ size_t Server::ConnectionToClient::checkReadComplete(const boost::system::error_
 }
 
 void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return;
     }
+    assert(bytes == MSG_FROM_SERVER_SIZE);
     if (!running_connections_) return;
     if (gameState.gameIsFinished()) {
         sendEndGameMessage();
@@ -143,12 +143,12 @@ void Server::ConnectionToClient::writeToSocket() {
 }
 
 void Server::ConnectionToClient::waitForAllConnections(const boost::system::error_code &err, size_t bytes) {
-    unused_parameter(bytes);
     if (err || stopped_) {
         std::cout << err.message() << std::endl;
         stopConnection();
         return;
     }
+    assert(bytes == MSG_WAIT_FROM_SERVER_SIZE);
     if (running_connections_ == PLAYERS_REQUIRED) {
         running_ = true;
         writer_.flushBuffer();
