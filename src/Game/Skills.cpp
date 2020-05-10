@@ -1,4 +1,7 @@
 #include "Skills.h"
+
+#include <algorithm>
+
 #include "GameState.h"
 
 Skill::Skill(Hero &hero) : hero_{hero} {}
