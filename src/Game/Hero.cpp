@@ -33,8 +33,9 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(),
                             deathCounter_{0},
                             skills_{ShortCoil(*this),
                                     MidCoil(*this),
-                                    LongCoil(*this)},
-                            player_{player} {}
+                                    LongCoil(*this)} {
+    team_ = static_cast<Team>(player);
+}
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
                                                gold_{START_GOLD},
@@ -43,8 +44,9 @@ Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.cre
                                                deathCounter_{0},
                                                skills_{ShortCoil(*this),
                                                        MidCoil(*this),
-                                                       LongCoil(*this)},
-                                               player_{player} {}
+                                                       LongCoil(*this)} {
+    team_ = static_cast<Team>(player);
+}
 
 Hero::Hero(Player player, Position position, Stats stats) : Hero(player, position) {
     stats_ = stats;
@@ -97,7 +99,7 @@ void Hero::updateUnit(double elapsedTimeInSeconds) {
 }
 
 void Hero::refreshPosition() {
-    position_ = player_ == Player::First ? firstHeroStartingPosition_ : secondHeroStartingPosition_;
+    position_ = team_ == Team::Radiant ? firstHeroStartingPosition_ : secondHeroStartingPosition_;
 }
 
 void Hero::refreshUnit() {

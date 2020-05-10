@@ -137,30 +137,32 @@ bool GameState::isDead(Player player) const {
 }
 
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
+    Team team = static_cast<Team>(player);
     // first serialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero->player_ == player) {
+        if (hero->getTeam() == team) {
             hero->serialize(writer);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero->player_ != player) {
+        if (hero->getTeam() != team) {
             hero->serialize(writer);
         }
     }
 }
 
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
+    Team team = static_cast<Team>(player);
     // first deserialize player
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero->player_ == player) {
+        if (hero->getTeam() == team) {
             hero->deserialize(reader);
         }
     }
     // then every other unit
     for (Hero *hero : {firstHero_, secondHero_}) {
-        if (hero->player_ != player) {
+        if (hero->getTeam() != team) {
             hero->deserialize(reader);
         }
     }

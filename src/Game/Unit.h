@@ -10,12 +10,20 @@
 #include "Position.h"
 #include "Utils/BufferIO.h"
 
+enum class Team : uint8_t {
+    Radiant = 0,
+    Dire = 1,
+    Neutral = 2
+};
+
 constexpr size_t MAX_ITEMS = 6;
 
 class Unit {
 protected:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
+
+    Team team_;
 
     Stats stats_;
 
@@ -70,6 +78,8 @@ public:
 
 
     // getters and setters
+
+    [[nodiscard]] Team getTeam() const;
 
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
