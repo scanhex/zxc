@@ -19,11 +19,18 @@ void Coil::use(GameState &gameState) {
      * иначе даже минимальную рассинхонизацию подсчета времени контролировать сложно,
      * и могут возникнуть проблемы с отрисовкой того, что не произошло.
      */
+    auto team = hero_.getTeam();
     Point coilCenter = hero_.shiftUnitPosition(len_);
-    for (Hero *hero : {gameState.getHero(Player::First), gameState.getHero(Player::Second)}) {
-        // TODO loop over all units
-        if (hero != &hero_ && hero->inRadius(coilCenter, radius_)) {
+    for (Hero *hero : gameState.heroes_) {
+        // TODO loop over all units dadadadadadadada
+        if (hero->getTeam() != team && hero->inRadius(coilCenter, radius_)) {
             hero->applyDamage(damage_);
+        }
+    }
+
+    for (Creep *creep : gameState.creeps_) {
+        if (creep->getTeam() != team && creep->inRadius(coilCenter, radius_)) {
+            creep->applyDamage(damage_);
         }
     }
 
