@@ -75,6 +75,12 @@ void GameState::update(double elapsedTime) { // time in milliseconds
             }
         }
     }
+
+    for (Creep *creep : creeps_) {
+        if (!creep->isDead()) {
+            creep->updateUnit(elapsedTimeInSeconds);
+        }
+    }
 }
 
 void GameState::refreshAllUnits() {
@@ -134,6 +140,11 @@ void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
             hero->serialize(writer);
         }
     }
+    for (Creep *creep : creeps_) {
+        if (creep->getTeam() != team) {
+            creep->serialize(writer);
+        }
+    }
 }
 
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
@@ -144,10 +155,15 @@ void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
             hero->deserialize(reader);
         }
     }
-    // then every other unit
+    // then every other unit TODO UNITS potom!
     for (Hero *hero : heroes_) {
         if (hero->getTeam() != team) {
             hero->deserialize(reader);
+        }
+    }
+    for (Creep *creep : creeps_) {
+        if (creep->getTeam() != team) {
+            creep->deserialize(reader);
         }
     }
 }

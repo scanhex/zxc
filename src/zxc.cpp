@@ -130,7 +130,18 @@ void ZxcApplication::updateGameState() {
         unitObjects_[index]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
     }
 
-    for(Creep &)
+    // TODO loop over all units
+    for (Creep &creep : creeps_) {
+        const Point &position = creep.getPosition();
+        auto index = static_cast<uint8_t>(creep.getTeam()) + 2; // potom sdelau norm
+
+        Vector3 vectorPosition(position.x_, position.y_, position.z_);
+        unitObjects_[index]->translate(vectorPosition - unitObjects_[index]->transformation().translation());
+
+        double angle = gameState_.getAngle(static_cast<Player>(index));
+        auto matrixPosition = Matrix4::translation(unitObjects_[index]->transformationMatrix().translation());
+        unitObjects_[index]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+    }
 }
 
 void ZxcApplication::drawEvent() {

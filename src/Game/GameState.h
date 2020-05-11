@@ -63,4 +63,6 @@ private:
 
     Hero *heroes_[NUM_PLAYERS];
     Creep *creeps_[NUM_PLAYERS];
+
+    friend class Coil;
 };

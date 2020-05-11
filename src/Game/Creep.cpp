@@ -16,8 +16,8 @@ StatsBuilder Creep::defaultCreepStatsBuilder_ =
                 .setResist(0.25);
 
 
-Position Creep::creepSpawns_[] = {Position(Point(-5, -6), 0),  // Radiant
-                                  Position(Point(5, 6), M_PI), // Dire
+Position Creep::creepSpawns_[] = {Position(Point(-3, -6), 0),  // Radiant
+                                  Position(Point(3, 6), M_PI), // Dire
                                   Position(Point(0, 0), 0)};   // Neutral
 
 Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[static_cast<uint8_t>(team)]) {
