@@ -220,6 +220,7 @@ void Client::ConnectionToServer::clearEvents() {
 
 void Client::ConnectionToServer::fireOtherEvents() {
     Event *e;
+    if (othersEvents_.empty()) return;
     while (othersEvents_.pop(e)) {
         e->fire();
         delete e;
@@ -288,8 +289,3 @@ void Client::run() {
 }
 
 Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {}
-
-void runClient(GameState &gameState) {
-    Client client(gameState);
-    client.run();
-}
