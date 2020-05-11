@@ -68,7 +68,6 @@ private:
     std::vector<Hero *> heroes_;
     Hero &myHero_; // just a ref to heroes[0]
 
-    Creep creeps_[NUM_PLAYERS];
     GameState gameState_;
 
     std::thread networkThread_;

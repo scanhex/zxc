@@ -95,10 +95,13 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        units_{new Hero(Player::First), new Hero(Player::Second), new Creep(Team::Radiant), new Creep(Team::Dire)},
-        heroes_{dynamic_cast<Hero *>(units_[0]), dynamic_cast<Hero *>(units_[0])},
+        units_{new Hero(Player::First),
+               new Hero(Player::Second),
+               new Creep(Team::Radiant),
+               new Creep(Team::Dire)},
+        heroes_{dynamic_cast<Hero *>(units_[0]),
+                dynamic_cast<Hero *>(units_[1])},
         myHero_{*heroes_[0]},
-        creeps_{Creep(Team::Radiant), Creep(Team::Dire)},
         gameState_{units_},
         client_{gameState_} {
 
