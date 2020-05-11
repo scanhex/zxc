@@ -89,17 +89,19 @@ void ZxcApplication::initHandlers() {
 
 void ZxcApplication::initNetwork() {
     client_ = Client(gameState_);
-    networkThread_ = std::thread(&Client::run, *client_);
+    networkThread_ = std::thread(&Client::run, client_);
 }
 
 ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        heroes_{Hero(Player::First), Hero(Player::Second)},
-        myHero_{heroes_[0]},
-        creeps_{Creep(Team::Radiant), Creep(Team::Dire)},
-        gameState_(GameState(heroes_, creeps_)) {
+		heroes_{ Hero(Player::First), Hero(Player::Second) },
+		myHero_{ heroes_[0] },
+		creeps_{ Creep(Team::Radiant), Creep(Team::Dire) },
+		gameState_{ heroes_, creeps_ },
+		client_{ gameState_ }
+{
 
     setSwapInterval(1);
 
