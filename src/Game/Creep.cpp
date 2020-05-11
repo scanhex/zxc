@@ -1,4 +1,5 @@
 #define _USE_MATH_DEFINES
+
 #include "Creep.h"
 #include <cmath>
 
@@ -23,4 +24,5 @@ Position Creep::creepSpawns_[] = {Position(Point(-3, -6), 0),  // Radiant
 
 Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[static_cast<uint8_t>(team)]) {
     team_ = team;
+    killReward_ = 100;
 }

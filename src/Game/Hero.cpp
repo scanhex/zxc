@@ -31,6 +31,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[
                                     MidCoil(*this),
                                     LongCoil(*this)} {
     team_ = static_cast<Team>(player);
+    killReward_ = 500;
 }
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
@@ -111,13 +112,15 @@ void Hero::refreshUnit() {
 
 void Hero::serialize(BufferIO::BufferWriter &writer) {
     Unit::serialize(writer);
-    // gold, lvl, exp?
+    writer.writeInt32(gold_); // TODO add UINT RUslan?
+    // lvl, exp?
 
 }
 
 void Hero::deserialize(BufferIO::BufferReader &reader) {
     Unit::deserialize(reader);
-    // gold, lvl, exp?
+    gold_ = reader.readInt32(); // TODO add UINT RUslan?
+    // lvl, exp?
 }
 
 // setters and getters
