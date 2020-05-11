@@ -150,7 +150,6 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 
 void Client::ConnectionToServer::parseEventsFromBuffer() {
     size_t sz = reader_.readInt32();
-    assert(sz <= 5);
     Hero *hero = gameState_.getHero(Player::Second);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();

@@ -227,7 +227,7 @@ void Server::ConnectionToClient::writeGStoBuffer() {
 void Server::ConnectionToClient::writeEventsToBuffer() {
     std::vector<SerializedEvent *> events;
     size_t cnt = 0;
-    while (!othersEvents_.empty() && cnt < 5) {
+    while (!othersEvents_.empty()) {
         ++cnt;
         SerializedEvent *e;
         othersEvents_.pop(e);
