@@ -112,14 +112,14 @@ void Hero::refreshUnit() {
 
 void Hero::serialize(BufferIO::BufferWriter &writer) {
     Unit::serialize(writer);
-    writer.writeInt32(gold_); // TODO add UINT RUslan?
+    writer.writeInt32(gold_);
     // lvl, exp?
 
 }
 
 void Hero::deserialize(BufferIO::BufferReader &reader) {
     Unit::deserialize(reader);
-    gold_ = reader.readInt32(); // TODO add UINT RUslan?
+    gold_ = reader.readInt32();
     // lvl, exp?
 }
 
