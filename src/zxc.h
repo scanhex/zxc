@@ -85,5 +85,5 @@ private:
     Magnum::Timeline timeline_;
     std::unique_ptr<GraphicsHandler> graphicsHandler_;
 
-    Optional<Client> client_;
+    Client client_;
 };
