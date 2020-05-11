@@ -87,6 +87,8 @@ void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 
 void Unit::updateUnit(double elapsedTimeInSeconds) {
+    if (isDead()) return;
+
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
 

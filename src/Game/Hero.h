@@ -44,8 +44,6 @@ public:
     bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
-    void increaseDeathCounter();
-
     void updateUnit(double elapsedTimeInSeconds) override;
 
     void refreshPosition();
