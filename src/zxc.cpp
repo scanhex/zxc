@@ -78,6 +78,8 @@ void ZxcApplication::initScene() {
 void ZxcApplication::initGame() {
     addUnit(heroes_[0]);
     addUnit(heroes_[1]);
+    addUnit(creeps_[0]);
+    addUnit(creeps_[1]);
 }
 
 void ZxcApplication::initHandlers() {
@@ -94,7 +96,8 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
         heroes_{Hero(Player::First), Hero(Player::Second)},
         myHero_{heroes_[0]},
-        gameState_(GameState(heroes_)) {
+        creeps_{Creep(Team::Radiant), Creep(Team::Dire)},
+        gameState_(GameState(heroes_, creeps_)) {
 
     setSwapInterval(1);
 
@@ -115,21 +118,19 @@ void ZxcApplication::addUnit(const Unit &u) {
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
-    Point myPosition = gameState_.getPosition(Player::First);
-    Point otherPosition = gameState_.getPosition(Player::Second);
-    Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
-    Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
+    for (Hero &hero : heroes_) {
+        const Point &position = hero.getPosition();
+        auto index = static_cast<uint8_t>(hero.getTeam());
 
-    unitObjects_[0]->translate(myVectorPosition - unitObjects_[0]->transformation().translation());
-    unitObjects_[1]->translate(otherVectorPosition - unitObjects_[1]->transformation().translation());
+        Vector3 vectorPosition(position.x_, position.y_, position.z_);
+        unitObjects_[index]->translate(vectorPosition - unitObjects_[index]->transformation().translation());
 
-    double myAngle = gameState_.getAngle(Player::First);
-    double otherAngle = gameState_.getAngle(Player::Second);
-    auto myPos = Matrix4::translation(unitObjects_[0]->transformationMatrix().translation());
-    auto otherPos = Matrix4::translation(unitObjects_[1]->transformationMatrix().translation());
+        double angle = gameState_.getAngle(static_cast<Player>(index));
+        auto matrixPosition = Matrix4::translation(unitObjects_[index]->transformationMatrix().translation());
+        unitObjects_[index]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+    }
 
-    unitObjects_[0]->setTransformation(myPos * Matrix4::rotationZ(Magnum::Rad(M_PI + myAngle)));
-    unitObjects_[1]->setTransformation(otherPos * Matrix4::rotationZ(Magnum::Rad(M_PI + otherAngle)));
+    for(Creep &)
 }
 
 void ZxcApplication::drawEvent() {

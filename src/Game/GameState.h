@@ -1,11 +1,11 @@
 #pragma once
 
 #include <optional>
-#include "StatsBuilder.h"
+#include "Hero.h"
 #include "Point.h"
+#include "Creep.h"
 #include "Events/Events.h"
 
-class Hero;
 
 enum class Player : uint8_t {
     First = 0,
@@ -19,7 +19,7 @@ class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<ThirdSkillUseEvent> {
 public:
     GameState();
-    explicit GameState(Hero heroes_[NUM_PLAYERS]);
+    explicit GameState(Hero heroes_[NUM_PLAYERS], Creep creeps_[NUM_PLAYERS]);
 
     [[nodiscard]] bool gameIsFinished() const;
 
@@ -62,4 +62,5 @@ public:
 private:
 
     Hero *heroes_[NUM_PLAYERS];
+    Creep *creeps_[NUM_PLAYERS];
 };
