@@ -22,8 +22,11 @@ void Coil::use(GameState &gameState) {
     auto team = hero_.getTeam();
     Point coilCenter = hero_.shiftUnitPosition(len_);
     for (Unit *unit : gameState.units_) {
-        if (unit->getTeam() != team && unit->inRadius(coilCenter, radius_)) {
+        if (unit->getTeam() != team && !unit->isDead() && unit->inRadius(coilCenter, radius_)) {
             unit->applyDamage(damage_);
+            if (unit->isDead()) {
+                hero_.addGold(unit->getKillReward());
+            }
         }
     }
 

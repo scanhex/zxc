@@ -6,6 +6,7 @@
 #include <cmath>
 
 Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
+                                             killReward_{0},
                                              stats_{stats},
                                              position_{position} {
     stats_.refreshStats();
@@ -136,6 +137,7 @@ bool Unit::isDead() const { return stats_.getHealthPoints() == 0.0; }
 // setters and getters
 
 Team Unit::getTeam() const { return team_; }
+uint32_t Unit::getKillReward() const { return killReward_; }
 
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }

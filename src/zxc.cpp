@@ -124,6 +124,8 @@ void ZxcApplication::addUnit(const Unit &u) {
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
+    std::cerr << myHero_.getGold() << std::endl;
+
     for (size_t i = 0; i < unitObjects_.size(); i++) {
         const Point &position = units_[i]->getPosition();
 

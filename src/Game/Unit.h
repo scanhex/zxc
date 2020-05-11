@@ -25,6 +25,7 @@ protected:
     std::vector<Buff> buffs_;
 
     Team team_;
+    uint32_t killReward_;
 
     Stats stats_;
 
@@ -81,6 +82,7 @@ public:
     // getters and setters
 
     [[nodiscard]] Team getTeam() const;
+    [[nodiscard]] uint32_t getKillReward() const;
 
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
