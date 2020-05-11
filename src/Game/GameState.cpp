@@ -1,15 +1,24 @@
 #include "GameState.h"
 #include <algorithm>
 
-GameState::GameState(Hero heroes[NUM_PLAYERS], Creep creeps[NUM_PLAYERS]) : heroes_{&heroes[0], &heroes[1]},
-                                                                            creeps_{&creeps[0], &creeps[1]} {}
+GameState::GameState(std::vector<Unit *> &units) : units_{units} {
+    heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
+    heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
+}
 
-GameState::GameState() : heroes_{new Hero(Player::First),
-                                 new Hero(Player::Second)}, // 2 default heros
-                         creeps_{new Creep(Team::Radiant),
-                                 new Creep(Team::Dire)} {}   // 2 default creeps
+GameState::GameState() {
+    // create 2 default heroes and 2 default creeps
+    units_.push_back(new Hero(Player::First));
+    units_.push_back(new Hero(Player::Second));
+    units_.push_back(new Creep(Team::Radiant));
+    units_.push_back(new Creep(Team::Dire));
+
+    heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
+    heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
+}
+
 Hero *GameState::getHero(Player player) const {
-    return heroes_[static_cast<uint8_t>(player)];
+    return dynamic_cast<Hero *>(units_[static_cast<uint8_t>(player)]);
 }
 
 double GameState::getHealthPoints(Player player) const {
@@ -65,21 +74,8 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
-    for (Hero *hero : heroes_) {
-        if (!hero->isDead()) {
-            hero->updateUnit(elapsedTimeInSeconds);
-        } else {
-            if (hero->getDeathCounter() < 1) {
-                hero->increaseDeathCounter();
-                hero->refreshUnit();
-            }
-        }
-    }
-
-    for (Creep *creep : creeps_) {
-        if (!creep->isDead()) {
-            creep->updateUnit(elapsedTimeInSeconds);
-        }
+    for (Unit *unit : units_) {
+        unit->updateUnit(elapsedTimeInSeconds);
     }
 }
 
@@ -127,43 +123,25 @@ bool GameState::isDead(Player player) const {
 }
 
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
-    Team team = static_cast<Team>(player);
-    // first serialize player
-    for (Hero *hero : heroes_) {
-        if (hero->getTeam() == team) {
-            hero->serialize(writer);
-        }
-    }
+    Hero *myHero = heroes_[static_cast<uint8_t>(player)];
+    // first serialize player(my))Hero
+    myHero->serialize(writer);
     // then every other unit
-    for (Hero *hero : heroes_) {
-        if (hero->getTeam() != team) {
-            hero->serialize(writer);
-        }
-    }
-    for (Creep *creep : creeps_) {
-        if (creep->getTeam() != team) {
-            creep->serialize(writer);
+    for (Unit *unit : units_) {
+        if (unit != myHero) {
+            unit->serialize(writer);
         }
     }
 }
 
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
-    Team team = static_cast<Team>(player);
-    // first deserialize player
-    for (Hero *hero : heroes_) {
-        if (hero->getTeam() == team) {
-            hero->deserialize(reader);
-        }
-    }
-    // then every other unit TODO UNITS potom!
-    for (Hero *hero : heroes_) {
-        if (hero->getTeam() != team) {
-            hero->deserialize(reader);
-        }
-    }
-    for (Creep *creep : creeps_) {
-        if (creep->getTeam() != team) {
-            creep->deserialize(reader);
+    Hero *myHero = heroes_[static_cast<uint8_t>(player)];
+    // first serialize player(my))Hero
+    myHero->deserialize(reader);
+    // then every other unit
+    for (Unit *unit : units_) {
+        if (unit != myHero) {
+            unit->deserialize(reader);
         }
     }
 }

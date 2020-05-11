@@ -83,14 +83,17 @@ void Hero::useSkill(SkillName skillName, GameState &gameState) {
     skills_[static_cast<uint8_t>(skillName)].use(gameState);
 }
 
-void Hero::increaseDeathCounter() {
-    ++deathCounter_;
-}
-
 void Hero::updateUnit(double elapsedTimeInSeconds) {
-    Unit::updateUnit(elapsedTimeInSeconds);
-    for (Coil &coil : skills_) {
-        coil.update(elapsedTimeInSeconds);
+    if (isDead()) {
+        if (deathCounter_ < 1) {
+            ++deathCounter_;
+            refreshUnit();
+        }
+    } else {
+        Unit::updateUnit(elapsedTimeInSeconds);
+        for (Coil &coil : skills_) {
+            coil.update(elapsedTimeInSeconds);
+        }
     }
 }
 

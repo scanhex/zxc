@@ -19,7 +19,7 @@ class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<ThirdSkillUseEvent> {
 public:
     GameState();
-    explicit GameState(Hero heroes_[NUM_PLAYERS], Creep creeps_[NUM_PLAYERS]);
+    explicit GameState(std::vector<Unit *> &units);
 
     [[nodiscard]] bool gameIsFinished() const;
 
@@ -61,8 +61,8 @@ public:
 
 private:
 
-    Hero *heroes_[NUM_PLAYERS];
-    Creep *creeps_[NUM_PLAYERS];
+    std::vector<Unit *> units_;
+    std::vector<Hero *> heroes_;
 
     friend class Coil;
 };

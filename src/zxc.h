@@ -64,7 +64,8 @@ private:
     ShaderLibrary shaderLibrary_;
     ModelLoader modelLoader_;
 
-    Hero heroes_[NUM_PLAYERS];
+    std::vector<Unit *> units_;
+    std::vector<Hero *> heroes_;
     Hero &myHero_; // just a ref to heroes[0]
 
     Creep creeps_[NUM_PLAYERS];

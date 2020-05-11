@@ -21,16 +21,9 @@ void Coil::use(GameState &gameState) {
      */
     auto team = hero_.getTeam();
     Point coilCenter = hero_.shiftUnitPosition(len_);
-    for (Hero *hero : gameState.heroes_) {
-        // TODO loop over all units dadadadadadadada
-        if (hero->getTeam() != team && hero->inRadius(coilCenter, radius_)) {
-            hero->applyDamage(damage_);
-        }
-    }
-
-    for (Creep *creep : gameState.creeps_) {
-        if (creep->getTeam() != team && creep->inRadius(coilCenter, radius_)) {
-            creep->applyDamage(damage_);
+    for (Unit *unit : gameState.units_) {
+        if (unit->getTeam() != team && unit->inRadius(coilCenter, radius_)) {
+            unit->applyDamage(damage_);
         }
     }
 
