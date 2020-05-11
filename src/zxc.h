@@ -84,4 +84,6 @@ private:
     GL::Mesh grid_;
     Magnum::Timeline timeline_;
     std::unique_ptr<GraphicsHandler> graphicsHandler_;
+
+    Optional<Client> client_;
 };

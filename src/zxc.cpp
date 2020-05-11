@@ -86,8 +86,10 @@ void ZxcApplication::initHandlers() {
     graphicsHandler_ = std::make_unique<GraphicsHandler>(scene_, drawables_, timeline_);
 }
 
+
 void ZxcApplication::initNetwork() {
-    networkThread_ = std::thread(runClient, std::ref(gameState_));
+    client_ = Client(gameState_);
+    networkThread_ = std::thread(&Client::run, *client_);
 }
 
 ZxcApplication::ZxcApplication(const Arguments &arguments) :

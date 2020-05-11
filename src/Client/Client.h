@@ -155,5 +155,3 @@ private:
         explicit FromServerThirdSkillUseEvent(Hero &hero) : ThirdSkillUseEvent(hero) {}
     };
 };
-
-void runClient(GameState &gameState);
