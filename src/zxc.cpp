@@ -96,12 +96,11 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-		heroes_{ Hero(Player::First), Hero(Player::Second) },
-		myHero_{ heroes_[0] },
-		creeps_{ Creep(Team::Radiant), Creep(Team::Dire) },
-		gameState_{ heroes_, creeps_ },
-		client_{ gameState_ }
-{
+        heroes_{Hero(Player::First), Hero(Player::Second)},
+        myHero_{heroes_[0]},
+        creeps_{Creep(Team::Radiant), Creep(Team::Dire)},
+        gameState_{heroes_, creeps_},
+        client_{gameState_} {
 
     setSwapInterval(1);
 
