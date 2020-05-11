@@ -17,59 +17,6 @@ GameState::GameState() {
     heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
 }
 
-Hero *GameState::getHero(Player player) const {
-    return dynamic_cast<Hero *>(units_[static_cast<uint8_t>(player)]);
-}
-
-double GameState::getHealthPoints(Player player) const {
-    Hero *hero = getHero(player);
-    return hero->getHealthPoints();
-}
-
-Point GameState::getPosition(Player player) const {
-    Hero *hero = getHero(player);
-    return hero->getPosition();
-}
-
-double GameState::getAngle(Player player) const {
-    Hero *hero = getHero(player);
-    return hero->getAngle();
-}
-
-Point GameState::getDestination(Player player) const {
-    Hero *hero = getHero(player);
-    return hero->getDestination();
-}
-
-void GameState::setPosition(Point pos, Player player) const {
-    Hero *hero = getHero(player);
-    hero->setPosition(pos);
-}
-
-void GameState::setPosition(double x, double y, Player player) const {
-    Hero *hero = getHero(player);
-    hero->setPosition(x, y);
-}
-
-void GameState::setHealthPoints(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->setHealthPoints(amount);
-}
-
-void GameState::setDestination(double x, double y, Player player) const {
-    Hero *hero = getHero(player);
-    hero->setDestination(x, y);
-}
-
-void GameState::setAngle(double angle, Player player) const {
-    Hero *hero = getHero(player);
-    hero->setAngle(angle);
-}
-
-bool GameState::gameIsFinished() const {
-    return heroes_[0]->getDeathCounter() >= 2 || heroes_[1]->getDeathCounter() >= 2;
-}
-
 void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
@@ -86,61 +33,33 @@ void GameState::refreshAllUnits() {
     }
 }
 
-
-void GameState::applyDamage(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->applyDamage(amount);
-}
-
-void GameState::applyDamagePhys(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->applyDamagePhys(amount);
-}
-
-void GameState::applyDamageMagic(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->applyDamageMagic(amount);
-}
-
-void GameState::regenMana(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->regenMana(amount);
-}
-
-void GameState::spendMana(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    hero->spendMana(amount);
-}
-
-bool GameState::canSpendMana(double amount, Player player) const {
-    Hero *hero = getHero(player);
-    return hero->canSpendMana(amount);
-}
-
-bool GameState::isDead(Player player) const {
-    Hero *hero = getHero(player);
-    return hero->isDead();
-}
-
 void GameState::serialize(BufferIO::BufferWriter &writer, Player player) {
-    Hero *myHero = heroes_[static_cast<uint8_t>(player)];
-    // first serialize player(my))Hero
-    myHero->serialize(writer);
+    Team team = static_cast<Team>(player);
+    // first serialize player team
+    for (Unit *unit : units_) {
+        if (unit->getTeam() == team) {
+            unit->serialize(writer);
+        }
+    }
     // then every other unit
     for (Unit *unit : units_) {
-        if (unit != myHero) {
+        if (unit->getTeam() != team) {
             unit->serialize(writer);
         }
     }
 }
 
 void GameState::deserialize(BufferIO::BufferReader &reader, Player player) {
-    Hero *myHero = heroes_[static_cast<uint8_t>(player)];
-    // first serialize player(my))Hero
-    myHero->deserialize(reader);
+    Team team = static_cast<Team>(player);
+    // first serialize player team
+    for (Unit *unit : units_) {
+        if (unit->getTeam() == team) {
+            unit->deserialize(reader);
+        }
+    }
     // then every other unit
     for (Unit *unit : units_) {
-        if (unit != myHero) {
+        if (unit->getTeam() != team) {
             unit->deserialize(reader);
         }
     }
@@ -165,4 +84,79 @@ void GameState::handle(const SecondSkillUseEvent &event) {
 
 void GameState::handle(const ThirdSkillUseEvent &event) {
     event.hero_.useSkill(SkillName::ThirdSkill, *this);
+}
+
+
+// getters and setters
+
+Hero *GameState::getHero(Player player) const {
+    return dynamic_cast<Hero *>(units_[static_cast<uint8_t>(player)]);
+}
+
+double GameState::getHealthPoints(Player player) const {
+    return getHero(player)->getHealthPoints();
+}
+
+Point GameState::getPosition(Player player) const {
+    return getHero(player)->getPosition();
+}
+
+double GameState::getAngle(Player player) const {
+    return getHero(player)->getAngle();
+}
+
+Point GameState::getDestination(Player player) const {
+    return getHero(player)->getDestination();
+}
+
+bool GameState::isDead(Player player) const {
+    return getHero(player)->isDead();
+}
+
+void GameState::setHealthPoints(double amount, Player player) const {
+    getHero(player)->setHealthPoints(amount);
+}
+
+void GameState::setPosition(Point pos, Player player) const {
+    getHero(player)->setPosition(pos);
+}
+
+void GameState::setPosition(double x, double y, Player player) const {
+    getHero(player)->setPosition(x, y);
+}
+
+void GameState::setDestination(double x, double y, Player player) const {
+    getHero(player)->setDestination(x, y);
+}
+
+void GameState::setAngle(double angle, Player player) const {
+    getHero(player)->setAngle(angle);
+}
+
+void GameState::applyDamage(double amount, Player player) const {
+    getHero(player)->applyDamage(amount);
+}
+
+void GameState::applyDamagePhys(double amount, Player player) const {
+    getHero(player)->applyDamagePhys(amount);
+}
+
+void GameState::applyDamageMagic(double amount, Player player) const {
+    getHero(player)->applyDamageMagic(amount);
+}
+
+void GameState::regenMana(double amount, Player player) const {
+    getHero(player)->regenMana(amount);
+}
+
+void GameState::spendMana(double amount, Player player) const {
+    getHero(player)->spendMana(amount);
+}
+
+bool GameState::canSpendMana(double amount, Player player) const {
+    return getHero(player)->canSpendMana(amount);
+}
+
+bool GameState::gameIsFinished() const {
+    return heroes_[0]->getDeathCounter() >= 2 || heroes_[1]->getDeathCounter() >= 2;
 }
