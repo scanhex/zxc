@@ -1,13 +1,15 @@
 #include "GameState.h"
 #include <algorithm>
 
-GameState::GameState(Hero heroes[NUM_PLAYERS]) : heroes_{&heroes[0], &heroes[1]} {}
+GameState::GameState(Hero heroes[NUM_PLAYERS], Creep creeps[NUM_PLAYERS]) : heroes_{&heroes[0], &heroes[1]},
+                                                                            creeps_{&creeps[0], &creeps[1]} {}
 
 GameState::GameState() : heroes_{new Hero(Player::First),
-                                 new Hero(Player::Second)} {} // 2 default heros
-
+                                 new Hero(Player::Second)}, // 2 default heros
+                         creeps_{new Creep(Team::Radiant),
+                                 new Creep(Team::Dire)} {}   // 2 default creeps
 Hero *GameState::getHero(Player player) const {
-    return heroes_[static_cast<uint8_t >(player)];
+    return heroes_[static_cast<uint8_t>(player)];
 }
 
 double GameState::getHealthPoints(Player player) const {

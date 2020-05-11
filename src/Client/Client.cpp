@@ -94,7 +94,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     }
     assert(bytes == MSG_WAIT_FROM_SERVER_SIZE);
     uint8_t status = reader_.readUInt8();
-    // clearEvents();
+    clearEvents();
     if (status) {
         runGame();
     } else {
