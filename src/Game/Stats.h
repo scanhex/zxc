@@ -6,6 +6,7 @@
 class Stats {
 private:
     int32_t damage_;
+    int32_t default_damage_;
     uint32_t attackRange_;
 
     uint32_t moveSpeed_;
@@ -14,6 +15,8 @@ private:
 
     uint32_t maxHP_;
     uint32_t maxMP_;
+    uint32_t default_maxHP_;
+    uint32_t default_maxMP_;
     double healthPoints_;
     double manaPoints_;
     double hpRegen_; // per second
@@ -50,6 +53,9 @@ public:
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
 
+    [[nodiscard]] int32_t getDefaultDamage() const;
+    void setDefaultDamage(int32_t damage);
+
     [[nodiscard]] uint32_t getAttackRange() const;
     void setAttackRange(uint32_t attackRange);
 
@@ -71,8 +77,14 @@ public:
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
 
+    [[nodiscard]] int32_t getDefaultHealthPoints() const;
+    void setDefaultHealthPoints(int32_t healthPoints);
+
     [[nodiscard]] double getManaPoints() const;
     void setManaPoints(double manaPoints);
+
+    [[nodiscard]] int32_t getDefaultManaPoints() const;
+    void setDefaultManaPoints(int32_t manaPoints);
 
     [[nodiscard]] double getHpRegen() const;
     void setHpRegen(double hpRegen);
