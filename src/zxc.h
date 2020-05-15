@@ -48,7 +48,7 @@ private:
 
     void updateGameState();
 
-    void addUnit(const Unit &u);
+    void addUnit(const Unit &u, std::string filename, bool wtf);
     void initCamera();
     void initRenderer();
     void initGrid();

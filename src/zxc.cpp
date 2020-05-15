@@ -76,10 +76,10 @@ void ZxcApplication::initScene() {
 }
 
 void ZxcApplication::initGame() {
-    addUnit(heroes_[0]);
-    addUnit(heroes_[1]);
-    addUnit(creeps_[0]);
-    addUnit(creeps_[1]);
+    addUnit(heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(creeps_[0], RESOURCE_DIR "/yasher.fbx", true);
+    addUnit(creeps_[1], RESOURCE_DIR "/crocodil.fbx", true);
 }
 
 void ZxcApplication::initHandlers() {
@@ -112,9 +112,9 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     timeline_.start();
 }
 
-void ZxcApplication::addUnit(const Unit &u) {
+void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
     unitObjects_.push_back(
-            modelLoader_.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", scene_, drawables_).release());
+            modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 

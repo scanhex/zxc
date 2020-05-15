@@ -90,14 +90,14 @@ public:
                               GL::Texture2D &texture,
                               SceneGraph::DrawableGroup3D &group) :
             SceneGraph::Drawable3D{object, &group},
-            shader_(shader), mesh_(mesh), texture_(texture) {}
+            shader_(shader), mesh_(std::move(mesh)), texture_(std::move(texture)) {}
 
 private:
     void draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) override;
 
     Shaders::Phong &shader_;
-    GL::Mesh &mesh_;
-    GL::Texture2D &texture_;
+    GL::Mesh mesh_;
+    GL::Texture2D texture_;
 };
 
 constexpr float COIL_ANIMATION_DURATION = 0.4;
