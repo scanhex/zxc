@@ -31,6 +31,7 @@ protected:
     Stats stats_;
 
     Position position_;
+    double heroRadius_;
 
 public:
     Unit(Stats stats, Position position);
@@ -67,9 +68,11 @@ public:
     void changeArmor(int32_t delta);
     void changeResist(double delta);
 
-    virtual void updateUnit(double elapsedTimeInSeconds);
+    virtual void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits);
 
     virtual void refreshUnit();
+
+    [[nodiscard]] bool checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const;
 
     virtual void serialize(BufferIO::BufferWriter &writer);
     virtual void deserialize(BufferIO::BufferReader &reader);
@@ -85,6 +88,7 @@ public:
     [[nodiscard]] Team getTeam() const;
     [[nodiscard]] uint32_t getGoldKillReward() const;
     [[nodiscard]] uint32_t getExpKillReward() const;
+    [[nodiscard]] double getHeroRadius() const;
 
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
