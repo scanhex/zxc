@@ -25,7 +25,8 @@ void Coil::use(GameState &gameState) {
         if (unit->getTeam() != team && !unit->isDead() && unit->inRadius(coilCenter, radius_)) {
             unit->applyDamage(damage_);
             if (unit->isDead()) {
-                hero_.addGold(unit->getKillReward());
+                hero_.addGold(unit->getGoldKillReward());
+                hero_.changeExperience(unit->getExpKillReward());
             }
         }
     }

@@ -21,6 +21,10 @@ private:
     uint32_t level_;
     uint32_t experience_;
 
+    uint32_t hpIncreasePerLevel_;
+    uint32_t mpIncreasePerLevel_;
+    int32_t damageIncreasePerLevel_;
+
     int32_t deathCounter_;
 
     Coil skills_[NUM_SKILLS];
@@ -48,6 +52,11 @@ public:
 
     void refreshPosition();
     void refreshUnit() override;
+
+    void updateStats();
+    void updateDamage();
+    void updateMaxHP();
+    void updateMaxMP();
 
     void serialize(BufferIO::BufferWriter &writer) override;
     void deserialize(BufferIO::BufferReader &reader) override;

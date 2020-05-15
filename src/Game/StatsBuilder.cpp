@@ -6,6 +6,7 @@ Stats StatsBuilder::create() {
 
 StatsBuilder &StatsBuilder::setDamage(int32_t damage) {
     stats_.setDamage(damage);
+    stats_.setDefaultDamage(damage);
     return *this;
 }
 
@@ -31,11 +32,13 @@ StatsBuilder &StatsBuilder::setAttackSpeed(uint32_t attackSpeed) {
 
 StatsBuilder &StatsBuilder::setMaxHp(uint32_t maxHp) {
     stats_.setMaxHp(maxHp);
+    stats_.setDefaultHealthPoints(maxHp);
     return *this;
 }
 
 StatsBuilder &StatsBuilder::setMaxMp(uint32_t maxMp) {
     stats_.setMaxMp(maxMp);
+    stats_.setDefaultManaPoints(maxMp);
     return *this;
 }
 
