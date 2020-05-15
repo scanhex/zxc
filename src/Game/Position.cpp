@@ -11,8 +11,8 @@ Position::Position(Point current, double angle) : current_{current},
 
 void Position::update(double deltaTurn, double deltaMove) {
     if (current_ == destination_) return;
-    updateAngle(deltaTurn);
     updatePoint(deltaMove);
+    //  updateAngle(deltaTurn);
 }
 
 void Position::updateAngle(double deltaTurn) {
@@ -47,21 +47,21 @@ void Position::updatePoint(double deltaMove) {
 
 void Position::updateDestinationAngle() {
     Point vector = destination_ - current_;
-    if(vector == Point{0, 0}) return;
+    if (vector == Point{0, 0}) return;
     destAngle_ = std::acos(vector.y_ / vector.norm());
     if (vector.x_ > 0) {
         destAngle_ = 2 * M_PI - destAngle_;
     }
 }
 
-void Position::serialize(BufferIO::BufferWriter &writer){
+void Position::serialize(BufferIO::BufferWriter &writer) {
     current_.serialize(writer);
     destination_.serialize(writer);
     writer.writeDouble(currentAngle_);
     writer.writeDouble(destAngle_);
 }
 
-void Position::deserialize(BufferIO::BufferReader &reader){
+void Position::deserialize(BufferIO::BufferReader &reader) {
     current_.deserialize(reader);
     destination_.deserialize(reader);
     currentAngle_ = reader.readDouble();
@@ -77,6 +77,7 @@ void Position::setPosition(const Point &current) {
     current_ = current;
     updateDestinationAngle();
 }
+
 void Position::setPosition(double x, double y) {
     current_ = Point(x, y);
     updateDestinationAngle();
@@ -95,6 +96,7 @@ void Position::setDestination(double x, double y) {
 }
 
 double Position::getAngle() const { return currentAngle_; }
+
 void Position::setAngle(double angle) {
     currentAngle_ = angle;
     destAngle_ = angle;
@@ -112,4 +114,19 @@ bool Position::inRadius(double x, double y, double r) const {
 
 bool Position::inRadius(const Point &point, double r) const {
     return current_.inRadius(point, r);
+}
+
+Point Position::nextPosition(double deltaMove) const {
+    if (current_ == destination_) return current_;
+    double delta = std::abs(destAngle_ - currentAngle_);
+    if (std::min(delta, 2 * M_PI - delta) > 0) return current_;
+
+    Point vector = destination_ - current_;
+    if (vector.normLessThan(deltaMove)) {
+        return destination_;
+    } else {
+        vector.normalize();
+        vector *= deltaMove;
+        return current_ + vector;
+    }
 }

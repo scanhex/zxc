@@ -48,7 +48,7 @@ public:
     bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
-    void updateUnit(double elapsedTimeInSeconds) override;
+    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) override;
 
     void refreshPosition();
     void refreshUnit() override;

@@ -15,7 +15,7 @@
 #include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int TICK_TIME_GS_UPDATE = 30;
+static constexpr int TICK_TIME_GS_UPDATE = 10;
 static constexpr int TICK_TIME_SEND_GS = 30;
 static constexpr int PLAYERS_REQUIRED = 2;
 static constexpr int MSG_FROM_SERVER_SIZE = 512;

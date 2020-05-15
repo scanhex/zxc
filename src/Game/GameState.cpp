@@ -16,14 +16,16 @@ GameState::GameState() {
     heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
     heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
 }
-
+#include <iostream>
 void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
     for (Unit *unit : units_) {
-        unit->updateUnit(elapsedTimeInSeconds);
+        unit->updateUnit(elapsedTimeInSeconds, units_);
+       // std::cout<< unit->getPosition().x_<< " "<<unit->getPosition().y_<<std::endl;
     }
+   // std::cout<<std::endl;
 }
 
 void GameState::refreshAllUnits() {
