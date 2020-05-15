@@ -32,6 +32,7 @@ protected:
 
     Position position_;
     double heroRadius_;
+    bool moved_{false};
 
 public:
     Unit(Stats stats, Position position);
@@ -89,6 +90,9 @@ public:
     [[nodiscard]] uint32_t getGoldKillReward() const;
     [[nodiscard]] uint32_t getExpKillReward() const;
     [[nodiscard]] double getHeroRadius() const;
+
+    [[nodiscard]] bool getMovedFlag() const;
+    void setDamage(bool status);
 
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);

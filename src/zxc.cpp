@@ -128,7 +128,8 @@ void ZxcApplication::updateGameState() {
         const Point &position = units_[i]->getPosition();
 
         Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
+        if(units_[i]->getMovedFlag())
+            unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
 
         double angle = units_[i]->getAngle();
         auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
@@ -162,7 +163,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
         previousPosition_ = positionOnSphere(event.position());
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
+        // unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
 
         double x = newPosition.x(), y = newPosition.y();
 

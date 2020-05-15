@@ -101,8 +101,10 @@ void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnit
     Point nextPos = position_.nextPosition(moveDelta);
     if (checkUnitsPosition(nextPos, allUnits)) {
       //  position_.update(turnDelta, moveDelta);
+      moved_ = true;
       position_.updatePoint(moveDelta);
-      assert(nextPos == position_.getPosition());
+    } else {
+        moved_ = false;
     }
 }
 
@@ -159,6 +161,9 @@ double Unit::getHeroRadius() const { return heroRadius_; }
 Team Unit::getTeam() const { return team_; }
 uint32_t Unit::getGoldKillReward() const { return goldKillReward_; }
 uint32_t Unit::getExpKillReward() const { return expKillReward_; }
+
+bool Unit::getMovedFlag() const { return moved_; }
+void Unit::setDamage(bool status) { moved_ = status; }
 
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
