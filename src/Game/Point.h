@@ -24,6 +24,8 @@ public:
 
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
     [[nodiscard]] bool inRadius(const Point& point, double r) const;
+    [[nodiscard]] static bool isEnoughDistance(const Point& first, double r1,
+                                               const Point& second, double r2);
 
     [[nodiscard]] double normSqr() const;
     [[nodiscard]] double norm() const;

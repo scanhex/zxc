@@ -21,6 +21,10 @@ private:
     uint32_t level_;
     uint32_t experience_;
 
+    uint32_t hpIncreasePerLevel_;
+    uint32_t mpIncreasePerLevel_;
+    int32_t damageIncreasePerLevel_;
+
     int32_t deathCounter_;
 
     Coil skills_[NUM_SKILLS];
@@ -44,12 +48,15 @@ public:
     bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
-    void increaseDeathCounter();
-
-    void updateUnit(double elapsedTimeInSeconds) override;
+    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) override;
 
     void refreshPosition();
     void refreshUnit() override;
+
+    void updateStats();
+    void updateDamage();
+    void updateMaxHP();
+    void updateMaxMP();
 
     void serialize(BufferIO::BufferWriter &writer) override;
     void deserialize(BufferIO::BufferReader &reader) override;

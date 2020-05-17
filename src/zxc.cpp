@@ -46,8 +46,9 @@ void ZxcApplication::initCamera() {
     constexpr float camHeight = 20;
     constexpr auto camAngle = Math::Deg<Float>{30};
     cameraObject_
-        .setParent(&scene_)
-        .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(camAngle);
+            .setParent(&scene_)
+            .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(
+                    camAngle);
     (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
             .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
             .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -80,10 +81,10 @@ void ZxcApplication::initScene() {
 }
 
 void ZxcApplication::initGame() {
-    addUnit(heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
-    addUnit(heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
-    addUnit(creeps_[0], RESOURCE_DIR "/yasher.fbx", true);
-    addUnit(creeps_[1], RESOURCE_DIR "/crocodil.fbx", true);
+    addUnit(*heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*units_[2], RESOURCE_DIR "/yasher.fbx", true);
+    addUnit(*units_[3], RESOURCE_DIR "/crocodil.fbx", true);
 }
 
 void ZxcApplication::initHandlers() {
@@ -105,10 +106,14 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        heroes_{Hero(Player::First), Hero(Player::Second)},
-        myHero_{heroes_[0]},
-        creeps_{Creep(Team::Radiant), Creep(Team::Dire)},
-        gameState_{heroes_, creeps_},
+        units_{new Hero(Player::First),
+               new Hero(Player::Second),
+               new Creep(Team::Radiant),
+               new Creep(Team::Dire)},
+        heroes_{dynamic_cast<Hero *>(units_[0]),
+                dynamic_cast<Hero *>(units_[1])},
+        myHero_{*heroes_[0]},
+        gameState_{units_},
         client_{gameState_} {
 
     setSwapInterval(1);
@@ -131,29 +136,16 @@ void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
-    for (Hero &hero : heroes_) {
-        const Point &position = hero.getPosition();
-        auto index = static_cast<uint8_t>(hero.getTeam());
+    for (size_t i = 0; i < unitObjects_.size(); i++) {
+        const Point &position = units_[i]->getPosition();
 
         Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        unitObjects_[index]->translate(vectorPosition - unitObjects_[index]->transformation().translation());
+        if (units_[i]->getMovedFlag())
+            unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
 
-        double angle = gameState_.getAngle(static_cast<Player>(index));
-        auto matrixPosition = Matrix4::translation(unitObjects_[index]->transformationMatrix().translation());
-        unitObjects_[index]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
-    }
-
-    // TODO loop over all units
-    for (Creep &creep : creeps_) {
-        const Point &position = creep.getPosition();
-        auto index = static_cast<uint8_t>(creep.getTeam()) + 2; // potom sdelau norm
-
-        Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        unitObjects_[index]->translate(vectorPosition - unitObjects_[index]->transformation().translation());
-
-        double angle = gameState_.getAngle(static_cast<Player>(index));
-        auto matrixPosition = Matrix4::translation(unitObjects_[index]->transformationMatrix().translation());
-        unitObjects_[index]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+        double angle = units_[i]->getAngle();
+        auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
+        unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
     }
 }
 
@@ -179,14 +171,14 @@ void ZxcApplication::viewportEvent(ViewportEvent &event) {
     camera_->setViewport(event.windowSize());
 }
 
-void ZxcApplication::mousePressEvent(MouseEvent& event) {
-	if (event.button() == MouseEvent::Button::Middle) {
-        previousPosition_ = intersectWithPlane(event.position(), { 0, 0, 1 });
+void ZxcApplication::mousePressEvent(MouseEvent &event) {
+    if (event.button() == MouseEvent::Button::Middle) {
+        previousPosition_ = intersectWithPlane(event.position(), {0, 0, 1});
         cameraMoving_ = true;
-	}
+    }
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
+        // unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
 
         double x = newPosition.x(), y = newPosition.y();
 
@@ -196,11 +188,11 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
     }
 }
 
-void ZxcApplication::mouseReleaseEvent(MouseEvent& event) {
+void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
     if (event.button() == MouseEvent::Button::Middle) {
-		previousPosition_ = Containers::NullOpt;
-		cameraMoving_ = false;
-	}
+        previousPosition_ = Containers::NullOpt;
+        cameraMoving_ = false;
+    }
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
@@ -269,14 +261,14 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
 
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
     if (cameraMoving_ || (event.buttons() & MouseMoveEvent::Button::Middle)) {
-        const Vector3 currentPosition = intersectWithPlane(event.position(), { 0, 0, 1 });
+        const Vector3 currentPosition = intersectWithPlane(event.position(), {0, 0, 1});
         if (!previousPosition_)
             previousPosition_ = currentPosition;
-		else {
-			auto delta = currentPosition - *previousPosition_;
-			cameraObject_.translate(-delta);
-			redraw();
-		}
+        else {
+            auto delta = currentPosition - *previousPosition_;
+            cameraObject_.translate(-delta);
+            redraw();
+        }
     }
 }
 
@@ -310,7 +302,7 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     }
 }
 
-void ZxcApplication::keyReleaseEvent(KeyEvent& event) {
+void ZxcApplication::keyReleaseEvent(KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
         cameraMoving_ = false;
         previousPosition_ = Containers::NullOpt;
