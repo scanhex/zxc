@@ -13,6 +13,7 @@ public:
     void update(double deltaTurn, double deltaMove);
     void updateAngle(double deltaTurn);
     void updatePoint(double deltaMove);
+    void updatePointIgnoreAngle(double deltaMove);
 
     [[nodiscard]] const Point &getPosition() const;
     void setPosition(const Point &current);
