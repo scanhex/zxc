@@ -23,10 +23,12 @@
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
+#include <Corrade/PluginManager/PluginManager.h>
+#include <Magnum/Text/Text.h>
+
+
 #include <iostream>
 #include <cassert>
-
-#include <boost/lockfree/queue.hpp>
 
 #include "Graphics/Types.h"
 #include "Graphics/Drawables.h"
@@ -35,6 +37,8 @@
 #include "Graphics/ShaderLibrary.h"
 
 #include "zxc.h"
+
+#include "Graphics/PluginLibrary.h"
 
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
@@ -73,8 +77,6 @@ void ZxcApplication::initGrid() {
 void ZxcApplication::initScene() {
     initCamera();
     initRenderer();
-    /* Setup shaders */
-
     initGrid();
 }
 
@@ -95,6 +97,11 @@ void ZxcApplication::initNetwork() {
     networkThread_ = std::thread(&Client::run, client_);
 }
 
+void ZxcApplication::initUi() {
+    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "»");
+    uiGoldPlane_.emplace(*ui_);
+}
+
 ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
@@ -112,8 +119,9 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     setSwapInterval(1);
 
     initScene();
-    initGame();
     initHandlers();
+    initUi();
+    initGame();
     initNetwork();
 
     timeline_.start();
@@ -151,6 +159,7 @@ void ZxcApplication::drawEvent() {
     //	Debug{} << 1 / timeline_.previousFrameDuration();
 
     camera_->draw(drawables_);
+    ui_->draw();
 
     swapBuffers();
     redraw();

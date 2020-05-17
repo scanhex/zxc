@@ -10,6 +10,13 @@
 #include <Magnum/SceneGraph/Scene.h>
 #include <Magnum/Timeline.h>
 #include <Magnum/Magnum.h>
+#include <Magnum/Ui/Anchor.h>
+#include <Magnum/Ui/Button.h>
+#include <Magnum/Ui/Input.h>
+#include <Magnum/Ui/Label.h>
+#include <Magnum/Ui/Modal.h>
+#include <Magnum/Ui/Plane.h>
+#include <Magnum/Ui/UserInterface.h>
 
 
 #include <boost/lockfree/queue.hpp>
@@ -19,6 +26,7 @@
 #include "Graphics/GraphicsHandler.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
+#include "Graphics/GoldPlane.h"
 
 using namespace Magnum;
 using namespace Corrade;
@@ -55,6 +63,7 @@ private:
     void initGame();
     void initHandlers();
     void initNetwork();
+    void initUi();
 
     Float depthAt(const Vector2i &position) const;
     Vector3 unproject(const Vector2i &position, Float depth) const;
@@ -84,6 +93,9 @@ private:
     GL::Mesh grid_;
     Magnum::Timeline timeline_;
     std::unique_ptr<GraphicsHandler> graphicsHandler_;
+
+    Optional<Ui::UserInterface> ui_;
+    Optional<GoldPlane> uiGoldPlane_;
 
     Client client_;
 };

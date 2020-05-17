@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Events/Events.h"
 #include "GameState.h"
 
 Skill::Skill(Hero &hero) : hero_{hero} {}
@@ -27,6 +28,8 @@ void Coil::use(GameState &gameState) {
             if (unit->isDead()) {
                 hero_.addGold(unit->getGoldKillReward());
                 hero_.changeExperience(unit->getExpKillReward());
+                GoldChangedEvent ev{ (int)hero_.getGold() };
+                EventHandler<GoldChangedEvent>::fireEvent(ev);
             }
         }
     }

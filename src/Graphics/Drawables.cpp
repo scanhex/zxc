@@ -12,13 +12,15 @@
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/Shaders/DistanceFieldVector.h>
 
+#include "PluginLibrary.h"
 
-PluginManager::Manager<Text::AbstractFont> manager;
+
 Containers::Pointer<Text::AbstractFont> font;
+
 UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Unit &unit)
         : SceneGraph::Drawable3D(object, &group), unit_(unit) {
     if (!font) {
-        font = manager.loadAndInstantiate("StbTrueTypeFont");
+        font = PluginLibrary::getFontManager().loadAndInstantiate("StbTrueTypeFont");
     }
     if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
         Fatal{} << "Cannot open font file";
