@@ -39,9 +39,12 @@
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
+    constexpr float camHeight = 20;
+    constexpr auto camAngle = Math::Deg<Float>{30};
     cameraObject_
             .setParent(&scene_)
-            .translate(Vector3::zAxis(30.0f));
+            .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(
+                    camAngle);
     (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
             .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
             .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -63,7 +66,7 @@ void ZxcApplication::initRenderer() {
 void ZxcApplication::initGrid() {
     grid_ = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
     auto grid = new Object3D{&scene_};
-    (*grid).scale(Vector3{8});
+    (*grid).scale(Vector3{30});
     new FlatDrawable{*grid, ShaderLibrary::flatShader(), grid_, drawables_};
 }
 
@@ -76,9 +79,10 @@ void ZxcApplication::initScene() {
 }
 
 void ZxcApplication::initGame() {
-    for (Unit *unit : units_) {
-        addUnit(*unit);
-    }
+    addUnit(*heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*units_[2], RESOURCE_DIR "/yasher.fbx", true);
+    addUnit(*units_[3], RESOURCE_DIR "/crocodil.fbx", true);
 }
 
 void ZxcApplication::initHandlers() {
@@ -115,9 +119,9 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     timeline_.start();
 }
 
-void ZxcApplication::addUnit(const Unit &u) {
+void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
     unitObjects_.push_back(
-            modelLoader_.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", scene_, drawables_).release());
+            modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
@@ -128,7 +132,7 @@ void ZxcApplication::updateGameState() {
         const Point &position = units_[i]->getPosition();
 
         Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        if(units_[i]->getMovedFlag())
+        if (units_[i]->getMovedFlag())
             unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
 
         double angle = units_[i]->getAngle();
@@ -159,8 +163,10 @@ void ZxcApplication::viewportEvent(ViewportEvent &event) {
 }
 
 void ZxcApplication::mousePressEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = positionOnSphere(event.position());
+    if (event.button() == MouseEvent::Button::Middle) {
+        previousPosition_ = intersectWithPlane(event.position(), {0, 0, 1});
+        cameraMoving_ = true;
+    }
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
         // unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
@@ -174,8 +180,10 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
 }
 
 void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = Vector3();
+    if (event.button() == MouseEvent::Button::Middle) {
+        previousPosition_ = Containers::NullOpt;
+        cameraMoving_ = false;
+    }
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
@@ -185,8 +193,11 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     // const Float distance = cameraObject_.transformation().translation().z();
 
     /* Move 15% of the distance back or forward */
+    auto coords = cameraObject_.transformationMatrix().translation();
+    coords.x() = 0;
+    coords.y() = 0;
     cameraObject_.translate(
-            -cameraObject_.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+            -coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
 //	cameraObject_.translate(Vector3::zAxis(
 //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
@@ -239,50 +250,53 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
        */
 }
 
-Vector3 ZxcApplication::positionOnSphere(const Vector2i &position) const {
-    const Vector2 positionNormalized = Vector2{position} / Vector2{camera_->viewport()} - Vector2{0.5f};
-    const Float length = positionNormalized.length();
-    const Vector3 result(
-            length > 1.0f ? Vector3(positionNormalized, 0.0f) : Vector3(positionNormalized, 1.0f - length));
-    return (result * Vector3::yScale(-1.0f)).normalized();
-}
-
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
-    if (!(event.buttons() & MouseMoveEvent::Button::Left)) return;
-
-    const Vector3 currentPosition = positionOnSphere(event.position());
-    const Vector3 axis = Math::cross(previousPosition_, currentPosition);
-
-    if (previousPosition_.length() < 0.001f || axis.length() < 0.001f) return;
-
-    cameraObject_.rotate(Math::angle(previousPosition_, currentPosition), axis.normalized());
-    previousPosition_ = currentPosition;
-
-    redraw();
+    if (cameraMoving_ || (event.buttons() & MouseMoveEvent::Button::Middle)) {
+        const Vector3 currentPosition = intersectWithPlane(event.position(), {0, 0, 1});
+        if (!previousPosition_)
+            previousPosition_ = currentPosition;
+        else {
+            auto delta = currentPosition - *previousPosition_;
+            cameraObject_.translate(-delta);
+            redraw();
+        }
+    }
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+    // QWERTY and Dvorak bindings
+    if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
         if (myHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
+    if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
         if (myHero_.isSkillReady(SkillName::SecondSkill)) {
             EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
+    if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
         if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
             EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
+    if (event.key() == KeyEvent::Key::S || event.key() == KeyEvent::Key::O) {
         EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
         redraw();
+    }
+    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
+        cameraMoving_ = true;
+        previousPosition_ = Containers::NullOpt;
+    }
+}
+
+void ZxcApplication::keyReleaseEvent(KeyEvent &event) {
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
+        cameraMoving_ = false;
+        previousPosition_ = Containers::NullOpt;
     }
 }
 

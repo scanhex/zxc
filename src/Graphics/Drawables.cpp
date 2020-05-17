@@ -5,6 +5,7 @@
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
+#include <Magnum/Primitives/Circle.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Complex.h>
 #include <Magnum/Math/Matrix3.h>
@@ -33,14 +34,26 @@ void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
     } else {
         hpShader_.setColor(0x1ac100_rgbf);
     }
-	hpShader_.setTransformationProjectionMatrix(
+    hpShader_.setTransformationProjectionMatrix(
                     camera.projectionMatrix() *
                     Matrix4::translation(transformationMatrix.translation()) *
                     Matrix4::translation({0.f, 1.f, 5.f}))
             .bindVectorTexture(cache.texture());
+
     int32_t myHP = ceil(unit_.getHealthPoints());
     hpRenderer_->render(std::to_string(myHP));
     hpRenderer_->mesh().draw(hpShader_);
+    // Debugging Circle under the character: 
+    /*
+    auto mesh = MeshTools::compile(Magnum::Primitives::circle3DSolid(100));
+    shader_.setDiffuseColor(0x1ac100_rgbf)
+        .setLightPosition(camera.cameraMatrix().translation())
+        .setLightColor(Color4(1.f, 1.f, 1.f))
+        .setTransformationMatrix(Matrix4::translation({ 0.f, 0.f, 0.01f }) * transformationMatrix * Matrix4::scaling({ 0.64f, 0.64f, 0.64f }))
+        .setNormalMatrix(transformationMatrix.normalMatrix())
+        .setProjectionMatrix(camera.projectionMatrix());
+    mesh.draw(shader_);
+    */
 }
 
 
@@ -53,7 +66,7 @@ void FlatDrawable::draw(const Matrix4 &transformation, SceneGraph::Camera3D &cam
 void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     shader_.setDiffuseColor(color_)
             .setLightPosition(camera.cameraMatrix().translation())
-            .setLightColor(Color4(255, 255, 255, 255))
+            .setLightColor(Color4(1.f, 1.f, 1.f))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());

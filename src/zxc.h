@@ -43,12 +43,11 @@ private:
     void exitEvent(ExitEvent &event) override;
 
     void keyPressEvent(KeyEvent &event) override;
-
-    Vector3 positionOnSphere(const Vector2i &position) const;
+    void keyReleaseEvent(KeyEvent& event) override;
 
     void updateGameState();
 
-    void addUnit(const Unit &u);
+    void addUnit(const Unit &u, std::string filename, bool wtf);
     void initCamera();
     void initRenderer();
     void initGrid();
@@ -77,9 +76,10 @@ private:
     Scene3D scene_;
     Object3D cameraObject_;
     SceneGraph::Camera3D *camera_ = nullptr;
+    bool cameraMoving_ = false;
     Object3D mapObject_;
     SceneGraph::DrawableGroup3D drawables_;
-    Vector3 previousPosition_;
+    Optional<Vector3> previousPosition_;
 
     GL::Mesh grid_;
     Magnum::Timeline timeline_;
