@@ -21,7 +21,7 @@
 #include "Drawables.h"
 #include "ShaderLibrary.h"
 
-Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::DrawableGroup3D &drawables) {
+Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::DrawableGroup3D &drawables, bool wtf) {
     /* Load a scene importer plugin */
     Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;
     auto loadState = manager.load("AssimpImporter");
@@ -39,7 +39,7 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, S
 
     /* Load all textures. Textures that fail to load will be NullOpt. */
     /**/
-    if (textures_.empty()) { // TODO apply correct memoization
+//    if (textures_.empty()) { // TODO apply correct memoization
         textures_ = Containers::Array<Containers::Optional<GL::Texture2D>>{importer->textureCount()};
         for (UnsignedInt i = 0; i != importer->textureCount(); ++i) {
             Debug{} << "Importing texture" << i << importer->textureName(i);
@@ -92,7 +92,7 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, S
             /* Compile the mesh */
             meshes_[i] = MeshTools::compile(*meshData);
         }
-    }
+//    }
 
     /* Load all materials. Materials that fail to load will be NullOpt. The
        data will be stored directly in objects later, so save them only
@@ -122,7 +122,7 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, S
 
         /* Recursively add all children */
         for (UnsignedInt objectId : sceneData->children3D())
-            addObject(*importer, materials, *manipulator, objectId, drawables);
+            addObject(*importer, materials, *manipulator, objectId, drawables, wtf);
 
         /* The format has no scene support, display just the first loaded mesh with
            a default material and be done with it */
@@ -135,7 +135,7 @@ void ModelLoader::addObject(Trade::AbstractImporter &importer,
                             Containers::ArrayView<const Containers::Optional<Trade::PhongMaterialData>> materials,
                             Object3D &parent,
                             UnsignedInt i,
-                            SceneGraph::DrawableGroup3D &drawables) {
+                            SceneGraph::DrawableGroup3D &drawables, bool wtf) {
     Debug{} << "Importing object" << i << importer.object3DName(i);
     Containers::Pointer<Trade::ObjectData3D> objectData = importer.object3D(i);
     if (!objectData) {
@@ -145,8 +145,15 @@ void ModelLoader::addObject(Trade::AbstractImporter &importer,
 
     /* Add the object to the scene and set its transformation */
     auto *object = new Object3D{&parent};
-    object->setTransformation(Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) *
-                              Matrix4::scaling({0.01f, 0.01f, 0.01f}) * objectData->transformation());
+//    Debug{} << objectData->transformation();
+    /*
+    object->setTransformation(//Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) *
+		objectData->transformation() * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }));
+        */
+    if (wtf)
+		object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()) / 2);
+    else
+		object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()));
     /* Add a drawable if the object has a mesh and the mesh is loaded */
     if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 &&
         meshes_[objectData->instance()]) {
@@ -191,6 +198,6 @@ void ModelLoader::addObject(Trade::AbstractImporter &importer,
     Debug{} << objectData->children().size();
     /* Recursively add children */
     for (std::size_t id : objectData->children()) {
-        addObject(importer, materials, *object, id, drawables);
+        addObject(importer, materials, *object, id, drawables, wtf);
     }
 }
