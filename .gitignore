@@ -6,6 +6,6 @@ build*/
 /SDL2-2.0.10
 /SDL2-MSVC
 /resources/nevermore/materials
+/resources-local
 /assimp-vc142-mt.dll
 /.gitattributes
-/resources
