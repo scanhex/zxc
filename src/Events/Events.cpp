@@ -58,6 +58,10 @@ void ThirdSkillUseEvent::fire() {
     Event::fire(this);
 }
 
+void GoldChangedEvent::fire() {
+    Event::fire(this);
+}
+
 void DrawEvent::fire() {
     Event::fire(this);
 }

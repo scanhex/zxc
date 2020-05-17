@@ -119,7 +119,14 @@ public:
     void fire() override;
 };
 
+class GoldChangedEvent : public Event {
+public:
+    int gold_;
+    void fire() override;
+};
+
 class DrawEvent : public Event {
 public:
     void fire() override;
 };
+

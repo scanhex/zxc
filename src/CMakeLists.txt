@@ -12,6 +12,7 @@ find_package(Magnum REQUIRED
         )
 find_package(Assimp)
 find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
+find_package(MagnumExtras REQUIRED)
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
@@ -69,6 +70,7 @@ target_link_libraries(zxc PRIVATE
     Magnum::Trade
     Magnum::Primitives
     Magnum::Text
+	MagnumExtras::Ui
         )
 
 # Make the executable a default target to build & run in Visual Studio
