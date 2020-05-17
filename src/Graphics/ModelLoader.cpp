@@ -146,8 +146,10 @@ void ModelLoader::addObject(Trade::AbstractImporter &importer,
     /* Add the object to the scene and set its transformation */
     auto *object = new Object3D{&parent};
 //    Debug{} << objectData->transformation();
+    /*
     object->setTransformation(//Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) *
 		objectData->transformation() * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }));
+        */
     if (wtf)
 		object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()) / 2);
     else
