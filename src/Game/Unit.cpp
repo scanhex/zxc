@@ -163,7 +163,7 @@ uint32_t Unit::getGoldKillReward() const { return goldKillReward_; }
 uint32_t Unit::getExpKillReward() const { return expKillReward_; }
 
 bool Unit::getMovedFlag() const { return moved_; }
-void Unit::setDamage(bool status) { moved_ = status; }
+void Unit::setMovedFlag(bool status) { moved_ = status; }
 
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }

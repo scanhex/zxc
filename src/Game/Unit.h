@@ -92,7 +92,7 @@ public:
     [[nodiscard]] double getHeroRadius() const;
 
     [[nodiscard]] bool getMovedFlag() const;
-    void setDamage(bool status);
+    void setMovedFlag(bool status);
 
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
