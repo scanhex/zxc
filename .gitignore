@@ -9,3 +9,5 @@ build*/
 /resources-local
 /assimp-vc142-mt.dll
 /.gitattributes
+/resources/materials_compressed
+/resources_local
