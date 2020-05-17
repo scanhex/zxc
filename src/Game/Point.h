@@ -26,11 +26,12 @@ public:
     [[nodiscard]] bool inRadius(const Point& point, double r) const;
     [[nodiscard]] static bool isEnoughDistance(const Point& first, double r1,
                                                const Point& second, double r2);
+    [[nodiscard]] static double getDistance(const Point& first,const Point& second);
 
     [[nodiscard]] double normSqr() const;
     [[nodiscard]] double norm() const;
     [[nodiscard]] bool normLessThan(double v) const;
 
-    void serialize(BufferIO::BufferWriter &writer);
+    void serialize(BufferIO::BufferWriter &writer) const;
     void deserialize(BufferIO::BufferReader &reader);
 };
