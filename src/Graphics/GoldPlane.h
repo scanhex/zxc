@@ -4,6 +4,7 @@
 #include <Magnum/Ui/Label.h>
 #include <Magnum/Ui/Anchor.h>
 #include <Magnum/Text/Alignment.h>
+#include <Magnum/Ui/BasicUserInterface.h>
 
 #include "Events/Events.h"
 
