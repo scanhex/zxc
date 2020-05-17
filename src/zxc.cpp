@@ -39,9 +39,11 @@
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
+    constexpr float camHeight = 20;
+    constexpr auto camAngle = Math::Deg<Float>{30};
     cameraObject_
-            .setParent(&scene_)
-            .translate(Vector3::zAxis(30.0f));
+        .setParent(&scene_)
+        .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(camAngle);
     (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
             .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
             .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -63,7 +65,7 @@ void ZxcApplication::initRenderer() {
 void ZxcApplication::initGrid() {
     grid_ = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
     auto grid = new Object3D{&scene_};
-    (*grid).scale(Vector3{8});
+    (*grid).scale(Vector3{30});
     new FlatDrawable{*grid, ShaderLibrary::flatShader(), grid_, drawables_};
 }
 
@@ -270,29 +272,30 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
+    // QWERTY and Dvorak bindings
+    if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
         if (myHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
+    if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
         if (myHero_.isSkillReady(SkillName::SecondSkill)) {
             EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
+    if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
         if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
             EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
             redraw();
         }
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
+    if (event.key() == KeyEvent::Key::S || event.key() == KeyEvent::Key::O) {
         EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
         redraw();
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
+    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
         cameraMoving_ = true;
         previousPosition_ = Containers::NullOpt;
     }
