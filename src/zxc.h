@@ -43,6 +43,7 @@ private:
     void exitEvent(ExitEvent &event) override;
 
     void keyPressEvent(KeyEvent &event) override;
+    void keyReleaseEvent(KeyEvent& event) override;
 
     void updateGameState();
 
@@ -75,9 +76,10 @@ private:
     Scene3D scene_;
     Object3D cameraObject_;
     SceneGraph::Camera3D *camera_ = nullptr;
+    bool cameraMoving_ = false;
     Object3D mapObject_;
     SceneGraph::DrawableGroup3D drawables_;
-    Vector3 previousPosition_;
+    Optional<Vector3> previousPosition_;
 
     GL::Mesh grid_;
     Magnum::Timeline timeline_;

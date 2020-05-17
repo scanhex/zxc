@@ -169,8 +169,10 @@ void ZxcApplication::viewportEvent(ViewportEvent &event) {
 }
 
 void ZxcApplication::mousePressEvent(MouseEvent& event) {
-    if (event.button() == MouseEvent::Button::Middle)
+	if (event.button() == MouseEvent::Button::Middle) {
         previousPosition_ = intersectWithPlane(event.position(), { 0, 0, 1 });
+        cameraMoving_ = true;
+	}
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
         unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
@@ -183,9 +185,11 @@ void ZxcApplication::mousePressEvent(MouseEvent& event) {
     }
 }
 
-void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = Vector3();
+void ZxcApplication::mouseReleaseEvent(MouseEvent& event) {
+    if (event.button() == MouseEvent::Button::Middle) {
+		previousPosition_ = Containers::NullOpt;
+		cameraMoving_ = false;
+	}
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
@@ -253,12 +257,15 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
 }
 
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
-    if (event.buttons() & MouseMoveEvent::Button::Middle) {
+    if (cameraMoving_ || (event.buttons() & MouseMoveEvent::Button::Middle)) {
         const Vector3 currentPosition = intersectWithPlane(event.position(), { 0, 0, 1 });
-        auto delta = currentPosition - previousPosition_;
-        cameraObject_.translate(-delta);
-//        previousPosition_ = currentPosition;
-        redraw();
+        if (!previousPosition_)
+            previousPosition_ = currentPosition;
+		else {
+			auto delta = currentPosition - *previousPosition_;
+			cameraObject_.translate(-delta);
+			redraw();
+		}
     }
 }
 
@@ -284,6 +291,17 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
         EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
         redraw();
+    }
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
+        cameraMoving_ = true;
+        previousPosition_ = Containers::NullOpt;
+    }
+}
+
+void ZxcApplication::keyReleaseEvent(KeyEvent& event) {
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
+        cameraMoving_ = false;
+        previousPosition_ = Containers::NullOpt;
     }
 }
 
