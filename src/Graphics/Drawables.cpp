@@ -28,11 +28,11 @@ UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group,
 }
 
 void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    if (unit_.getTeam() == Team::Dire)
+    if (unit_.getTeam() == Team::Dire) {
         hpShader_.setColor(0xe90000_rgbf);
-    else
+    } else {
         hpShader_.setColor(0x1ac100_rgbf);
-
+    }
 	hpShader_.setTransformationProjectionMatrix(
                     camera.projectionMatrix() *
                     Matrix4::translation(transformationMatrix.translation()) *
