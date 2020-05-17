@@ -43,7 +43,7 @@
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
-    constexpr float camHeight = 20;
+    constexpr float camHeight = 25;
     constexpr auto camAngle = Math::Deg<Float>{30};
     cameraObject_
             .setParent(&scene_)
