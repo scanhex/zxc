@@ -45,6 +45,17 @@ void Position::updatePoint(double deltaMove) {
     }
 }
 
+void Position::updatePointIgnoreAngle(double deltaMove) {
+    Point vector = destination_ - current_;
+    if (vector.normLessThan(deltaMove)) {
+        current_ = destination_;
+    } else {
+        vector.normalize();
+        vector *= deltaMove;
+        current_ += vector;
+    }
+}
+
 void Position::updateDestinationAngle() {
     Point vector = destination_ - current_;
     if (vector == Point{0, 0}) return;
