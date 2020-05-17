@@ -31,6 +31,8 @@ public:
     void serialize(BufferIO::BufferWriter &writer);
     void deserialize(BufferIO::BufferReader &reader);
 
+    [[nodiscard]] Point nextPosition(double deltaMove) const;
+
 private:
     void updateDestinationAngle();
     void changeAngle(double delta);

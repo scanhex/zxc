@@ -48,6 +48,9 @@ void Stats::deserialize(BufferIO::BufferReader &reader) {
 int32_t Stats::getDamage() const { return damage_; }
 void Stats::setDamage(int32_t damage) { damage_ = damage; } // forbid negative applyDamage?
 
+int32_t Stats::getDefaultDamage() const { return default_damage_; }
+void Stats::setDefaultDamage(int32_t damage) { default_damage_ = damage; }
+
 uint32_t Stats::getAttackRange() const { return attackRange_; }
 void Stats::setAttackRange(uint32_t attackRange) { attackRange_ = attackRange; }
 
@@ -77,6 +80,12 @@ void Stats::setManaPoints(double manaPoints) {
     assert(manaPoints >= 0 && manaPoints <= maxHP_ && "Wrong new mana points!");
     manaPoints_ = manaPoints;
 }
+
+int32_t Stats::getDefaultHealthPoints() const { return default_maxHP_; }
+void Stats::setDefaultHealthPoints(int32_t healthPoints) { default_maxHP_ = healthPoints; }
+
+int32_t Stats::getDefaultManaPoints() const { return default_maxMP_; }
+void Stats::setDefaultManaPoints(int32_t manaPoints) { default_maxMP_ = manaPoints; }
 
 double Stats::getHpRegen() const { return hpRegen_; }
 void Stats::setHpRegen(double hpRegen) { hpRegen_ = hpRegen; }

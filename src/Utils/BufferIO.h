@@ -5,53 +5,58 @@
 
 namespace BufferIO {
 
-    static constexpr int MAX_BUF = 1024;
+static constexpr int MAX_BUF = 1024;
 
-    union binaryDouble {
-        double dValue;
-        uint64_t iValue;
-    };
+union binaryDouble {
+    double dValue;
+    uint64_t iValue;
+};
 
 /*
 *  Classes to parse args to bytes and back
 */
-    class BufferWriter final {
-    public:
-        void writeUInt8(uint8_t d);
 
-        void writeDouble(double d);
+/*
+ * Считывания и запись int32 и int64 работают также и с беззнаковыми типами.
+ */
 
-        void writeInt32(int32_t d);
+class BufferWriter final {
+public:
+    void writeUInt8(uint8_t d);
 
-        void writeInt64(int64_t d);
+    void writeDouble(double d);
 
-        void flushBuffer();
+    void writeInt32(int32_t d);
 
-    public:
-        uint8_t write_buffer_[MAX_BUF]{};
+    void writeInt64(int64_t d);
 
-    private:
-        std::size_t idx_{0};
-    };
+    void flushBuffer();
 
-    class BufferReader final {
-    public:
+public:
+    uint8_t write_buffer_[MAX_BUF]{};
 
-        uint8_t readUInt8();
+private:
+    std::size_t idx_{0};
+};
 
-        double readDouble();
+class BufferReader final {
+public:
 
-        int32_t readInt32();
+    uint8_t readUInt8();
 
-        int64_t readInt64();
+    double readDouble();
 
-        void flushBuffer();
+    int32_t readInt32();
 
-    public:
-        uint8_t read_buffer_[MAX_BUF]{};
+    int64_t readInt64();
 
-    private:
-        size_t idx_{0};
-    };
+    void flushBuffer();
+
+public:
+    uint8_t read_buffer_[MAX_BUF]{};
+
+private:
+    size_t idx_{0};
+};
 
 }

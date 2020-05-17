@@ -6,8 +6,11 @@
 #include <cmath>
 
 Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
+                                             goldKillReward_{0},
+                                             expKillReward_{0},
                                              stats_{stats},
-                                             position_{position} {
+                                             position_{position},
+                                             heroRadius_{0.24} {
     stats_.refreshStats();
 }
 
@@ -86,13 +89,35 @@ void Unit::spendMana(double amount) {
 void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 
-void Unit::updateUnit(double elapsedTimeInSeconds) {
+void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) {
+    if (isDead()) return;
+
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
 
     double turnDelta = getTurnRate() * (elapsedTimeInSeconds / 0.03);
     double moveDelta = (getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
-    position_.update(turnDelta, moveDelta);
+    position_.updateAngle(turnDelta);
+    Point nextPos = position_.nextPosition(moveDelta);
+    if (checkUnitsPosition(nextPos, allUnits)) {
+      //  position_.update(turnDelta, moveDelta);
+      moved_ = true;
+      position_.updatePoint(moveDelta);
+    } else {
+        moved_ = false;
+    }
+}
+
+bool Unit::checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const {
+    for (auto & unit : allUnits) {
+        if (unit != this) {
+            if (!Point::isEnoughDistance(position, heroRadius_,
+                                         unit->getPosition(), unit->heroRadius_)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void Unit::refreshUnit() {
@@ -132,8 +157,13 @@ bool Unit::isDead() const { return stats_.getHealthPoints() == 0.0; }
 
 
 // setters and getters
-
+double Unit::getHeroRadius() const { return heroRadius_; }
 Team Unit::getTeam() const { return team_; }
+uint32_t Unit::getGoldKillReward() const { return goldKillReward_; }
+uint32_t Unit::getExpKillReward() const { return expKillReward_; }
+
+bool Unit::getMovedFlag() const { return moved_; }
+void Unit::setMovedFlag(bool status) { moved_ = status; }
 
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
