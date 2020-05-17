@@ -44,8 +44,6 @@ private:
 
     void keyPressEvent(KeyEvent &event) override;
 
-    Vector3 positionOnSphere(const Vector2i &position) const;
-
     void updateGameState();
 
     void addUnit(const Unit &u, std::string filename, bool wtf);

@@ -168,9 +168,9 @@ void ZxcApplication::viewportEvent(ViewportEvent &event) {
     camera_->setViewport(event.windowSize());
 }
 
-void ZxcApplication::mousePressEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = positionOnSphere(event.position());
+void ZxcApplication::mousePressEvent(MouseEvent& event) {
+    if (event.button() == MouseEvent::Button::Middle)
+        previousPosition_ = intersectWithPlane(event.position(), { 0, 0, 1 });
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
         unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
@@ -195,8 +195,11 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     // const Float distance = cameraObject_.transformation().translation().z();
 
     /* Move 15% of the distance back or forward */
+    auto coords = cameraObject_.transformationMatrix().translation();
+    coords.x() = 0;
+    coords.y() = 0;
     cameraObject_.translate(
-            -cameraObject_.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+            -coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
 //	cameraObject_.translate(Vector3::zAxis(
 //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
@@ -249,26 +252,14 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
        */
 }
 
-Vector3 ZxcApplication::positionOnSphere(const Vector2i &position) const {
-    const Vector2 positionNormalized = Vector2{position} / Vector2{camera_->viewport()} - Vector2{0.5f};
-    const Float length = positionNormalized.length();
-    const Vector3 result(
-            length > 1.0f ? Vector3(positionNormalized, 0.0f) : Vector3(positionNormalized, 1.0f - length));
-    return (result * Vector3::yScale(-1.0f)).normalized();
-}
-
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
-    if (!(event.buttons() & MouseMoveEvent::Button::Left)) return;
-
-    const Vector3 currentPosition = positionOnSphere(event.position());
-    const Vector3 axis = Math::cross(previousPosition_, currentPosition);
-
-    if (previousPosition_.length() < 0.001f || axis.length() < 0.001f) return;
-
-    cameraObject_.rotate(Math::angle(previousPosition_, currentPosition), axis.normalized());
-    previousPosition_ = currentPosition;
-
-    redraw();
+    if (event.buttons() & MouseMoveEvent::Button::Middle) {
+        const Vector3 currentPosition = intersectWithPlane(event.position(), { 0, 0, 1 });
+        auto delta = currentPosition - previousPosition_;
+        cameraObject_.translate(-delta);
+//        previousPosition_ = currentPosition;
+        redraw();
+    }
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
