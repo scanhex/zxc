@@ -117,7 +117,6 @@ void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnit
 }
 
 void Unit::claimReward(Unit *killed_unit) {
-    return;
 }
 
 bool Unit::checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const {

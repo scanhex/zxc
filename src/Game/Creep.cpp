@@ -28,3 +28,10 @@ Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[
     expKillReward_ = 500;
     giveId();
 }
+
+void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
+    if (isDead()) {
+        refreshUnit();
+    }
+    Unit::updateUnit(elapsedTimeInSeconds, allUnits);
+}
