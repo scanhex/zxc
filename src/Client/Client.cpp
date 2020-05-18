@@ -96,6 +96,8 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     uint8_t status = reader_.readUInt8();
     clearEvents();
     if (status) {
+        if(status == 2)
+            gameState_.reverseIndices();
         runGame();
     } else {
         waitForGameStart();
@@ -155,6 +157,14 @@ void Client::ConnectionToServer::parseEventsFromBuffer() {
         uint8_t actionId = reader_.readUInt8();
         auto eventName = static_cast<SerializedEventName>(actionId);
         switch (eventName) {
+            case SerializedEventName::Attack: {
+                uint8_t attacker_id = reader_.readUInt8();
+                uint8_t target_id = reader_.readUInt8();
+                Attack *attack = new Attack(gameState_.findUnitByID(attacker_id),
+                                            gameState_.findUnitByID(target_id));
+                othersEvents_.push(new FromServerAttackEvent(*attack));
+                break;
+            }
             case SerializedEventName::FirstSkillUse: {
                 othersEvents_.push(new FromServerFirstSkillUseEvent(*hero));
                 break;
@@ -226,7 +236,6 @@ void Client::ConnectionToServer::fireOtherEvents() {
     }
 }
 
-
 void Client::checkServerResponse() {
     if (!connection_->isConnected()) return;
     now_ = boost::posix_time::microsec_clock::local_time();
@@ -252,6 +261,12 @@ void Client::handle(const MoveEvent &event) {
 void Client::handle(const StopEvent &event) {
     if (isNotFromServerEvent(event)) {
         connection_->events_.push(new StopEvent(event));
+    }
+}
+
+void Client::handle(const AttackEvent &event) {
+    if (isNotFromServerEvent(event)) {
+        connection_->events_.push(new AttackEvent(event));
     }
 }
 

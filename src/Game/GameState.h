@@ -14,6 +14,7 @@ enum class Player : uint8_t {
 
 class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<StopEvent>,
+                  public EventHandler<AttackEvent>,
                   public EventHandler<FirstSkillUseEvent>,
                   public EventHandler<SecondSkillUseEvent>,
                   public EventHandler<ThirdSkillUseEvent> {
@@ -24,12 +25,14 @@ public:
     void update(double elapsedTime); // time in milliseconds
 
     void refreshAllUnits();
+    void reverseIndices();
 
     void serialize(BufferIO::BufferWriter &writer, Player player);
     void deserialize(BufferIO::BufferReader &reader, Player player);
 
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
+    void handle(const AttackEvent &event) override;
     void handle(const FirstSkillUseEvent &event) override;
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
@@ -58,10 +61,15 @@ public:
 
     [[nodiscard]] bool gameIsFinished() const;
 
+    Unit* findUnitByID(uint8_t id);
+    std::vector<Unit * >& getAllUnits();
+
 private:
 
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
+
+    std::vector<Attack *> attacks_;
 
     friend class Coil;
 };

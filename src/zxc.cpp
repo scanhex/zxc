@@ -98,7 +98,7 @@ void ZxcApplication::initNetwork() {
 }
 
 void ZxcApplication::initUi() {
-    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "»");
+    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "ï¿½");
     uiGoldPlane_.emplace(*ui_);
 }
 
@@ -274,6 +274,13 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     // QWERTY and Dvorak bindings
+    if (event.key() == KeyEvent::Key::A) {
+        Attack* attack = myHero_.attack(gameState_.getAllUnits());
+        if(attack){
+            EventHandler<AttackEvent>::fireEvent(AttackEvent(*attack));
+        }
+        redraw();
+    }
     if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
         if (myHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));

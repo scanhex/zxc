@@ -26,4 +26,5 @@ Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[
     team_ = team;
     goldKillReward_ = 100;
     expKillReward_ = 500;
+    giveId();
 }

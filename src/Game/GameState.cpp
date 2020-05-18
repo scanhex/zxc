@@ -21,6 +21,10 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
+    for (Attack *attack: attacks_) {
+        attack->update(elapsedTimeInSeconds);
+    }
+
     for (Unit *unit : units_) {
         unit->updateUnit(elapsedTimeInSeconds, units_);
     }
@@ -30,6 +34,16 @@ void GameState::refreshAllUnits() {
     for (Hero *hero : heroes_) {
         hero->setDeathCounter(0);
         hero->refreshUnit();
+    }
+
+    for (Attack *attack: attacks_) {
+        attack->setMovingFlag(false);
+    }
+}
+
+void GameState::reverseIndices() {
+    for (Unit *unit : units_) {
+        unit->unique_id_ = 255-unit->unique_id_;
     }
 }
 
@@ -72,6 +86,10 @@ void GameState::handle(const MoveEvent &event) {
 void GameState::handle(const StopEvent &event) {
     Point curPosition = event.hero_.getPosition();
     event.hero_.setDestination(curPosition);
+}
+
+void GameState::handle(const AttackEvent &event) {
+    attacks_.push_back(&event.attack_);
 }
 
 void GameState::handle(const FirstSkillUseEvent &event) {
@@ -159,4 +177,17 @@ bool GameState::canSpendMana(double amount, Player player) const {
 
 bool GameState::gameIsFinished() const {
     return heroes_[0]->getDeathCounter() >= 2 || heroes_[1]->getDeathCounter() >= 2;
+}
+
+Unit *GameState::findUnitByID(uint8_t id) {
+    for (Unit *unit : units_) {
+        if (unit->unique_id_ == id) {
+            return unit;
+        }
+    }
+    return nullptr;
+}
+
+std::vector<Unit *> &GameState::getAllUnits() {
+    return units_;
 }

@@ -5,13 +5,17 @@
 #include <algorithm>
 #include <cmath>
 
+uint8_t Unit::radiant_counter_ = 0;
+uint8_t Unit::dire_counter = 255;
+
 Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
                                              goldKillReward_{0},
                                              expKillReward_{0},
                                              stats_{stats},
                                              position_{position},
-                                             heroRadius_{0.24} {
+                                             heroRadius_{0.24}{
     stats_.refreshStats();
+    creator_ = new AttackCreator();
 }
 
 
@@ -43,6 +47,10 @@ void Unit::deleteBuff(size_t indexToDelete) {
 
 void Unit::clearBuffs() {
     buffs_.clear();
+}
+
+Attack* Unit::attack(std::vector<Unit * >& allUnits) {
+    return creator_->attack(this, allUnits);
 }
 
 void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
@@ -91,7 +99,7 @@ void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 
 void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) {
     if (isDead()) return;
-
+    creator_->update(elapsedTimeInSeconds);
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
 
@@ -100,12 +108,16 @@ void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnit
     position_.updateAngle(turnDelta);
     Point nextPos = position_.nextPosition(moveDelta);
     if (checkUnitsPosition(nextPos, allUnits)) {
-      //  position_.update(turnDelta, moveDelta);
-      moved_ = true;
-      position_.updatePoint(moveDelta);
+        //  position_.update(turnDelta, moveDelta);
+        moved_ = true;
+        position_.updatePoint(moveDelta);
     } else {
         moved_ = false;
     }
+}
+
+void Unit::claimReward(Unit *killed_unit) {
+    return;
 }
 
 bool Unit::checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const {
@@ -121,6 +133,7 @@ bool Unit::checkUnitsPosition(const Point& position, std::vector<Unit * >& allUn
 }
 
 void Unit::refreshUnit() {
+    creator_->refreshCoolDown();
     stats_.refreshStats();
 }
 
@@ -215,4 +228,13 @@ void Unit::setDestination(double x, double y) { position_.setDestination(x, y); 
 double Unit::getAngle() const { return position_.getAngle(); }
 void Unit::setAngle(double angle) {
     position_.setAngle(angle);
+}
+
+void Unit::giveId() {
+    if(team_ == Team::Neutral)
+        return; //TODO
+    if(team_ == Team::Dire)
+            unique_id_ = dire_counter--;
+    if(team_ == Team::Radiant)
+        unique_id_ = radiant_counter_++;
 }
