@@ -98,7 +98,7 @@ void ZxcApplication::initNetwork() {
 }
 
 void ZxcApplication::initUi() {
-    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "�");
+    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "»");
     uiGoldPlane_.emplace(*ui_);
 }
 

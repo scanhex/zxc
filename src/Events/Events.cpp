@@ -43,9 +43,7 @@ void AttackEvent::fire() {
 SkillUseEvent::SkillUseEvent(Hero &hero) : hero_{hero} {}
 
 FirstSkillUseEvent::FirstSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
-
 SecondSkillUseEvent::SecondSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
-
 ThirdSkillUseEvent::ThirdSkillUseEvent(Hero &hero) : SkillUseEvent(hero) {}
 
 void FirstSkillUseEvent::serialize(BufferIO::BufferWriter &writer) {
