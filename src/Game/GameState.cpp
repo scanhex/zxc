@@ -43,7 +43,7 @@ void GameState::refreshAllUnits() {
 
 void GameState::reverseIndices() {
     for (Unit *unit : units_) {
-        unit->unique_id_ = 255-unit->unique_id_;
+        unit->unique_id_ = 255 - unit->unique_id_; //TODO better way?
     }
 }
 
