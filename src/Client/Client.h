@@ -26,6 +26,7 @@ using namespace boost::asio;
 
 class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
+                     EventHandler<AttackEvent>,
                      EventHandler<FirstSkillUseEvent>,
                      EventHandler<SecondSkillUseEvent>,
                      EventHandler<ThirdSkillUseEvent>,
@@ -114,6 +115,7 @@ private:
 
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
+    void handle(const AttackEvent &event) override;
     void handle(const FirstSkillUseEvent &event) override;
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
@@ -138,6 +140,11 @@ private:
     class FromServerStopEvent : public StopEvent, public FromServerEvent {
     public:
         explicit FromServerStopEvent(Hero &hero) : StopEvent(hero) {}
+    };
+
+    class FromServerAttackEvent : public AttackEvent, public FromServerEvent {
+    public:
+        explicit FromServerAttackEvent(Attack& attack) : AttackEvent(attack) {}
     };
 
     class FromServerFirstSkillUseEvent : public FirstSkillUseEvent, public FromServerEvent {

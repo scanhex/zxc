@@ -8,7 +8,11 @@
 #include "Item.h"
 #include "Buff.h"
 #include "Position.h"
+#include "Attack.h"
 #include "Utils/BufferIO.h"
+
+class AttackCreator;
+class Attack;
 
 enum class Team : uint8_t {
     Radiant = 0,
@@ -20,6 +24,9 @@ constexpr size_t MAX_ITEMS = 6;
 constexpr uint32_t NUM_TEAMS = 3;
 
 class Unit {
+public:
+    uint8_t unique_id_;
+
 protected:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
@@ -34,6 +41,11 @@ protected:
     double heroRadius_;
     bool moved_{false};
 
+    AttackCreator* creator_;
+
+    static uint8_t radiant_counter_;
+    static uint8_t dire_counter;
+
 public:
     Unit(Stats stats, Position position);
 
@@ -46,6 +58,10 @@ public:
 
     void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index TODO
     void clearBuffs();
+
+    Attack* attack(std::vector<Unit * >& allUnits);
+
+    void giveId();
 
     void changeDamage(int32_t delta);
     void changeAttackRange(int32_t delta);
@@ -70,6 +86,8 @@ public:
     void changeResist(double delta);
 
     virtual void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits);
+
+    virtual void claimReward(Unit* killed_unit);
 
     virtual void refreshUnit();
 

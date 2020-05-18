@@ -90,7 +90,7 @@ private:
         void startChecker();
 
     private:
-        GameState &gameState;
+        GameState &gameState_;
         bool &running_;
         bool &stopped_;
         ip::tcp::acceptor &acceptor_;

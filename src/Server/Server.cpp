@@ -7,7 +7,7 @@ Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &g
                                                bool &running, bool &stopped, ip::tcp::acceptor &ac, std::mutex &lock,
                                                boost::lockfree::queue<Event *> &myEvents,
                                                boost::lockfree::queue<Event *> &othersEvents) :
-        gameState(gs),
+        gameState_(gs),
         running_(running),
         stopped_(stopped),
         acceptor_(ac),
@@ -114,7 +114,7 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
     }
     assert(bytes == MSG_FROM_SERVER_SIZE);
     if (!running_connections_) return;
-    if (gameState.gameIsFinished()) {
+    if (gameState_.gameIsFinished()) {
         sendEndGameMessage();
         return;
     }
@@ -123,9 +123,9 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
 }
 
 void Server::ConnectionToClient::sendEndGameMessage() {
-    assert(gameState.gameIsFinished());
+    assert(gameState_.gameIsFinished());
     writer_.flushBuffer();
-    writer_.writeUInt8(!gameState.gameIsFinished());
+    writer_.writeUInt8(!gameState_.gameIsFinished());
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE),
                            BIND_FN(stopConnection));
 }
@@ -133,7 +133,7 @@ void Server::ConnectionToClient::sendEndGameMessage() {
 void Server::ConnectionToClient::writeToSocket() {
     g_lock_.lock();
     writer_.flushBuffer();
-    writer_.writeUInt8(!gameState.gameIsFinished()); //Game is running flag
+    writer_.writeUInt8(!gameState_.gameIsFinished()); //Game is running flag
     writeEventsToBuffer();
     writeGStoBuffer();
     g_lock_.unlock();
@@ -152,7 +152,7 @@ void Server::ConnectionToClient::waitForAllConnections(const boost::system::erro
     if (running_connections_ == PLAYERS_REQUIRED) {
         running_ = true;
         writer_.flushBuffer();
-        writer_.writeUInt8(1);
+        writer_.writeUInt8(1 + player_id_);
         sock_.write_some(buffer(writer_.write_buffer_, MSG_WAIT_FROM_SERVER_SIZE));
         timer_.expires_from_now(boost::posix_time::milliseconds(TICK_TIME_SEND_GS));
         timer_.wait();
@@ -172,11 +172,21 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
     reader_.flushBuffer();
     uint8_t actionId = reader_.readUInt8();
     auto eventName = static_cast<SerializedEventName>(actionId);
-    Hero &hero = player_id_ == 0 ? *gameState.getHero(Player::First) : *gameState.getHero(Player::Second);
+    Hero &hero = player_id_ == 0 ? *gameState_.getHero(Player::First) : *gameState_.getHero(Player::Second);
 
     assert(eventName != SerializedEventName::None);
 
     switch (eventName) {
+        case SerializedEventName::Attack: {
+            uint8_t attacker_id = reader_.readUInt8();
+            uint8_t target_id = reader_.readUInt8();
+            Attack *attack = new Attack(gameState_.findUnitByID(attacker_id),
+                                        gameState_.findUnitByID(target_id));
+            auto e = new AttackEvent(*attack);
+            EventHandler<AttackEvent>::fireEvent(*e);
+            myEvents_.push(e);
+            break;
+        }
         case SerializedEventName::FirstSkillUse: {
             auto e = new FirstSkillUseEvent(hero);
             EventHandler<FirstSkillUseEvent>::fireEvent(*e);
@@ -212,8 +222,8 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
         }
     }
 
-    std::cout << "ME: " << gameState.getHealthPoints(Player::First) << '\n';
-    std::cout << "SASHKA: " << gameState.getHealthPoints(Player::Second) << '\n';
+    std::cout << "ME: " << gameState_.getHealthPoints(Player::First) << '\n';
+    std::cout << "SASHKA: " << gameState_.getHealthPoints(Player::Second) << '\n';
     std::cout << '\n';
 }
 
@@ -221,7 +231,7 @@ void Server::ConnectionToClient::writeGStoBuffer() {
     Player current = Player::First, second = Player::Second;
     if (player_id_ == 1) std::swap(current, second);
 
-    gameState.serialize(writer_, current);
+    gameState_.serialize(writer_, current);
 }
 
 void Server::ConnectionToClient::writeEventsToBuffer() {

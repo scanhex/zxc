@@ -8,7 +8,7 @@
 StatsBuilder Hero::defaultHeroStatsBuilder_ =
         StatsBuilder()
                 .setDamage(100)
-                .setAttackRange(100)
+                .setAttackRange(75)
                 .setMoveSpeed(450)
                 .setTurnRate(0.5)
                 .setAttackSpeed(100)
@@ -36,6 +36,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[
     team_ = static_cast<Team>(player);
     goldKillReward_ = 500;
     expKillReward_ = 1000;
+    giveId();
 }
 
 Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
@@ -50,6 +51,7 @@ Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.cre
                                                        MidCoil(*this),
                                                        LongCoil(*this)} {
     team_ = static_cast<Team>(player);
+    giveId();
 }
 
 Hero::Hero(Player player, Position position, Stats stats) : Hero(player, position) {
@@ -86,6 +88,13 @@ void Hero::changeExperience(uint32_t delta) {
     }
 }
 
+void Hero::claimReward(Unit *killed_unit) {
+    addGold(killed_unit->getGoldKillReward());
+    changeExperience(killed_unit->getExpKillReward());
+    GoldChangedEvent ev{static_cast<int>( getGold())};
+    EventHandler<GoldChangedEvent>::fireEvent(ev);
+}
+
 bool Hero::isSkillReady(SkillName skillName) {
     return skills_[static_cast<uint8_t>(skillName)].isReady();
 }
@@ -94,7 +103,7 @@ void Hero::useSkill(SkillName skillName, GameState &gameState) {
     skills_[static_cast<uint8_t>(skillName)].use(gameState);
 }
 
-void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) {
+void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
         if (deathCounter_ < 1) {
             ++deathCounter_;
