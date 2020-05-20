@@ -25,7 +25,7 @@ Position Creep::creepSpawns_[] = {Position(Point(-3, -6), 0),  // Radiant
 Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[static_cast<uint8_t>(team)]) {
     team_ = team;
     goldKillReward_ = 100;
-    expKillReward_ = 500;
+    expKillReward_ = 1000;
     giveId();
 }
 
