@@ -102,3 +102,20 @@ void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
 
     mesh_.draw(shader_);
 }
+
+AttackDrawable::AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack) :
+        SceneGraph::Drawable3D(object, &group), attack_(attack) {
+    mesh_ = MeshTools::compile(Primitives::cubeSolid());
+}
+
+void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
+    if (!attack_.getMovingFlag())
+        return;
+    shader_.setDiffuseColor(0xa5c9ea_rgbf)
+            .setLightPosition(camera.cameraMatrix().transformPoint(
+                    { 5.0f, 5.0f, 7.0f }))
+            .setTransformationMatrix(transformationMatrix)
+            .setNormalMatrix(transformationMatrix.normalMatrix())
+            .setProjectionMatrix(camera.projectionMatrix());
+    mesh_.draw(shader_);
+}

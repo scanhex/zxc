@@ -147,6 +147,18 @@ void ZxcApplication::updateGameState() {
         auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
         unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
     }
+
+    for (size_t i = 0; i < attackObjects_.size(); i++) {
+        const Point &position = attacks_[i]->getPosition();
+
+        Vector3 vectorPosition(position.x_, position.y_, position.z_);
+        if (attacks_[i]->getMovingFlag())
+            attackObjects_[i]->translate(vectorPosition - attackObjects_[i]->transformation().translation());
+
+      //  double angle = attacks_[i]->getAngle();
+      //  auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
+       // unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+    }
 }
 
 void ZxcApplication::drawEvent() {
@@ -277,6 +289,14 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == KeyEvent::Key::A) {
         Attack* attack = myHero_.attack(gameState_.getAllUnits());
         if(attack){
+            auto *obj = new Object3D{&scene_};
+
+            obj->transform(Matrix4::translation(Vector3{static_cast<float>(attack->getPosition().x_),
+                                                               static_cast<float>(attack->getPosition().y_), 0.1f}));
+            Debug{} << "attack";
+            new AttackDrawable(*obj, drawables_, *attack);
+            attackObjects_.push_back(obj);
+            attacks_.push_back(attack);
             EventHandler<AttackEvent>::fireEvent(AttackEvent(*attack));
         }
         redraw();

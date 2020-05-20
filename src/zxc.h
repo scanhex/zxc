@@ -74,6 +74,8 @@ private:
 
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
+    std::vector<Attack *>attacks_;
+
     Hero &myHero_; // just a ref to heroes[0]
 
     GameState gameState_;
@@ -81,6 +83,8 @@ private:
     std::thread networkThread_;
 
     std::vector<Object3D *> unitObjects_;
+
+    std::vector<Object3D *> attackObjects_;
 
     Scene3D scene_;
     Object3D cameraObject_;

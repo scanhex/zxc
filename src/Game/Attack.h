@@ -5,6 +5,8 @@ class Unit;
 
 class Attack {
 public:
+    Attack();
+
     Attack(Unit* attacker, Unit* target);
 
     void update(double elapsedTimeInSeconds);
@@ -30,7 +32,7 @@ public:
     void setAttacker(Unit * attacker);
 
 private:
-    bool moving_{true};
+    bool moving_;
     Unit* attacker_;
     Unit* target_;
     int32_t damage_;
