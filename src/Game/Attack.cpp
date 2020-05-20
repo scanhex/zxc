@@ -5,7 +5,7 @@
 Attack::Attack(Unit *attacker, Unit *target) : attacker_{attacker},
                                                target_{target},
                                                damage_{attacker->getDamage()},
-                                               moveSpeed_{600},
+                                               moveSpeed_{1200},
                                                position_{attacker->getPosition(), 0} {
     position_.setDestination(target->getPosition());
 }
@@ -13,11 +13,10 @@ Attack::Attack(Unit *attacker, Unit *target) : attacker_{attacker},
 void Attack::update(double elapsedTimeInSeconds) {
     if (!moving_)
         return;
-    position_.setDestination(target_->getDestination());
+    position_.setDestination(target_->getPosition());
     double moveDelta = (moveSpeed_ / 100.0) * elapsedTimeInSeconds;
     position_.updatePointIgnoreAngle(moveDelta);
-    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <=
-        target_->getHeroRadius() * 2) { //TODO *2?
+    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= 0.01) {
         moving_ = false;
         target_->applyDamage(damage_);
         if (target_->isDead()) {
