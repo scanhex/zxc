@@ -1,9 +1,10 @@
 # zxc
 ```
 git clone https://github.com/scanhex/zxc
+cd zxc
 ```
 
-## Подмодули
+## Подмодули -- Magnum 2019.10
 ```
 git submodule update --init
 ```
@@ -11,7 +12,7 @@ git submodule update --init
 Инструкции по установке библиотек:
 
 ## Ubuntu
-Boost
+Boost 1.65+
 ```
 apt-get install libboost-system-dev
 apt-get install libboost-thread-dev
@@ -24,7 +25,7 @@ apt-get install libboost-serialization-dev
 apt-get install libboost-all-dev   
 ```
 
-OpenGL & SDL2
+OpenGL & SDL2 - 2.0.10
 
 ```
 apt-get install libgl1-mesa-dev
