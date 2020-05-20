@@ -5,7 +5,7 @@ Attack::Attack() : moving_{false},
                    attacker_{nullptr},
                    target_{nullptr},
                    damage_{0},
-                   moveSpeed_{600},
+                   moveSpeed_{1600},
                    position_{Point(0, 0), 0} {
 
 }
@@ -14,7 +14,7 @@ Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
                                                attacker_{attacker},
                                                target_{target},
                                                damage_{attacker->getDamage()},
-                                               moveSpeed_{600},
+                                               moveSpeed_{1600},
                                                position_{attacker->getPosition(), 0} {
     position_.setDestination(target->getPosition());
 }
