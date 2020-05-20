@@ -4,7 +4,8 @@ git clone https://github.com/scanhex/zxc
 cd zxc
 ```
 
-## Подмодули -- Magnum 2019.10
+## Подмодули
+Magnum 2019.10
 ```
 git submodule update --init
 ```
