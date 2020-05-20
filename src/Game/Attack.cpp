@@ -1,4 +1,5 @@
 #include "Attack.h"
+#include <algorithm>
 
 Attack::Attack() : moving_{false},
                    attacker_{nullptr},
@@ -6,8 +7,8 @@ Attack::Attack() : moving_{false},
                    damage_{0},
                    moveSpeed_{600},
                    position_{Point(0, 0), 0} {
-}
 
+}
 
 Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
                                                attacker_{attacker},
@@ -21,11 +22,10 @@ Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
 void Attack::update(double elapsedTimeInSeconds) {
     if (!moving_)
         return;
-    position_.setDestination(target_->getDestination());
+    position_.setDestination(target_->getPosition());
     double moveDelta = (moveSpeed_ / 100.0) * elapsedTimeInSeconds;
     position_.updatePointIgnoreAngle(moveDelta);
-    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <=
-        target_->getHeroRadius() * 2) { //TODO *2?
+    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= 0.01) {
         moving_ = false;
         target_->applyDamage(damage_);
         if (target_->isDead()) {
