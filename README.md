@@ -3,7 +3,6 @@
 git clone https://github.com/scanhex/zxc
 cd zxc
 ```
-# Инструкции по установке:
 
 ## Подмодули
 ```
