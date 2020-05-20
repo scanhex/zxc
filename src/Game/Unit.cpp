@@ -15,7 +15,7 @@ Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
                                              position_{position},
                                              heroRadius_{0.24}{
     stats_.refreshStats();
-    creator_ = new AttackCreator();
+    creator_ = new AttackCreator(stats_.getAttackSpeed());
 }
 
 
