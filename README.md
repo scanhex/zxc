@@ -3,13 +3,12 @@
 git clone https://github.com/scanhex/zxc
 cd zxc
 ```
+# Инструкции по установке:
 
 ## Подмодули
 ```
 git submodule update --init
 ```
-
-Инструкции по установке библиотек:
 
 ## Ubuntu
 ```
