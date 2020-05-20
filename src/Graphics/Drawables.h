@@ -130,7 +130,6 @@ class AttackDrawable : public SceneGraph::Drawable3D {
 public:
     explicit AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack);
     ~AttackDrawable() override {
-//        std::cerr<<"Bye from UnitDrawable!"<<'\n';
     }
 
 private:
@@ -138,6 +137,4 @@ private:
     GL::Mesh mesh_;
     Shaders::Phong shader_;
     const Attack &attack_;
-
-    Text::GlyphCache cache{Vector2i{512}};
 };

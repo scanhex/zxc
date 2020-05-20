@@ -6,6 +6,7 @@
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/Primitives/Circle.h>
+#include <Magnum/Primitives/UVSphere.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Complex.h>
 #include <Magnum/Math/Matrix3.h>
@@ -100,12 +101,12 @@ void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
 
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
 }
 
 AttackDrawable::AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack) :
         SceneGraph::Drawable3D(object, &group), attack_(attack) {
-    mesh_ = MeshTools::compile(Primitives::cubeSolid());
+    mesh_ = MeshTools::compile(Primitives::uvSphereSolid(100, 100));
 }
 
 void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
@@ -114,8 +115,8 @@ void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camer
     shader_.setDiffuseColor(0xa5c9ea_rgbf)
             .setLightPosition(camera.cameraMatrix().transformPoint(
                     { 5.0f, 5.0f, 7.0f }))
-            .setTransformationMatrix(transformationMatrix)
+        .setTransformationMatrix(transformationMatrix * Matrix4::scaling({ 0.4, 0.4, 0.4 }))
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
 }
