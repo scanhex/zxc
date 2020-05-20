@@ -124,6 +124,8 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     initGame();
     initNetwork();
 
+    GoldChangedEvent(239).fire();
+
     timeline_.start();
 }
 
