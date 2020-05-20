@@ -1,5 +1,7 @@
 #include "Attack.h"
 
+#include <algorithm>
+
 Attack::Attack(Unit *attacker, Unit *target) : attacker_{attacker},
                                                target_{target},
                                                damage_{attacker->getDamage()},
