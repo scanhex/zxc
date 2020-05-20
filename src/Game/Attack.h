@@ -42,7 +42,7 @@ private:
 
 class AttackCreator final {
 public:
-    constexpr static double COOL_DOWN = 2; //TODO set attackSpeed
+    AttackCreator(uint32_t attackSpeed);
 
     Attack* attack(Unit* attacker, std::vector<Unit *> &allUnits);
 
@@ -52,4 +52,5 @@ public:
 
 private:
     double coolDown_{0};
+    double defaultCoolDown;
 };

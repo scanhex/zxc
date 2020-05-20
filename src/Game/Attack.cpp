@@ -60,6 +60,9 @@ Unit *Attack::getAttacker() const { return attacker_; }
 
 void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; }
 
+AttackCreator::AttackCreator(uint32_t attackSpeed) : defaultCoolDown{100.0 / attackSpeed} {
+}
+
 Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
     if (coolDown_ != 0)
         return nullptr;
@@ -77,7 +80,7 @@ Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
     if (!enemy)
         return nullptr;
     auto *attack = new Attack(attacker, enemy); //TODO better way to choose target
-    coolDown_ = COOL_DOWN;
+    coolDown_ = defaultCoolDown;
     return attack;
 }
 
