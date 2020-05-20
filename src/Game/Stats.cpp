@@ -7,8 +7,14 @@ void Stats::changeAttackRange(int32_t delta) { attackRange_ += delta; }
 void Stats::changeMoveSpeed(int32_t delta) { moveSpeed_ += delta; }
 void Stats::changeTurnRate(int32_t delta) { turnRate_ += delta; }
 void Stats::changeAttackSpeed(int32_t delta) { attackSpeed_ += delta; }
-void Stats::changeMaxHP(int32_t delta) { maxHP_ += delta; }
-void Stats::changeMaxMP(int32_t delta) { maxMP_ += delta; }
+void Stats::changeMaxHP(int32_t delta) {
+    changeHP(delta * (healthPoints_ / maxHP_));
+	maxHP_ += delta;
+}
+void Stats::changeMaxMP(int32_t delta) {
+    changeMP(delta * (manaPoints_ / maxMP_));
+	maxMP_ += delta;
+}
 
 void Stats::changeHP(double delta) {
     healthPoints_ += delta;
@@ -64,10 +70,16 @@ uint32_t Stats::getAttackSpeed() const { return attackSpeed_; }
 void Stats::setAttackSpeed(uint32_t attackSpeed) { attackSpeed_ = attackSpeed; }
 
 uint32_t Stats::getMaxHp() const { return maxHP_; }
-void Stats::setMaxHp(uint32_t maxHp) { maxHP_ = maxHp; }
+void Stats::setMaxHp(uint32_t maxHp) {
+    healthPoints_ = healthPoints_ * maxHp / maxHP_;
+	maxHP_ = maxHp;
+}
 
 uint32_t Stats::getMaxMp() const { return maxMP_; }
-void Stats::setMaxMp(uint32_t maxMp) { maxMP_ = maxMp; }
+void Stats::setMaxMp(uint32_t maxMp) {
+    manaPoints_ = manaPoints_ * maxMp / maxMP_;
+	maxMP_ = maxMp;
+}
 
 double Stats::getHealthPoints() const { return healthPoints_; }
 void Stats::setHealthPoints(double healthPoints) {
