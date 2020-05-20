@@ -97,7 +97,7 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8001};
+        ip::tcp::endpoint ep_{ip::address::from_string("40.112.66.140"), 8080}; //TODO 127.0.0.1 to test local
         ip::tcp::socket sock_;
         BufferIO::BufferReader reader_{};
         BufferIO::BufferWriter writer_{};
