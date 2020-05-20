@@ -5,15 +5,11 @@ cd zxc
 ```
 
 ## Подмодули
-Magnum 2019.10
 ```
 git submodule update --init
 ```
 
-Инструкции по установке библиотек:
-
 ## Ubuntu
-Boost 1.65+
 ```
 apt-get install libboost-system-dev
 apt-get install libboost-thread-dev
@@ -26,7 +22,6 @@ apt-get install libboost-serialization-dev
 apt-get install libboost-all-dev   
 ```
 
-OpenGL & SDL2 - 2.0.10
 
 ```
 apt-get install libgl1-mesa-dev
@@ -51,4 +46,11 @@ SDL2 можно скачать с того же сайта, но файл буд
 ## Запуск
 Просто запустить цель `zxc` в CMake.
 
-
+## Используемые библиотеки 
+* Magnum 2019.10
+* Corrade 2019.10
+* Boost 1.65+
+* OpenGL & SDL2 - 2.0.10
+* Dear ImGui 1.76
+* stb_truetype.h 1.24
+* Assimp 5.01
