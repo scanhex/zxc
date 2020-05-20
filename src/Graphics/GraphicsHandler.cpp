@@ -8,6 +8,10 @@ GraphicsHandler::GraphicsHandler(Scene3D &scene, SceneGraph::DrawableGroup3D &dr
         drawables_(drawables),
         timeline_(timeline) {}
 
+void GraphicsHandler::handle(const AttackEvent &event) {
+    //TODO
+}
+
 void GraphicsHandler::handleCoil(const SkillUseEvent &event, double dist) {
     auto *obj = new Object3D{&scene_};
     dist /= 100; // TODO: remove this line after fixing game scale

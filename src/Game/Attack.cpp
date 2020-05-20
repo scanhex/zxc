@@ -1,6 +1,16 @@
 #include "Attack.h"
 
-Attack::Attack(Unit *attacker, Unit *target) : attacker_{attacker},
+Attack::Attack() : moving_{false},
+                   attacker_{nullptr},
+                   target_{nullptr},
+                   damage_{0},
+                   moveSpeed_{600},
+                   position_{Point(0, 0), 0} {
+}
+
+
+Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
+                                               attacker_{attacker},
                                                target_{target},
                                                damage_{attacker->getDamage()},
                                                moveSpeed_{600},
@@ -25,25 +35,32 @@ void Attack::update(double elapsedTimeInSeconds) {
 }
 
 bool Attack::getMovingFlag() const { return moving_; }
+
 void Attack::setMovingFlag(bool flag) { moving_ = flag; }
 
 int32_t Attack::getDamage() const { return damage_; }
+
 void Attack::setDamage(int32_t damage) { damage_ = damage; }
 
 double Attack::getMoveSpeed() const { return moveSpeed_; }
+
 void Attack::setMoveSpeed(double speed) { moveSpeed_ = speed; }
 
 const Point &Attack::getPosition() const { return position_.getPosition(); }
+
 void Attack::setPosition(const Point &position) { position_.setPosition(position); }
+
 void Attack::setPosition(double x, double y) { position_.setPosition(x, y); }
 
 Unit *Attack::getTarget() const { return target_; }
+
 void Attack::setTarget(Unit *target) { target_ = target; }
 
-Unit *Attack::getAttacker() const { return attacker_;}
+Unit *Attack::getAttacker() const { return attacker_; }
+
 void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; }
 
-Attack *AttackCreator::attack(Unit* attacker, std::vector<Unit *> &allUnits) {
+Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
     if (coolDown_ != 0)
         return nullptr;
     Unit *enemy = nullptr;
