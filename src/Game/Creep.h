@@ -8,9 +8,11 @@ private:
     static StatsBuilder defaultCreepStatsBuilder_;
     static Position creepSpawns_[NUM_TEAMS];
 
-    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) override;
+    Point findNewDestination(std::vector<Unit *> &allUnits);
+
+    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) override;
+    void refreshPosition();
 
 public:
     explicit Creep(Team team);
 };
-

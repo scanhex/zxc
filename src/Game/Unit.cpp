@@ -13,7 +13,7 @@ Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
                                              expKillReward_{0},
                                              stats_{stats},
                                              position_{position},
-                                             heroRadius_{0.24}{
+                                             heroRadius_{0.24} {
     stats_.refreshStats();
     creator_ = new AttackCreator(stats_.getAttackSpeed());
 }
@@ -49,7 +49,7 @@ void Unit::clearBuffs() {
     buffs_.clear();
 }
 
-Attack* Unit::attack(std::vector<Unit * >& allUnits) {
+Attack *Unit::attack(std::vector<Unit *> &allUnits) {
     return creator_->attack(this, allUnits);
 }
 
@@ -97,7 +97,7 @@ void Unit::spendMana(double amount) {
 void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 
-void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) {
+void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) return;
     creator_->update(elapsedTimeInSeconds);
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
@@ -117,10 +117,11 @@ void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnit
 }
 
 void Unit::claimReward(Unit *killed_unit) {
+    // ??
 }
 
-bool Unit::checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const {
-    for (auto & unit : allUnits) {
+bool Unit::checkUnitsPosition(const Point &position, std::vector<Unit *> &allUnits) const {
+    for (auto &unit : allUnits) {
         if (unit != this) {
             if (!Point::isEnoughDistance(position, heroRadius_,
                                          unit->getPosition(), unit->heroRadius_)) {
@@ -230,10 +231,10 @@ void Unit::setAngle(double angle) {
 }
 
 void Unit::giveId() {
-    if(team_ == Team::Neutral)
+    if (team_ == Team::Neutral)
         return; //TODO
-    if(team_ == Team::Dire)
-            unique_id_ = dire_counter--;
-    if(team_ == Team::Radiant)
+    if (team_ == Team::Dire)
+        unique_id_ = dire_counter--;
+    if (team_ == Team::Radiant)
         unique_id_ = radiant_counter_++;
 }

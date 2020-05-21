@@ -2,6 +2,7 @@
 
 #include "Creep.h"
 #include <cmath>
+#include <cfloat>
 
 StatsBuilder Creep::defaultCreepStatsBuilder_ =
         StatsBuilder()
@@ -29,9 +30,34 @@ Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[
     giveId();
 }
 
+void Creep::refreshPosition() {
+    position_ = creepSpawns_[static_cast<uint8_t>(team_)];
+}
+
 void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
         refreshUnit();
+        refreshPosition();
+    }
+    if (!allUnits.empty()) {
+        position_.setDestination(findNewDestination(allUnits));
     }
     Unit::updateUnit(elapsedTimeInSeconds, allUnits);
 }
+
+Point Creep::findNewDestination(std::vector<Unit *> &allUnits) {
+    assert(!allUnits.empty());
+    const Point &myPosition = position_.getPosition();
+    double closest = DBL_MAX; // ......nevazhno
+    Unit *closestUnit = this;
+    for (Unit *unit : allUnits) {
+        if (unit->getTeam() == team_) continue;
+        double current = Point(unit->getPosition() - myPosition).normSqr();
+        if (current < closest) {
+            closest = current;
+            closestUnit = unit;
+        }
+    }
+    return closestUnit->getPosition();
+}
+
