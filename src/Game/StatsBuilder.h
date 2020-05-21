@@ -8,7 +8,7 @@ public:
     Stats create();
 
     StatsBuilder &setDamage(int32_t damage);
-    StatsBuilder &setAttackRange(uint32_t attackRange);
+    StatsBuilder &setAttackRange(double attackRange);
     StatsBuilder &setMoveSpeed(uint32_t moveSpeed);
     StatsBuilder &setTurnRate(double turnRate);
     StatsBuilder &setAttackSpeed(uint32_t attackSpeed);

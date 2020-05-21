@@ -53,8 +53,12 @@ Attack *Unit::attack(std::vector<Unit *> &allUnits) {
     return creator_->attack(this, allUnits);
 }
 
+Attack *Unit::attack(Unit *unit) {
+    return creator_->attack(this, unit);
+}
+
 void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
-void Unit::changeAttackRange(int32_t delta) { stats_.changeAttackRange(delta); }
+void Unit::changeAttackRange(double delta) { stats_.changeAttackRange(delta); }
 void Unit::changeMoveSpeed(int32_t delta) { stats_.changeMoveSpeed(delta); }
 void Unit::changeTurnRate(double delta) { stats_.changeTurnRate(delta); }
 void Unit::changeAttackSpeed(int32_t delta) { stats_.changeAttackSpeed(delta); }
@@ -181,8 +185,8 @@ void Unit::setMovedFlag(bool status) { moved_ = status; }
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
 
-uint32_t Unit::getAttackRange() const { return stats_.getAttackRange();; }
-void Unit::setAttackRange(uint32_t attackRange) { stats_.setAttackRange(attackRange); }
+double Unit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(double attackRange) { stats_.setAttackRange(attackRange); }
 
 uint32_t Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
 void Unit::setMoveSpeed(uint32_t moveSpeed) { stats_.setMoveSpeed(moveSpeed); }

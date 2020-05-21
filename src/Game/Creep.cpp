@@ -1,13 +1,14 @@
 #define _USE_MATH_DEFINES
 
 #include "Creep.h"
+#include "Events/Events.h"
 #include <cmath>
 #include <cfloat>
 
 StatsBuilder Creep::defaultCreepStatsBuilder_ =
         StatsBuilder()
                 .setDamage(20)
-                .setAttackRange(100)
+                .setAttackRange(1)
                 .setMoveSpeed(300)
                 .setTurnRate(0.2)
                 .setAttackSpeed(50)
@@ -40,24 +41,30 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
         refreshPosition();
     }
     if (!allUnits.empty()) {
-        position_.setDestination(findNewDestination(allUnits));
+        Unit *closest = findClosestUnit(allUnits);
+        position_.setDestination(closest->getPosition());
+        if (Point::getDistance(closest->getPosition(), getPosition()) < getAttackRange()) {
+            if (Attack *currentAttack = attack(closest)) {
+                EventHandler<AttackEvent>::fireEvent(AttackEvent(*currentAttack));
+            }
+        }
     }
     Unit::updateUnit(elapsedTimeInSeconds, allUnits);
 }
 
-Point Creep::findNewDestination(std::vector<Unit *> &allUnits) {
+Unit *Creep::findClosestUnit(std::vector<Unit *> &allUnits) {
     assert(!allUnits.empty());
     const Point &myPosition = position_.getPosition();
     double closest = DBL_MAX; // ......nevazhno
     Unit *closestUnit = this;
     for (Unit *unit : allUnits) {
-        if (unit->getTeam() == team_) continue;
-        double current = Point(unit->getPosition() - myPosition).normSqr();
+        if (unit->getTeam() == team_ || unit->isDead()) continue;
+        double current = Point::getDistance(unit->getPosition(), myPosition);
         if (current < closest) {
             closest = current;
             closestUnit = unit;
         }
     }
-    return closestUnit->getPosition();
+    return closestUnit;
 }
 

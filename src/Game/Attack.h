@@ -46,6 +46,7 @@ public:
     explicit AttackCreator(uint32_t attackSpeed);
 
     Attack *attack(Unit *attacker, std::vector<Unit *> &allUnits);
+    Attack *attack(Unit *attacker, Unit *enemy);
 
     void update(double elapsedTimeInSeconds);
 
