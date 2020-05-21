@@ -8,7 +8,7 @@ StatsBuilder Creep::defaultCreepStatsBuilder_ =
         StatsBuilder()
                 .setDamage(20)
                 .setAttackRange(100)
-                .setMoveSpeed(450)
+                .setMoveSpeed(300)
                 .setTurnRate(0.2)
                 .setAttackSpeed(50)
                 .setMaxHp(300)

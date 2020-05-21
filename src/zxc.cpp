@@ -98,7 +98,8 @@ void ZxcApplication::initNetwork() {
 }
 
 void ZxcApplication::initUi() {
-    ui_.emplace(PluginLibrary::getFontManager(), Vector2{ 300, 300 }, windowSize(), framebufferSize(), Ui::defaultStyleConfiguration(), "»");
+    ui_.emplace(PluginLibrary::getFontManager(), Vector2{300, 300}, windowSize(), framebufferSize(),
+                Ui::defaultStyleConfiguration(), "»");
     uiGoldPlane_.emplace(*ui_);
 }
 
@@ -157,9 +158,9 @@ void ZxcApplication::updateGameState() {
         if (attacks_[i]->getMovingFlag())
             attackObjects_[i]->translate(vectorPosition - attackObjects_[i]->transformation().translation());
 
-      //  double angle = attacks_[i]->getAngle();
-      //  auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
-       // unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+        //  double angle = attacks_[i]->getAngle();
+        //  auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
+        // unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
     }
 }
 
@@ -288,15 +289,19 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     // QWERTY and Dvorak bindings
+    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
+        cameraMoving_ = true;
+        previousPosition_ = Containers::NullOpt;
+    }
+    if (myHero_.isDead())
+        return;
     if (event.key() == KeyEvent::Key::A) {
-        if(myHero_.isDead())
-            return;
-        Attack* attack = myHero_.attack(gameState_.getAllUnits());
-        if(attack){
+        Attack *attack = myHero_.attack(gameState_.getAllUnits());
+        if (attack) {
             auto *obj = new Object3D{&scene_};
 
             obj->transform(Matrix4::translation(Vector3{static_cast<float>(attack->getPosition().x_),
-                                                               static_cast<float>(attack->getPosition().y_), 0.1f}));
+                                                        static_cast<float>(attack->getPosition().y_), 0.1f}));
             Debug{} << "attack";
             new AttackDrawable(*obj, drawables_, *attack);
             attackObjects_.push_back(obj);
@@ -306,19 +311,19 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         redraw();
     }
     if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
-        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::FirstSkill)) {
+        if (myHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
-        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::SecondSkill)) {
+        if (myHero_.isSkillReady(SkillName::SecondSkill)) {
             EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
-        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::ThirdSkill)) {
+        if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
             EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
             redraw();
         }
@@ -326,10 +331,6 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == KeyEvent::Key::S || event.key() == KeyEvent::Key::O) {
         EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
         redraw();
-    }
-    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
-        cameraMoving_ = true;
-        previousPosition_ = Containers::NullOpt;
     }
 }
 

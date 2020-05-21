@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Game/Unit.h>
 
 class Unit;
@@ -7,7 +8,7 @@ class Attack {
 public:
     Attack();
 
-    Attack(Unit* attacker, Unit* target);
+    Attack(Unit *attacker, Unit *target);
 
     void update(double elapsedTimeInSeconds);
 
@@ -25,16 +26,16 @@ public:
     void setPosition(const Point &position);
     void setPosition(double x, double y);
 
-    [[nodiscard]] Unit* getTarget() const;
-    void setTarget(Unit * target);
+    [[nodiscard]] Unit *getTarget() const;
+    void setTarget(Unit *target);
 
-    [[nodiscard]] Unit* getAttacker() const;
-    void setAttacker(Unit * attacker);
+    [[nodiscard]] Unit *getAttacker() const;
+    void setAttacker(Unit *attacker);
 
 private:
     bool moving_;
-    Unit* attacker_;
-    Unit* target_;
+    Unit *attacker_;
+    Unit *target_;
     int32_t damage_;
     double moveSpeed_;
     Position position_;
@@ -42,9 +43,9 @@ private:
 
 class AttackCreator final {
 public:
-    AttackCreator(uint32_t attackSpeed);
+    explicit AttackCreator(uint32_t attackSpeed);
 
-    Attack* attack(Unit* attacker, std::vector<Unit *> &allUnits);
+    Attack *attack(Unit *attacker, std::vector<Unit *> &allUnits);
 
     void update(double elapsedTimeInSeconds);
 
