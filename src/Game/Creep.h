@@ -8,7 +8,7 @@ private:
     static StatsBuilder defaultCreepStatsBuilder_;
     static Position creepSpawns_[NUM_TEAMS];
 
-    Point findNewDestination(std::vector<Unit *> &allUnits);
+    Unit *findClosestUnit(std::vector<Unit *> &allUnits);
 
     void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) override;
     void refreshPosition();

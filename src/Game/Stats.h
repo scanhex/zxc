@@ -7,7 +7,7 @@ class Stats {
 private:
     int32_t damage_;
     int32_t default_damage_;
-    uint32_t attackRange_;
+    double attackRange_;
 
     uint32_t moveSpeed_;
     uint32_t attackSpeed_;
@@ -27,10 +27,10 @@ private:
 public:
     Stats() = default;
     Stats(const Stats &) = default;
-    Stats& operator=(const Stats &) = default;
+    Stats &operator=(const Stats &) = default;
 
     void changeDamage(int32_t delta);
-    void changeAttackRange(int32_t delta);
+    void changeAttackRange(double delta);
     void changeMoveSpeed(int32_t delta);
     void changeTurnRate(int32_t delta);
     void changeAttackSpeed(int32_t delta);
@@ -56,8 +56,8 @@ public:
     [[nodiscard]] int32_t getDefaultDamage() const;
     void setDefaultDamage(int32_t damage);
 
-    [[nodiscard]] uint32_t getAttackRange() const;
-    void setAttackRange(uint32_t attackRange);
+    [[nodiscard]] double getAttackRange() const;
+    void setAttackRange(double attackRange);
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);

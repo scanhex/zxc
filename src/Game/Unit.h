@@ -41,7 +41,7 @@ protected:
     double heroRadius_;
     bool moved_{false};
 
-    AttackCreator* creator_;
+    AttackCreator *creator_;
 
     static uint8_t radiant_counter_;
     static uint8_t dire_counter;
@@ -59,12 +59,13 @@ public:
     void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index TODO
     void clearBuffs();
 
-    Attack* attack(std::vector<Unit * >& allUnits);
+    Attack *attack(std::vector<Unit *> &allUnits);
+    Attack *attack(Unit *unit);
 
     void giveId();
 
     void changeDamage(int32_t delta);
-    void changeAttackRange(int32_t delta);
+    void changeAttackRange(double delta);
     void changeMoveSpeed(int32_t delta);
     void changeTurnRate(double delta);
     void changeAttackSpeed(int32_t delta);
@@ -85,13 +86,13 @@ public:
     void changeArmor(int32_t delta);
     void changeResist(double delta);
 
-    virtual void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits);
+    virtual void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits);
 
-    virtual void claimReward(Unit* killed_unit);
+    virtual void claimReward(Unit *killed_unit);
 
     virtual void refreshUnit();
 
-    [[nodiscard]] bool checkUnitsPosition(const Point& position, std::vector<Unit * >& allUnits) const;
+    [[nodiscard]] bool checkUnitsPosition(const Point &position, std::vector<Unit *> &allUnits) const;
 
     virtual void serialize(BufferIO::BufferWriter &writer);
     virtual void deserialize(BufferIO::BufferReader &reader);
@@ -115,8 +116,8 @@ public:
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
 
-    [[nodiscard]] uint32_t getAttackRange() const;
-    void setAttackRange(uint32_t attackRange);
+    [[nodiscard]] double getAttackRange() const;
+    void setAttackRange(double attackRange);
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);

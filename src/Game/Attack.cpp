@@ -84,6 +84,14 @@ Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
     return attack;
 }
 
+Attack *AttackCreator::attack(Unit *attacker, Unit *enemy) {
+    if (coolDown_ != 0 || !enemy)
+        return nullptr;
+    auto *attack = new Attack(attacker, enemy); //TODO better way to choose target
+    coolDown_ = defaultCoolDown;
+    return attack;
+}
+
 void AttackCreator::update(double elapsedTimeInSeconds) {
     coolDown_ = std::max(0.0, coolDown_ - elapsedTimeInSeconds);
 }

@@ -51,7 +51,7 @@ private:
     void exitEvent(ExitEvent &event) override;
 
     void keyPressEvent(KeyEvent &event) override;
-    void keyReleaseEvent(KeyEvent& event) override;
+    void keyReleaseEvent(KeyEvent &event) override;
 
     void updateGameState();
 
@@ -74,7 +74,7 @@ private:
 
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
-    std::vector<Attack *>attacks_;
+    std::vector<Attack *> attacks_;
 
     Hero &myHero_; // just a ref to heroes[0]
 

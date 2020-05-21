@@ -10,7 +10,7 @@ StatsBuilder &StatsBuilder::setDamage(int32_t damage) {
     return *this;
 }
 
-StatsBuilder &StatsBuilder::setAttackRange(uint32_t attackRange) {
+StatsBuilder &StatsBuilder::setAttackRange(double attackRange) {
     stats_.setAttackRange(attackRange);
     return *this;
 }

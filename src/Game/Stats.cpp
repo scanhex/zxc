@@ -3,17 +3,17 @@
 #include <cassert>
 
 void Stats::changeDamage(int32_t delta) { damage_ += delta; }
-void Stats::changeAttackRange(int32_t delta) { attackRange_ += delta; }
+void Stats::changeAttackRange(double delta) { attackRange_ += delta; }
 void Stats::changeMoveSpeed(int32_t delta) { moveSpeed_ += delta; }
 void Stats::changeTurnRate(int32_t delta) { turnRate_ += delta; }
 void Stats::changeAttackSpeed(int32_t delta) { attackSpeed_ += delta; }
 void Stats::changeMaxHP(int32_t delta) {
     changeHP(delta * (healthPoints_ / maxHP_));
-	maxHP_ += delta;
+    maxHP_ += delta;
 }
 void Stats::changeMaxMP(int32_t delta) {
     changeMP(delta * (manaPoints_ / maxMP_));
-	maxMP_ += delta;
+    maxMP_ += delta;
 }
 
 void Stats::changeHP(double delta) {
@@ -57,8 +57,8 @@ void Stats::setDamage(int32_t damage) { damage_ = damage; } // forbid negative a
 int32_t Stats::getDefaultDamage() const { return default_damage_; }
 void Stats::setDefaultDamage(int32_t damage) { default_damage_ = damage; }
 
-uint32_t Stats::getAttackRange() const { return attackRange_; }
-void Stats::setAttackRange(uint32_t attackRange) { attackRange_ = attackRange; }
+double Stats::getAttackRange() const { return attackRange_; }
+void Stats::setAttackRange(double attackRange) { attackRange_ = attackRange; }
 
 uint32_t Stats::getMoveSpeed() const { return moveSpeed_; }
 void Stats::setMoveSpeed(uint32_t moveSpeed) { moveSpeed_ = moveSpeed; }
@@ -72,13 +72,13 @@ void Stats::setAttackSpeed(uint32_t attackSpeed) { attackSpeed_ = attackSpeed; }
 uint32_t Stats::getMaxHp() const { return maxHP_; }
 void Stats::setMaxHp(uint32_t maxHp) {
     healthPoints_ = healthPoints_ * maxHp / maxHP_;
-	maxHP_ = maxHp;
+    maxHP_ = maxHp;
 }
 
 uint32_t Stats::getMaxMp() const { return maxMP_; }
 void Stats::setMaxMp(uint32_t maxMp) {
     manaPoints_ = manaPoints_ * maxMp / maxMP_;
-	maxMP_ = maxMp;
+    maxMP_ = maxMp;
 }
 
 double Stats::getHealthPoints() const { return healthPoints_; }
