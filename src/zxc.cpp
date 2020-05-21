@@ -289,6 +289,8 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     // QWERTY and Dvorak bindings
     if (event.key() == KeyEvent::Key::A) {
+        if(myHero_.isDead())
+            return;
         Attack* attack = myHero_.attack(gameState_.getAllUnits());
         if(attack){
             auto *obj = new Object3D{&scene_};
@@ -304,19 +306,19 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         redraw();
     }
     if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
-        if (myHero_.isSkillReady(SkillName::FirstSkill)) {
+        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::FirstSkill)) {
             EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
-        if (myHero_.isSkillReady(SkillName::SecondSkill)) {
+        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::SecondSkill)) {
             EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
-        if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
+        if (!myHero_.isDead() && myHero_.isSkillReady(SkillName::ThirdSkill)) {
             EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
             redraw();
         }
