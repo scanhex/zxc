@@ -36,29 +36,22 @@ void Attack::update(double elapsedTimeInSeconds) {
 }
 
 bool Attack::getMovingFlag() const { return moving_; }
-
 void Attack::setMovingFlag(bool flag) { moving_ = flag; }
 
 int32_t Attack::getDamage() const { return damage_; }
-
 void Attack::setDamage(int32_t damage) { damage_ = damage; }
 
 double Attack::getMoveSpeed() const { return moveSpeed_; }
-
 void Attack::setMoveSpeed(double speed) { moveSpeed_ = speed; }
 
 const Point &Attack::getPosition() const { return position_.getPosition(); }
-
 void Attack::setPosition(const Point &position) { position_.setPosition(position); }
-
 void Attack::setPosition(double x, double y) { position_.setPosition(x, y); }
 
 Unit *Attack::getTarget() const { return target_; }
-
 void Attack::setTarget(Unit *target) { target_ = target; }
 
 Unit *Attack::getAttacker() const { return attacker_; }
-
 void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; damage_=attacker->getDamage(); }
 
 AttackCreator::AttackCreator(uint32_t attackSpeed) : defaultCoolDown{100.0 / attackSpeed} {
