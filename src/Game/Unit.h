@@ -22,6 +22,7 @@ enum class Team : uint8_t {
 
 constexpr size_t MAX_ITEMS = 6;
 constexpr uint32_t NUM_TEAMS = 3;
+constexpr size_t MAX_ATTACK_NUM = 2;
 
 class Unit {
 public:
@@ -45,6 +46,9 @@ protected:
 
     static uint8_t radiant_counter_;
     static uint8_t dire_counter;
+
+public:
+    std::vector<Attack*>myAttacks_;
 
 public:
     Unit(Stats stats, Position position);

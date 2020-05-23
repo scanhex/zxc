@@ -25,8 +25,9 @@ void Attack::update(double elapsedTimeInSeconds) {
     position_.setDestination(target_->getPosition());
     double moveDelta = (moveSpeed_ / 100.0) * elapsedTimeInSeconds;
     position_.updatePointIgnoreAngle(moveDelta);
-    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= 0.01) {
+    if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= target_->getHeroRadius()) {
         moving_ = false;
+        position_.setPosition({1000,1000});
         target_->applyDamage(damage_);
         if (target_->isDead()) {
             attacker_->claimReward(target_);
@@ -58,7 +59,7 @@ void Attack::setTarget(Unit *target) { target_ = target; }
 
 Unit *Attack::getAttacker() const { return attacker_; }
 
-void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; }
+void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; damage_=attacker->getDamage(); }
 
 AttackCreator::AttackCreator(uint32_t attackSpeed) : defaultCoolDown{100.0 / attackSpeed} {
 }

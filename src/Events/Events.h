@@ -89,9 +89,10 @@ class AttackEvent : public SerializedEvent {
 public:
     static const SerializedEventName name_ = SerializedEventName::Attack;
 
-    Attack &attack_;
+    uint8_t attackerID_;
+    uint8_t targetID_;
 
-    explicit AttackEvent(Attack& attack);
+    AttackEvent(uint8_t attackerID, uint8_t targetID);
     void serialize(BufferIO::BufferWriter &writer) override;
     void fire() override;
 };

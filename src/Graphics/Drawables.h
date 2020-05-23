@@ -129,8 +129,7 @@ private:
 class AttackDrawable : public SceneGraph::Drawable3D {
 public:
     explicit AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack);
-    ~AttackDrawable() override {
-    }
+    ~AttackDrawable() override = default;
 
 private:
     void draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) override;

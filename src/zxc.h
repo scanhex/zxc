@@ -55,6 +55,8 @@ private:
 
     void updateGameState();
 
+    void createAttackDrawables();
+
     void addUnit(const Unit &u, std::string filename, bool wtf);
     void initCamera();
     void initRenderer();
@@ -74,7 +76,6 @@ private:
 
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
-    std::vector<Attack *> attacks_;
 
     Hero &myHero_; // just a ref to heroes[0]
 
@@ -84,7 +85,7 @@ private:
 
     std::vector<Object3D *> unitObjects_;
 
-    std::vector<Object3D *> attackObjects_;
+    std::vector<std::vector<Object3D *>> attackObjects_;
 
     Scene3D scene_;
     Object3D cameraObject_;

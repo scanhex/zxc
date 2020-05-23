@@ -145,7 +145,7 @@ private:
 
     class FromServerAttackEvent : public AttackEvent, public FromServerEvent {
     public:
-        explicit FromServerAttackEvent(Attack &attack) : AttackEvent(attack) {}
+        explicit FromServerAttackEvent(uint8_t attackerID, uint8_t targetID) : AttackEvent(attackerID, targetID) {}
     };
 
     class FromServerFirstSkillUseEvent : public FirstSkillUseEvent, public FromServerEvent {
