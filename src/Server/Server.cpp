@@ -178,11 +178,9 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
     switch (eventName) {
         case SerializedEventName::Attack: {
-            uint8_t attacker_id = reader_.readUInt8();
-            uint8_t target_id = reader_.readUInt8();
-            Attack *attack = new Attack(gameState_.findUnitByID(attacker_id),
-                                        gameState_.findUnitByID(target_id));
-            auto e = new AttackEvent(*attack);
+            uint8_t attackerID = reader_.readUInt8();
+            uint8_t targetID = reader_.readUInt8();
+            auto e = new AttackEvent(attackerID, targetID);
             EventHandler<AttackEvent>::fireEvent(*e);
             myEvents_.push(e);
             break;

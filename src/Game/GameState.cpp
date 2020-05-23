@@ -21,23 +21,24 @@ void GameState::update(double elapsedTime) { // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
-    for (Attack *attack: attacks_) {
-        attack->update(elapsedTimeInSeconds);
-    }
-
     for (Unit *unit : units_) {
         unit->updateUnit(elapsedTimeInSeconds, units_);
+        for (Attack *attack: unit->myAttacks_) {
+            attack->update(elapsedTimeInSeconds);
+        }
     }
 }
 
 void GameState::refreshAllUnits() {
     for (Hero *hero : heroes_) {
         hero->setDeathCounter(0);
-        hero->refreshUnit();
     }
 
-    for (Attack *attack: attacks_) {
-        attack->setMovingFlag(false);
+    for (Unit *unit : units_) {
+        unit->refreshUnit();
+        for (Attack *attack: unit->myAttacks_) {
+            attack->setMovingFlag(false);
+        }
     }
 }
 
@@ -89,7 +90,17 @@ void GameState::handle(const StopEvent &event) {
 }
 
 void GameState::handle(const AttackEvent &event) {
-    attacks_.push_back(&event.attack_);
+    Unit *attacker = findUnitByID(event.attackerID_);
+    Unit *target = findUnitByID(event.targetID_);
+    for (auto & attack : attacker->myAttacks_) {
+        if (!attack->getMovingFlag()) {
+            attack->setAttacker(attacker);
+            attack->setTarget(target);
+            attack->setMovingFlag(true);
+            attack->setPosition(attacker->getPosition());
+            break;
+        }
+    }
 }
 
 void GameState::handle(const FirstSkillUseEvent &event) {

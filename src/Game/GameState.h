@@ -69,7 +69,5 @@ private:
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
 
-    std::vector<Attack *> attacks_;
-
     friend class Coil;
 };

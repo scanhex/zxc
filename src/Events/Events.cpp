@@ -27,13 +27,14 @@ void StopEvent::fire() {
     Event::fire(this);
 }
 
-AttackEvent::AttackEvent(Attack &attack) : attack_{attack} {
+AttackEvent::AttackEvent(uint8_t attackerID, uint8_t targetID) : attackerID_{attackerID},
+                                                                 targetID_{targetID}{
 }
 
 void AttackEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeUInt8(static_cast<uint8_t>(name_));
-    writer.writeUInt8(attack_.getAttacker()->unique_id_);
-    writer.writeUInt8(attack_.getTarget()->unique_id_);//poka kostyl'
+    writer.writeUInt8(attackerID_);
+    writer.writeUInt8(targetID_);
 }
 
 void AttackEvent::fire() {

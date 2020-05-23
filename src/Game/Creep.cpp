@@ -45,7 +45,8 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
         position_.setDestination(closest->getPosition());
         if (Point::getDistance(closest->getPosition(), getPosition()) < getAttackRange()) {
             if (Attack *currentAttack = attack(closest)) {
-                EventHandler<AttackEvent>::fireEvent(AttackEvent(*currentAttack));
+                EventHandler<AttackEvent>::fireEvent(AttackEvent(currentAttack->getAttacker()->unique_id_,
+                                                                 currentAttack->getTarget()->unique_id_));
             }
         }
     }

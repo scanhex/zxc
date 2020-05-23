@@ -9,7 +9,7 @@ GraphicsHandler::GraphicsHandler(Scene3D &scene, SceneGraph::DrawableGroup3D &dr
         timeline_(timeline) {}
 
 void GraphicsHandler::handle(const AttackEvent &event) {
-    //TODO
+    //TODO do we need this handler?
 }
 
 void GraphicsHandler::handleCoil(const SkillUseEvent &event, double dist) {

@@ -124,10 +124,22 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
     initUi();
     initGame();
     initNetwork();
-
+    createAttackDrawables();
     GoldChangedEvent(239).fire();
 
     timeline_.start();
+}
+
+void ZxcApplication::createAttackDrawables() {
+    for (Unit *unit: units_) {
+        std::vector<Object3D *>objects;
+        for (Attack *attack:unit->myAttacks_) {
+            auto *obj = new Object3D{&scene_};
+            new AttackDrawable(*obj, drawables_, *attack);
+            objects.push_back(obj);
+        }
+        attackObjects_.push_back(objects);
+    }
 }
 
 void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
@@ -152,15 +164,15 @@ void ZxcApplication::updateGameState() {
     }
 
     for (size_t i = 0; i < attackObjects_.size(); i++) {
-        const Point &position = attacks_[i]->getPosition();
+        for (size_t j = 0; j < attackObjects_[i].size(); j++) {
+            Attack *attack = units_[i]->myAttacks_[j];
+            if (!attack->getMovingFlag())
+                continue;
+            const Point &position = attack->getPosition();
 
-        Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        if (attacks_[i]->getMovingFlag())
-            attackObjects_[i]->translate(vectorPosition - attackObjects_[i]->transformation().translation());
-
-        //  double angle = attacks_[i]->getAngle();
-        //  auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
-        // unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+            Vector3 vectorPosition(position.x_, position.y_, position.z_);
+            attackObjects_[i][j]->translate(vectorPosition - attackObjects_[i][j]->transformation().translation());
+        }
     }
 }
 
@@ -298,15 +310,8 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     if (event.key() == KeyEvent::Key::A) {
         Attack *attack = myHero_.attack(gameState_.getAllUnits());
         if (attack) {
-            auto *obj = new Object3D{&scene_};
-
-            obj->transform(Matrix4::translation(Vector3{static_cast<float>(attack->getPosition().x_),
-                                                        static_cast<float>(attack->getPosition().y_), 0.1f}));
-            Debug{} << "attack";
-            new AttackDrawable(*obj, drawables_, *attack);
-            attackObjects_.push_back(obj);
-            attacks_.push_back(attack);
-            EventHandler<AttackEvent>::fireEvent(AttackEvent(*attack));
+            EventHandler<AttackEvent>::fireEvent(AttackEvent(attack->getAttacker()->unique_id_,
+                                                             attack->getTarget()->unique_id_));
         }
         redraw();
     }
