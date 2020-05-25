@@ -37,6 +37,8 @@ public:
     Hero(Player player, Position position);
     Hero(Player player, Position position, Stats stats);
 
+    bool isHero() override;
+
     [[nodiscard]] bool canSpendGold(uint32_t amount) const;
     void addGold(uint32_t amount);
     void spendGold(uint32_t amount);

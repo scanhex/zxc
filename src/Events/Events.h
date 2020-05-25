@@ -137,7 +137,7 @@ class GoldChangedEvent : public Event {
 public:
     int gold_;
     void fire() override;
-    GoldChangedEvent(int gold);
+    explicit GoldChangedEvent(int gold);
 };
 
 class DrawEvent : public Event {

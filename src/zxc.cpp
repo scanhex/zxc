@@ -93,7 +93,7 @@ void ZxcApplication::initHandlers() {
 
 
 void ZxcApplication::initNetwork() {
-    client_ = Client(gameState_);
+    Client client(gameState_);
     networkThread_ = std::thread(&Client::run, client_);
 }
 

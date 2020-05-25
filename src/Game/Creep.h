@@ -10,6 +10,8 @@ private:
 
     Unit *findClosestUnit(std::vector<Unit *> &allUnits);
 
+    bool isHero() override;
+
     void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) override;
     void refreshPosition();
 

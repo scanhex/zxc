@@ -68,6 +68,8 @@ public:
 
     void giveId();
 
+    virtual bool isHero() = 0;
+
     void changeDamage(int32_t delta);
     void changeAttackRange(double delta);
     void changeMoveSpeed(int32_t delta);

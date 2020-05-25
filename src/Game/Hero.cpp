@@ -58,6 +58,10 @@ Hero::Hero(Player player, Position position, Stats stats) : Hero(player, positio
     stats_ = stats;
 }
 
+bool Hero::isHero() {
+    return true;
+}
+
 bool Hero::canSpendGold(uint32_t amount) const {
     return gold_ >= amount;
 }

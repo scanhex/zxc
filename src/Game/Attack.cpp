@@ -5,8 +5,8 @@ Attack::Attack() : moving_{false},
                    attacker_{nullptr},
                    target_{nullptr},
                    damage_{0},
-                   moveSpeed_{1600}, // TODO 1200 originally
-                   position_{Point(0, 0), 0} {
+                   moveSpeed_{800}, // TODO 1200 originally
+                   position_{Point(1000, 1000), 0} {
 
 }
 

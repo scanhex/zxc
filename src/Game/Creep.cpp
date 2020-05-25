@@ -8,7 +8,7 @@
 StatsBuilder Creep::defaultCreepStatsBuilder_ =
         StatsBuilder()
                 .setDamage(20)
-                .setAttackRange(1)
+                .setAttackRange(0.1)
                 .setMoveSpeed(300)
                 .setTurnRate(0.2)
                 .setAttackSpeed(50)
@@ -35,6 +35,10 @@ void Creep::refreshPosition() {
     position_ = creepSpawns_[static_cast<uint8_t>(team_)];
 }
 
+bool Creep::isHero() {
+    return false;
+}
+
 void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
         refreshUnit();
@@ -43,7 +47,8 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
     if (!allUnits.empty()) {
         Unit *closest = findClosestUnit(allUnits);
         position_.setDestination(closest->getPosition());
-        if (Point::getDistance(closest->getPosition(), getPosition()) < getAttackRange()) {
+        if (Point::getDistance(closest->getPosition(), getPosition()) <
+            std::max(getHeroRadius() + closest->getHeroRadius(), getAttackRange())) {
             if (Attack *currentAttack = attack(closest)) {
                 EventHandler<AttackEvent>::fireEvent(AttackEvent(currentAttack->getAttacker()->unique_id_,
                                                                  currentAttack->getTarget()->unique_id_));
@@ -56,7 +61,7 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
 Unit *Creep::findClosestUnit(std::vector<Unit *> &allUnits) {
     assert(!allUnits.empty());
     const Point &myPosition = position_.getPosition();
-    double closest = DBL_MAX; // ......nevazhno
+    auto closest = DBL_MAX; // ......nevazhno
     Unit *closestUnit = this;
     for (Unit *unit : allUnits) {
         if (unit->getTeam() == team_ || unit->isDead()) continue;
@@ -68,4 +73,3 @@ Unit *Creep::findClosestUnit(std::vector<Unit *> &allUnits) {
     }
     return closestUnit;
 }
-

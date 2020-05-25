@@ -125,6 +125,7 @@ private:
 private:
     std::shared_ptr<ConnectionToServer> connection_;
     boost::posix_time::ptime last_update_, now_;
+    GameState &gameState_;
 
 private:
     template<typename T>

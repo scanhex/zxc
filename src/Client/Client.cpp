@@ -96,7 +96,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     uint8_t status = reader_.readUInt8();
     clearEvents();
     if (status) {
-        if(status == 2)
+        if (status == 2)
             gameState_.reverseIndices();
         runGame();
     } else {
@@ -263,7 +263,7 @@ void Client::handle(const StopEvent &event) {
 }
 
 void Client::handle(const AttackEvent &event) {
-    if (isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event) && gameState_.findUnitByID(event.attackerID_)->isHero()) {
         connection_->events_.push(new AttackEvent(event));
     }
 }
@@ -300,4 +300,5 @@ void Client::run() {
     std::cout << "Disonnected " << std::endl;
 }
 
-Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {}
+Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)),
+                                       gameState_{gameState} {}
