@@ -8,7 +8,7 @@ class Position {
 public:
     Position(Point current, double angle);
 
-    Position& operator=(const Position &) = default;
+    Position &operator=(const Position &) = default;
 
     void update(double deltaTurn, double deltaMove);
     void updateAngle(double deltaTurn);
@@ -24,15 +24,18 @@ public:
     void setDestination(double x, double y);
 
     [[nodiscard]] double getAngle() const;
-     void setAngle(double angle);
+    void setAngle(double angle);
 
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
-    [[nodiscard]] bool inRadius(const Point& point, double r) const;
+    [[nodiscard]] bool inRadius(const Point &point, double r) const;
 
     void serialize(BufferIO::BufferWriter &writer);
     void deserialize(BufferIO::BufferReader &reader);
 
     [[nodiscard]] Point nextPosition(double deltaMove) const;
+
+    [[nodiscard]] Point move(const Point &delta) const;
+    void moveSelf(const Point &delta);
 
 private:
     void updateDestinationAngle();
