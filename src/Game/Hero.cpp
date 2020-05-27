@@ -14,7 +14,7 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ =
                 .setAttackSpeed(100)
                 .setMaxHp(1000)
                 .setMaxMp(300)
-                .setHpRegen(10)
+                .setHpRegen(3)
                 .setMpRegen(1)
                 .setArmor(3)
                 .setResist(0.25);

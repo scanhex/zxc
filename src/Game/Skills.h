@@ -61,6 +61,6 @@ public:
 
     constexpr static double LEN = 7;
     constexpr static double RADIUS = 1.5;
-    constexpr static double DAMAGE = 400; // to debug faster
+    constexpr static double DAMAGE = 400;
 };
 
