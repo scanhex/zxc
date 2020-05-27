@@ -349,8 +349,6 @@ void ZxcApplication::keyReleaseEvent(KeyEvent &event) {
 void ZxcApplication::exitEvent(ExitEvent &event) {
     event.setAccepted();
     exit_flag = true;
-    std::cout << "Vi v adekvate?" << '\n';
-    std::cout << "net" << std::endl;
     networkThread_.join();
     exit(0);
 }
