@@ -116,6 +116,8 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
         }
         moved_ = true;
         position_.setPosition(1000, 1000);
+        if(deathCounter_ == 2)
+            return;
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
             refreshUnit();
