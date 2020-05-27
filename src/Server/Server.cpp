@@ -22,7 +22,7 @@ Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &g
 void Server::ConnectionToClient::startConnection() {
     is_connected_ = true;
     conn_checker_.join();
-    std::cout<<"Player conneceted";
+    std::cout<<"Player conneceted"<<std::endl;
     if (stopped_)
         return;
     sock_.set_option(ip::tcp::no_delay(true));
@@ -67,7 +67,6 @@ void Server::ConnectionToClient::stopConnection() {
     }
     sock_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     sock_.close();
-    std::cout<<"Player disconneceted"<<'\n';
 }
 
 ip::tcp::socket &Server::ConnectionToClient::sock() {
@@ -318,4 +317,5 @@ void Server::run() {
     std::thread gs_cycle(&Server::runGameStateCycle, this);
     service_.run();
     gs_cycle.join();
+    std::cout<<"Game finished"<<std::endl;
 }
