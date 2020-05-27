@@ -9,7 +9,7 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ =
         StatsBuilder()
                 .setDamage(100)
                 .setAttackRange(75)
-                .setMoveSpeed(450)
+                .setMoveSpeed(340)
                 .setTurnRate(0.5)
                 .setAttackSpeed(100)
                 .setMaxHp(1000)
