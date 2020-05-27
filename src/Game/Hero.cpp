@@ -111,7 +111,7 @@ void Hero::useSkill(SkillName skillName, GameState &gameState) {
 
 void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
-        if (respawnTime_ == HERO_RESPAWN_TIME && deathCounter_ < 1) {
+        if (respawnTime_ == HERO_RESPAWN_TIME) {
             ++deathCounter_;
         }
         moved_ = true;
