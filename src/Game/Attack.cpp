@@ -20,6 +20,8 @@ Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
 }
 
 void Attack::update(double elapsedTimeInSeconds) {
+    if(target_->isDead())
+        moving_ = false;
     if (!moving_)
         return;
     position_.setDestination(target_->getPosition());
