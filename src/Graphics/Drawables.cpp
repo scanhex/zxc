@@ -32,6 +32,8 @@ UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group,
 }
 
 void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
+    if(unit_.isDead())
+        return;
     if (unit_.getTeam() == Team::Dire) {
         hpShader_.setColor(0xe90000_rgbf);
     } else {
