@@ -20,7 +20,7 @@ Attack::Attack(Unit *attacker, Unit *target) : moving_{true},
 }
 
 void Attack::update(double elapsedTimeInSeconds) {
-    if(target_->isDead())
+    if (target_ && target_->isDead())
         moving_ = false;
     if (!moving_)
         return;
@@ -29,8 +29,8 @@ void Attack::update(double elapsedTimeInSeconds) {
     position_.updatePointIgnoreAngle(moveDelta);
     if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= target_->getHeroRadius()) {
         moving_ = false;
-        position_.setPosition({1000,1000});
-        position_.setDestination({1000,1000});
+        position_.setPosition({1000, 1000});
+        position_.setDestination({1000, 1000});
         target_->applyDamage(damage_);
         if (target_->isDead()) {
             attacker_->claimReward(target_);
@@ -55,7 +55,10 @@ Unit *Attack::getTarget() const { return target_; }
 void Attack::setTarget(Unit *target) { target_ = target; }
 
 Unit *Attack::getAttacker() const { return attacker_; }
-void Attack::setAttacker(Unit *attacker) { attacker_ = attacker; damage_=attacker->getDamage(); }
+void Attack::setAttacker(Unit *attacker) {
+    attacker_ = attacker;
+    damage_ = attacker->getDamage();
+}
 
 AttackCreator::AttackCreator(uint32_t attackSpeed) : defaultCoolDown{100.0 / attackSpeed} {
 }
