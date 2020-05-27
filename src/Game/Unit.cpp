@@ -141,6 +141,7 @@ bool Unit::checkUnitsPosition(const Point &position, std::vector<Unit *> &allUni
 void Unit::refreshUnit() {
     creator_->refreshCoolDown();
     stats_.refreshStats();
+    moved_ = true;
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {

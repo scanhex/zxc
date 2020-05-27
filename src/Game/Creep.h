@@ -3,6 +3,8 @@
 #include "Unit.h"
 #include "StatsBuilder.h"
 
+constexpr double CREEP_RESPAWN_TIME = 10;
+
 class Creep : public Unit {
 private:
     static StatsBuilder defaultCreepStatsBuilder_;

@@ -12,6 +12,7 @@ constexpr uint32_t NUM_SKILLS = 3;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
+constexpr double HERO_RESPAWN_TIME = 2;
 
 class Hero : public Unit {
     // what does a Hero truly need?
