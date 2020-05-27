@@ -34,7 +34,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[
                                     MidCoil(*this),
                                     LongCoil(*this)} {
     team_ = static_cast<Team>(player);
-    goldKillReward_ = 500;
+    goldKillReward_ = 100;
     expKillReward_ = 1000;
     respawnTime_ = HERO_RESPAWN_TIME;
     giveId();
