@@ -3,6 +3,7 @@
 #include "Creep.h"
 #include "Events/Events.h"
 #include <cmath>
+#include <algorithm>
 #include <cfloat>
 
 StatsBuilder Creep::defaultCreepStatsBuilder_ =
