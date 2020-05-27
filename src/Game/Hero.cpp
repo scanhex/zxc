@@ -113,10 +113,8 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
     if (isDead()) {
         if (respawnTime_ == HERO_RESPAWN_TIME && deathCounter_ < 1) {
             ++deathCounter_;
-            moved_ = true;
-        } else {
-            moved_ = false;
         }
+        moved_ = true;
         position_.setPosition(1000, 1000);
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {

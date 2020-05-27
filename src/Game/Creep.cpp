@@ -42,11 +42,7 @@ bool Creep::isHero() {
 
 void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
-        if (respawnTime_ == CREEP_RESPAWN_TIME) {
-            moved_ = true;
-        } else {
-            moved_ = false;
-        }
+        moved_ = true;
         position_.setPosition(1000, 1000);
         position_.setDestination(1000, 1000);
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
@@ -62,7 +58,7 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
         position_.setDestination(closest->getPosition());
         if (Point::getDistance(closest->getPosition(), getPosition()) <
             std::max(getHeroRadius() + closest->getHeroRadius(), getAttackRange())) {
-            if (Attack * currentAttack = attack(closest)) {
+            if (Attack *currentAttack = attack(closest)) {
                 EventHandler<AttackEvent>::fireEvent(AttackEvent(currentAttack->getAttacker()->unique_id_,
                                                                  currentAttack->getTarget()->unique_id_));
             }
