@@ -28,6 +28,7 @@ void Attack::update(double elapsedTimeInSeconds) {
     if (Point::getDistance(target_->getPosition(), position_.getPosition()) <= target_->getHeroRadius()) {
         moving_ = false;
         position_.setPosition({1000,1000});
+        position_.setDestination({1000,1000});
         target_->applyDamage(damage_);
         if (target_->isDead()) {
             attacker_->claimReward(target_);

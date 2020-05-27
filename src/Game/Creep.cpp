@@ -48,6 +48,7 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
             moved_ = false;
         }
         position_.setPosition(1000, 1000);
+        position_.setDestination(1000, 1000);
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
             refreshUnit();

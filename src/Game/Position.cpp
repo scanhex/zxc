@@ -7,10 +7,7 @@
 Position::Position(Point current, double angle) : current_{current},
                                                   destination_{current},
                                                   currentAngle_{angle},
-                                                  destAngle_{angle} {
-    current_.fitInMap();
-    destination_.fitInMap();
-}
+                                                  destAngle_{angle} {}
 
 void Position::update(double deltaTurn, double deltaMove) {
     if (current_ == destination_) return;
@@ -35,6 +32,7 @@ void Position::updateAngle(double deltaTurn) {
 }
 
 void Position::updatePoint(double deltaMove) {
+    if(current_ == destination_) return;
     double delta = std::abs(destAngle_ - currentAngle_);
     if (std::min(delta, 2 * M_PI - delta) > 0) return;
 
@@ -101,13 +99,11 @@ const Point &Position::getDestination() const { return destination_; }
 
 void Position::setDestination(const Point &destination) {
     destination_ = destination;
-    destination_.fitInMap();
     updateDestinationAngle();
 }
 
 void Position::setDestination(double x, double y) {
     destination_ = Point(x, y);
-    destination_.fitInMap();
     updateDestinationAngle();
 }
 
