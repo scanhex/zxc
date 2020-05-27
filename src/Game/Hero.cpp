@@ -36,6 +36,7 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[
     team_ = static_cast<Team>(player);
     goldKillReward_ = 500;
     expKillReward_ = 1000;
+    respawnTime_ = HERO_RESPAWN_TIME;
     giveId();
 }
 
@@ -51,6 +52,7 @@ Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.cre
                                                        MidCoil(*this),
                                                        LongCoil(*this)} {
     team_ = static_cast<Team>(player);
+    respawnTime_ = HERO_RESPAWN_TIME;
     giveId();
 }
 
@@ -109,9 +111,17 @@ void Hero::useSkill(SkillName skillName, GameState &gameState) {
 
 void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
-        if (deathCounter_ < 1) {
+        if (respawnTime_ == HERO_RESPAWN_TIME && deathCounter_ < 1) {
             ++deathCounter_;
+            moved_ = true;
+        } else {
+            moved_ = false;
+        }
+        position_.setPosition(1000, 1000);
+        respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
+        if (respawnTime_ == 0) {
             refreshUnit();
+            respawnTime_ = HERO_RESPAWN_TIME;
         }
     } else {
         Unit::updateUnit(elapsedTimeInSeconds, allUnits);

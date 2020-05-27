@@ -47,6 +47,8 @@ protected:
     static uint8_t radiant_counter_;
     static uint8_t dire_counter;
 
+    double respawnTime_;
+
 public:
     std::vector<Attack*>myAttacks_;
 

@@ -28,6 +28,7 @@ Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[
     team_ = team;
     goldKillReward_ = 100;
     expKillReward_ = 1000;
+    respawnTime_ = CREEP_RESPAWN_TIME;
     giveId();
 }
 
@@ -41,15 +42,26 @@ bool Creep::isHero() {
 
 void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
     if (isDead()) {
-        refreshUnit();
-        refreshPosition();
+        if (respawnTime_ == CREEP_RESPAWN_TIME) {
+            moved_ = true;
+        } else {
+            moved_ = false;
+        }
+        position_.setPosition(1000, 1000);
+        respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
+        if (respawnTime_ == 0) {
+            refreshUnit();
+            refreshPosition();
+            respawnTime_ = CREEP_RESPAWN_TIME;
+        }
+        return;
     }
     if (!allUnits.empty()) {
         Unit *closest = findClosestUnit(allUnits);
         position_.setDestination(closest->getPosition());
         if (Point::getDistance(closest->getPosition(), getPosition()) <
             std::max(getHeroRadius() + closest->getHeroRadius(), getAttackRange())) {
-            if (Attack *currentAttack = attack(closest)) {
+            if (Attack * currentAttack = attack(closest)) {
                 EventHandler<AttackEvent>::fireEvent(AttackEvent(currentAttack->getAttacker()->unique_id_,
                                                                  currentAttack->getTarget()->unique_id_));
             }
