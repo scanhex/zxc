@@ -232,6 +232,9 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     auto coords = cameraObject_.transformationMatrix().translation();
     coords.x() = 0;
     coords.y() = 0;
+    auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+    if (2 >= newc.z() || newc.z() >= 40)
+        return;
     cameraObject_.translate(
             -coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
 //	cameraObject_.translate(Vector3::zAxis(
