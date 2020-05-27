@@ -70,7 +70,7 @@ void ZxcApplication::initRenderer() {
 void ZxcApplication::initGrid() {
     grid_ = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
     auto grid = new Object3D{&scene_};
-    (*grid).scale(Vector3{30});
+    (*grid).scale(Vector3{MAP_SIZE});
     new FlatDrawable{*grid, ShaderLibrary::flatShader(), grid_, drawables_};
 }
 
@@ -132,7 +132,7 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
 
 void ZxcApplication::createAttackDrawables() {
     for (Unit *unit: units_) {
-        std::vector<Object3D *>objects;
+        std::vector<Object3D *> objects;
         for (Attack *attack:unit->myAttacks_) {
             auto *obj = new Object3D{&scene_};
             new AttackDrawable(*obj, drawables_, *attack);

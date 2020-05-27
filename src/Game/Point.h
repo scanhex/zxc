@@ -2,6 +2,8 @@
 
 #include "Utils/BufferIO.h"
 
+constexpr double MAP_SIZE = 10.0;
+
 class Point final {
 public:
     double x_, y_, z_;
@@ -23,10 +25,12 @@ public:
     [[nodiscard]] bool yInRange(double left, double right) const;
 
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
-    [[nodiscard]] bool inRadius(const Point& point, double r) const;
-    [[nodiscard]] static bool isEnoughDistance(const Point& first, double r1,
-                                               const Point& second, double r2);
-    [[nodiscard]] static double getDistance(const Point& first,const Point& second);
+    [[nodiscard]] bool inRadius(const Point &point, double r) const;
+    [[nodiscard]] static bool isEnoughDistance(const Point &first, double r1,
+                                               const Point &second, double r2);
+    [[nodiscard]] static double getDistance(const Point &first, const Point &second);
+
+    void fitInMap();
 
     [[nodiscard]] double normSqr() const;
     [[nodiscard]] double norm() const;

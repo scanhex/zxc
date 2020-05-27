@@ -61,8 +61,8 @@ public:
 
     [[nodiscard]] bool gameIsFinished() const;
 
-    Unit* findUnitByID(uint8_t id);
-    std::vector<Unit * >& getAllUnits();
+    Unit *findUnitByID(uint8_t id);
+    std::vector<Unit *> &getAllUnits();
 
 private:
 

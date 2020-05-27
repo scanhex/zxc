@@ -7,7 +7,10 @@
 Position::Position(Point current, double angle) : current_{current},
                                                   destination_{current},
                                                   currentAngle_{angle},
-                                                  destAngle_{angle} {}
+                                                  destAngle_{angle} {
+    current_.fitInMap();
+    destination_.fitInMap();
+}
 
 void Position::update(double deltaTurn, double deltaMove) {
     if (current_ == destination_) return;
@@ -41,7 +44,7 @@ void Position::updatePoint(double deltaMove) {
     } else {
         vector.normalize();
         vector *= deltaMove;
-        current_ += vector;
+        moveSelf(vector);
     }
 }
 
@@ -52,7 +55,7 @@ void Position::updatePointIgnoreAngle(double deltaMove) {
     } else {
         vector.normalize();
         vector *= deltaMove;
-        current_ += vector;
+        moveSelf(vector);
     }
 }
 
@@ -98,11 +101,13 @@ const Point &Position::getDestination() const { return destination_; }
 
 void Position::setDestination(const Point &destination) {
     destination_ = destination;
+    destination_.fitInMap();
     updateDestinationAngle();
 }
 
 void Position::setDestination(double x, double y) {
     destination_ = Point(x, y);
+    destination_.fitInMap();
     updateDestinationAngle();
 }
 
@@ -138,6 +143,17 @@ Point Position::nextPosition(double deltaMove) const {
     } else {
         vector.normalize();
         vector *= deltaMove;
-        return current_ + vector;
+        return move(vector);
     }
+}
+
+Point Position::move(const Point &delta) const {
+    Point res = current_ + delta;
+    res.fitInMap();
+    return res;
+}
+
+void Position::moveSelf(const Point &delta) {
+    current_ += delta;
+    current_.fitInMap();
 }
