@@ -11,21 +11,21 @@ git submodule update --init
 
 ## Ubuntu
 ```
-apt-get install libboost-system-dev
-apt-get install libboost-thread-dev
-apt-get install libboost-date-time-dev
-apt-get install libboost-regex-dev
-apt-get install libboost-serialization-dev
+sudo apt-get install libboost-system-dev
+sudo apt-get install libboost-thread-dev
+sudo apt-get install libboost-date-time-dev
+sudo apt-get install libboost-regex-dev
+sudo apt-get install libboost-serialization-dev
 ```
 или целиком
 ```
-apt-get install libboost-all-dev   
+sudo apt-get install libboost-all-dev   
 ```
 
 
 ```
-apt-get install libgl1-mesa-dev
-apt-get install libsdl2-dev
+sudo apt-get install libgl1-mesa-dev
+sudo apt-get install libsdl2-dev
 ```
 
 ## macOS
