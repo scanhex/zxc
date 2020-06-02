@@ -93,10 +93,18 @@ void GameState::handle(const StopEvent &event) {
 void GameState::handle(const AttackEvent &event) {
     Unit *attacker = findUnitByID(event.attackerID_);
     Unit *target = findUnitByID(event.targetID_);
-    if(!attacker || !target) {
-        std::cerr << "Ruslan za chto " << (int)event.attackerID_ << ' ' << (int)event.targetID_ << std::endl;
+    // assert(attacker && target);
+    if (!attacker) {
+        std::cerr << "GameState::handle(AttackEvent) -> Attacker was not found. attackerID_ = "
+                  << event.attackerID_
+                  << std::endl;
     }
-    for (auto & attack : attacker->myAttacks_) {
+    if (!target) {
+        std::cerr << "GameState::handle(AttackEvent) -> Target was not found. targetID_ = "
+                  << event.targetID_
+                  << std::endl;
+    }
+    for (auto &attack : attacker->myAttacks_) {
         if (!attack->getMovingFlag()) {
             attack->setAttacker(attacker);
             attack->setTarget(target);
