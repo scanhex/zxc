@@ -97,8 +97,10 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("40.112.66.140"), 8080};
-        //127.0.0.1 to test locally, 40.112.66.140 to test on server
+        ip::tcp::endpoint ep_{ip::address::from_string("13.49.21.181"), 8080};
+        // 127.0.0.1 to test locally
+        // 40.112.66.140 Ruslan's server
+        // 13.49.21.181 Maxim's server
         ip::tcp::socket sock_;
         BufferIO::BufferReader reader_{};
         BufferIO::BufferWriter writer_{};
