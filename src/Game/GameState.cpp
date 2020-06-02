@@ -1,5 +1,6 @@
 #include "GameState.h"
 #include <algorithm>
+#include <iostream>
 
 GameState::GameState(std::vector<Unit *> &units) : units_{units} {
     heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
@@ -92,6 +93,7 @@ void GameState::handle(const StopEvent &event) {
 void GameState::handle(const AttackEvent &event) {
     Unit *attacker = findUnitByID(event.attackerID_);
     Unit *target = findUnitByID(event.targetID_);
+    if(!attacker || !target) std::cerr << "Ruslan za chto" << std::endl;
     for (auto & attack : attacker->myAttacks_) {
         if (!attack->getMovingFlag()) {
             attack->setAttacker(attacker);
