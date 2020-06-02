@@ -93,7 +93,9 @@ void GameState::handle(const StopEvent &event) {
 void GameState::handle(const AttackEvent &event) {
     Unit *attacker = findUnitByID(event.attackerID_);
     Unit *target = findUnitByID(event.targetID_);
-    if(!attacker || !target) std::cerr << "Ruslan za chto" << std::endl;
+    if(!attacker || !target) {
+        std::cerr << "Ruslan za chto " << event.attackerID_ << ' ' << event.targetID_ << std::endl;
+    }
     for (auto & attack : attacker->myAttacks_) {
         if (!attack->getMovingFlag()) {
             attack->setAttacker(attacker);
