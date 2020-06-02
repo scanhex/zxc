@@ -28,6 +28,9 @@ class Unit {
 public:
     uint8_t unique_id_;
 
+    static uint8_t radiant_counter_;
+    static uint8_t dire_counter_;
+
 protected:
     Item items_[MAX_ITEMS];
     std::vector<Buff> buffs_;
@@ -43,9 +46,6 @@ protected:
     bool moved_{false};
 
     AttackCreator *creator_;
-
-    static uint8_t radiant_counter_;
-    static uint8_t dire_counter;
 
     double respawnTime_;
 

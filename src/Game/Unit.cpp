@@ -6,7 +6,7 @@
 #include <cmath>
 
 uint8_t Unit::radiant_counter_ = 0;
-uint8_t Unit::dire_counter = 255;
+uint8_t Unit::dire_counter_ = 255;
 
 Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
                                              goldKillReward_{0},
@@ -241,7 +241,7 @@ void Unit::giveId() {
     if (team_ == Team::Neutral)
         return; //TODO
     if (team_ == Team::Dire)
-        unique_id_ = dire_counter--;
+        unique_id_ = dire_counter_--;
     if (team_ == Team::Radiant)
         unique_id_ = radiant_counter_++;
 }

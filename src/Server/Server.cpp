@@ -22,7 +22,7 @@ Server::ConnectionToClient::ConnectionToClient(io_service &service, GameState &g
 void Server::ConnectionToClient::startConnection() {
     is_connected_ = true;
     conn_checker_.join();
-    std::cout<<"Player conneceted"<<std::endl;
+    std::cout << "Player conneceted" << std::endl;
     if (stopped_)
         return;
     sock_.set_option(ip::tcp::no_delay(true));
@@ -303,6 +303,9 @@ void Server::runGameStateCycle() {
 void runServer() {
     Server server;
     server.run();
+    // ZA CHTO
+    Unit::radiant_counter_ = 0;
+    Unit::dire_counter_ = 255;
 }
 
 Server::Server() = default;
@@ -317,5 +320,5 @@ void Server::run() {
     std::thread gs_cycle(&Server::runGameStateCycle, this);
     service_.run();
     gs_cycle.join();
-    std::cout<<"Game finished"<<std::endl;
+    std::cout << "Game finished" << std::endl;
 }
