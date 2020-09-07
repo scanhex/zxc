@@ -4,7 +4,7 @@ git clone https://github.com/scanhex/zxc
 cd zxc
 ```
 
-## Подмодули
+## Submodules
 ```
 git submodule update --init
 ```
@@ -35,18 +35,18 @@ brew install sdl2
 ```
 
 ## Windows(MSVC)
-Скачать SDL2 в директорию проекта с https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip    
-Скачать бинарники Boost: https://sourceforge.net/projects/boost/files/boost-binaries/   
-Также нужно установить переменные среды `BOOST_INCLUDEDIR` на папку вида `boost_1_65_0` и `BOOST_LIBRARYDIR` на папку `boost_1_65_0\lib64-msvc-14.1`
+Download SDL2 to the project directory from https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip    
+Download Boost binaries: https://sourceforge.net/projects/boost/files/boost-binaries/   
+You also need to make `BOOST_INCLUDEDIR` environment variable point to the folder that looks like `boost_1_65_0` and make `BOOST_LIBRARYDIR` to point to the folder like `boost_1_65_0\lib64-msvc-14.1`
 
 ## Windows(MinGW)
-Аналогично MSVC, но бинарники Boost скачать отсюда не получится.
-SDL2 можно скачать с того же сайта, но файл будет с именем `SDL2-devel-2.0.10-mingw.tar.gz`
+Similar to MSVC, but you can't download Boost binaries from the same website.
+You can download SDL2 from the same place, but the filename will be `SDL2-devel-2.0.10-mingw.tar.gz`
 
-## Запуск
-Просто запустить цель `zxc` в CMake.
+## Run
+Just run `zxc` CMake target.
 
-## Используемые библиотеки 
+## Libraries used 
 * Magnum 2019.10
 * Corrade 2019.10
 * Boost 1.65+
