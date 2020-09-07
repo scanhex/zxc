@@ -17,7 +17,7 @@ sudo apt-get install libboost-date-time-dev
 sudo apt-get install libboost-regex-dev
 sudo apt-get install libboost-serialization-dev
 ```
-или целиком
+or you can install whole `libboost-all-dev`
 ```
 sudo apt-get install libboost-all-dev   
 ```
