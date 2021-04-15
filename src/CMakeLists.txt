@@ -29,6 +29,7 @@ endif()
 
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib -I/usr/local/opt/icu4c/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
 
 include_directories(".")
