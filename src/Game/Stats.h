@@ -6,7 +6,8 @@
 class Stats {
 private:
     int32_t damage_;
-    uint32_t attackRange_;
+    int32_t default_damage_;
+    double attackRange_;
 
     uint32_t moveSpeed_;
     uint32_t attackSpeed_;
@@ -14,6 +15,8 @@ private:
 
     uint32_t maxHP_;
     uint32_t maxMP_;
+    uint32_t default_maxHP_;
+    uint32_t default_maxMP_;
     double healthPoints_;
     double manaPoints_;
     double hpRegen_; // per second
@@ -24,10 +27,10 @@ private:
 public:
     Stats() = default;
     Stats(const Stats &) = default;
-    Stats& operator=(const Stats &) = default;
+    Stats &operator=(const Stats &) = default;
 
     void changeDamage(int32_t delta);
-    void changeAttackRange(int32_t delta);
+    void changeAttackRange(double delta);
     void changeMoveSpeed(int32_t delta);
     void changeTurnRate(int32_t delta);
     void changeAttackSpeed(int32_t delta);
@@ -50,8 +53,11 @@ public:
     [[nodiscard]] int32_t getDamage() const;
     void setDamage(int32_t damage);
 
-    [[nodiscard]] uint32_t getAttackRange() const;
-    void setAttackRange(uint32_t attackRange);
+    [[nodiscard]] int32_t getDefaultDamage() const;
+    void setDefaultDamage(int32_t damage);
+
+    [[nodiscard]] double getAttackRange() const;
+    void setAttackRange(double attackRange);
 
     [[nodiscard]] uint32_t getMoveSpeed() const;
     void setMoveSpeed(uint32_t moveSpeed);
@@ -71,8 +77,14 @@ public:
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
 
+    [[nodiscard]] int32_t getDefaultHealthPoints() const;
+    void setDefaultHealthPoints(int32_t healthPoints);
+
     [[nodiscard]] double getManaPoints() const;
     void setManaPoints(double manaPoints);
+
+    [[nodiscard]] int32_t getDefaultManaPoints() const;
+    void setDefaultManaPoints(int32_t manaPoints);
 
     [[nodiscard]] double getHpRegen() const;
     void setHpRegen(double hpRegen);

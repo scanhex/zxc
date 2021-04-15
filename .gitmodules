@@ -10,3 +10,6 @@
 [submodule "assimp"]
 	path = assimp
 	url = https://github.com/assimp/assimp
+[submodule "magnum-extras"]
+	path = magnum-extras
+	url = https://github.com/mosra/magnum-extras

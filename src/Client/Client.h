@@ -12,10 +12,10 @@
 #include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
-static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_SERVER_SIZE = 512;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
-static constexpr int SERVER_RESPONSE_TIME = 100; //max time we wait for next server response
+static constexpr int SERVER_RESPONSE_TIME = 1000; //max time we wait for next server response
 
 using namespace boost::asio;
 
@@ -26,6 +26,7 @@ using namespace boost::asio;
 
 class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
+                     EventHandler<AttackEvent>,
                      EventHandler<FirstSkillUseEvent>,
                      EventHandler<SecondSkillUseEvent>,
                      EventHandler<ThirdSkillUseEvent>,
@@ -50,8 +51,6 @@ private:
 
         bool isConnected() const;
 
-        bool gameIsStarted() const;
-      
         void fireOtherEvents();
 
     private:
@@ -98,7 +97,10 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8001};
+        ip::tcp::endpoint ep_{ip::address::from_string("13.49.21.181"), 8080};
+        // 127.0.0.1 to test locally
+        // 40.112.66.140 Ruslan's server
+        // 13.49.21.181 Maxim's server
         ip::tcp::socket sock_;
         BufferIO::BufferReader reader_{};
         BufferIO::BufferWriter writer_{};
@@ -116,6 +118,7 @@ private:
 
     void handle(const MoveEvent &event) override;
     void handle(const StopEvent &event) override;
+    void handle(const AttackEvent &event) override;
     void handle(const FirstSkillUseEvent &event) override;
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
@@ -124,12 +127,14 @@ private:
 private:
     std::shared_ptr<ConnectionToServer> connection_;
     boost::posix_time::ptime last_update_, now_;
+    GameState &gameState_;
 
 private:
     template<typename T>
     static bool isNotFromServerEvent(T &t);
 
-    class FromServerEvent {};
+    class FromServerEvent {
+    };
 
     class FromServerMoveEvent : public MoveEvent, public FromServerEvent {
     public:
@@ -139,6 +144,11 @@ private:
     class FromServerStopEvent : public StopEvent, public FromServerEvent {
     public:
         explicit FromServerStopEvent(Hero &hero) : StopEvent(hero) {}
+    };
+
+    class FromServerAttackEvent : public AttackEvent, public FromServerEvent {
+    public:
+        explicit FromServerAttackEvent(uint8_t attackerID, uint8_t targetID) : AttackEvent(attackerID, targetID) {}
     };
 
     class FromServerFirstSkillUseEvent : public FirstSkillUseEvent, public FromServerEvent {
@@ -156,5 +166,3 @@ private:
         explicit FromServerThirdSkillUseEvent(Hero &hero) : ThirdSkillUseEvent(hero) {}
     };
 };
-
-void runClient(GameState &gameState);

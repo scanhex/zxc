@@ -3,12 +3,18 @@
 #include <cassert>
 
 void Stats::changeDamage(int32_t delta) { damage_ += delta; }
-void Stats::changeAttackRange(int32_t delta) { attackRange_ += delta; }
+void Stats::changeAttackRange(double delta) { attackRange_ += delta; }
 void Stats::changeMoveSpeed(int32_t delta) { moveSpeed_ += delta; }
 void Stats::changeTurnRate(int32_t delta) { turnRate_ += delta; }
 void Stats::changeAttackSpeed(int32_t delta) { attackSpeed_ += delta; }
-void Stats::changeMaxHP(int32_t delta) { maxHP_ += delta; }
-void Stats::changeMaxMP(int32_t delta) { maxMP_ += delta; }
+void Stats::changeMaxHP(int32_t delta) {
+    changeHP(delta * (healthPoints_ / maxHP_));
+    maxHP_ += delta;
+}
+void Stats::changeMaxMP(int32_t delta) {
+    changeMP(delta * (manaPoints_ / maxMP_));
+    maxMP_ += delta;
+}
 
 void Stats::changeHP(double delta) {
     healthPoints_ += delta;
@@ -48,8 +54,11 @@ void Stats::deserialize(BufferIO::BufferReader &reader) {
 int32_t Stats::getDamage() const { return damage_; }
 void Stats::setDamage(int32_t damage) { damage_ = damage; } // forbid negative applyDamage?
 
-uint32_t Stats::getAttackRange() const { return attackRange_; }
-void Stats::setAttackRange(uint32_t attackRange) { attackRange_ = attackRange; }
+int32_t Stats::getDefaultDamage() const { return default_damage_; }
+void Stats::setDefaultDamage(int32_t damage) { default_damage_ = damage; }
+
+double Stats::getAttackRange() const { return attackRange_; }
+void Stats::setAttackRange(double attackRange) { attackRange_ = attackRange; }
 
 uint32_t Stats::getMoveSpeed() const { return moveSpeed_; }
 void Stats::setMoveSpeed(uint32_t moveSpeed) { moveSpeed_ = moveSpeed; }
@@ -61,10 +70,16 @@ uint32_t Stats::getAttackSpeed() const { return attackSpeed_; }
 void Stats::setAttackSpeed(uint32_t attackSpeed) { attackSpeed_ = attackSpeed; }
 
 uint32_t Stats::getMaxHp() const { return maxHP_; }
-void Stats::setMaxHp(uint32_t maxHp) { maxHP_ = maxHp; }
+void Stats::setMaxHp(uint32_t maxHp) {
+    healthPoints_ = healthPoints_ * maxHp / maxHP_;
+    maxHP_ = maxHp;
+}
 
 uint32_t Stats::getMaxMp() const { return maxMP_; }
-void Stats::setMaxMp(uint32_t maxMp) { maxMP_ = maxMp; }
+void Stats::setMaxMp(uint32_t maxMp) {
+    manaPoints_ = manaPoints_ * maxMp / maxMP_;
+    maxMP_ = maxMp;
+}
 
 double Stats::getHealthPoints() const { return healthPoints_; }
 void Stats::setHealthPoints(double healthPoints) {
@@ -77,6 +92,12 @@ void Stats::setManaPoints(double manaPoints) {
     assert(manaPoints >= 0 && manaPoints <= maxHP_ && "Wrong new mana points!");
     manaPoints_ = manaPoints;
 }
+
+int32_t Stats::getDefaultHealthPoints() const { return default_maxHP_; }
+void Stats::setDefaultHealthPoints(int32_t healthPoints) { default_maxHP_ = healthPoints; }
+
+int32_t Stats::getDefaultManaPoints() const { return default_maxMP_; }
+void Stats::setDefaultManaPoints(int32_t manaPoints) { default_maxMP_ = manaPoints; }
 
 double Stats::getHpRegen() const { return hpRegen_; }
 void Stats::setHpRegen(double hpRegen) { hpRegen_ = hpRegen; }

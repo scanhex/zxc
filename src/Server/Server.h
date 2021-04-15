@@ -16,9 +16,9 @@
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
-static constexpr int TICK_TIME_SEND_GS = 10;
+static constexpr int TICK_TIME_SEND_GS = 30;
 static constexpr int PLAYERS_REQUIRED = 2;
-static constexpr int MSG_FROM_SERVER_SIZE = 128;
+static constexpr int MSG_FROM_SERVER_SIZE = 512;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32;
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
@@ -90,7 +90,7 @@ private:
         void startChecker();
 
     private:
-        GameState &gameState;
+        GameState &gameState_;
         bool &running_;
         bool &stopped_;
         ip::tcp::acceptor &acceptor_;
@@ -130,7 +130,7 @@ private:
     boost::lockfree::queue<Event *> firstPlayerEvents_{20};
     boost::lockfree::queue<Event *> secondPlayerEvents_{20};
     io_service service_{};
-    ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8001)};
+    ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8080)};
     std::mutex gs_lock_{};
 };
 

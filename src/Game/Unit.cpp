@@ -1,38 +1,32 @@
 #define _USE_MATH_DEFINES
 
 #include "Unit.h"
+#include "Utils/Utils.h"
 #include <algorithm>
 #include <cmath>
 
-Unit::Unit(Stats stats, Position position) : stats_{stats},
-                                             startStats_{stats},
+uint8_t Unit::radiant_counter_ = 0;
+uint8_t Unit::dire_counter_ = 255;
+
+Unit::Unit(Stats stats, Position position) : team_{Team::Neutral},
+                                             goldKillReward_{0},
+                                             expKillReward_{0},
+                                             stats_{stats},
                                              position_{position},
-                                             startPosition_{position} {
+                                             heroRadius_{0.24} {
     stats_.refreshStats();
-    startStats_.refreshStats();
+    creator_ = new AttackCreator(stats_.getAttackSpeed());
+    myAttacks_.resize(MAX_ATTACK_NUM, new Attack());
 }
 
 
 void Unit::addItem(Item &item, size_t slot) {
-    if (slot == -1) {
-        for (size_t i = 0; i < MAX_ITEMS; i++) {
-            if (items_[i].isEmpty()) {
-                slot = i;
-                break;
-            }
-        }
-        assert(slot != -1 && "No item slots available!");
-    } else {
-        assert(slot >= 0 && slot < MAX_ITEMS && "Wrong item slot");
-        assert(items_[slot].isEmpty() && "Item slot occupied");
-    }
-
+    // TODO add items??
     items_[slot] = item;
 }
 
 void Unit::deleteItem(size_t indexToDelete) {
-    assert(indexToDelete >= 0 && indexToDelete < MAX_ITEMS && "Wrong index for deleting item!");
-
+    // TODO add items??
     items_[indexToDelete] = Item();
 }
 
@@ -42,24 +36,30 @@ void Unit::clearItems() {
     }
 }
 
-void Unit::addBuff(Buff &buff) { buffs_.push_back(buff); }
+void Unit::addBuff(Buff &buff) {
+    // TODO add buffs??
+    buffs_.push_back(buff);
+}
 
 void Unit::deleteBuff(size_t indexToDelete) {
-    std::vector<Buff> newBuffs;
-    for (Buff &buff : buffs_) {
-        if (buff.index != indexToDelete) {
-            newBuffs.push_back(buff);
-        }
-    }
-    std::swap(buffs_, newBuffs);
+    // TODO add buffs??
+    unused_parameter(indexToDelete);
 }
 
 void Unit::clearBuffs() {
     buffs_.clear();
 }
 
+Attack *Unit::attack(std::vector<Unit *> &allUnits) {
+    return creator_->attack(this, allUnits);
+}
+
+Attack *Unit::attack(Unit *unit) {
+    return creator_->attack(this, unit);
+}
+
 void Unit::changeDamage(int32_t delta) { stats_.changeDamage(delta); }
-void Unit::changeAttackRange(int32_t delta) { stats_.changeAttackRange(delta); }
+void Unit::changeAttackRange(double delta) { stats_.changeAttackRange(delta); }
 void Unit::changeMoveSpeed(int32_t delta) { stats_.changeMoveSpeed(delta); }
 void Unit::changeTurnRate(double delta) { stats_.changeTurnRate(delta); }
 void Unit::changeAttackSpeed(int32_t delta) { stats_.changeAttackSpeed(delta); }
@@ -100,20 +100,48 @@ void Unit::spendMana(double amount) {
 }
 
 void Unit::changeArmor(int32_t delta) { stats_.changeArmor(delta); }
+
 void Unit::changeResist(double delta) { stats_.changeResist(delta); }
 
-void Unit::updateUnit(double elapsedTimeInSeconds) {
+void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
+    if (isDead()) return;
+    creator_->update(elapsedTimeInSeconds);
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
 
     double turnDelta = getTurnRate() * (elapsedTimeInSeconds / 0.03);
     double moveDelta = (getMoveSpeed() / 100.0) * elapsedTimeInSeconds;
-    position_.update(turnDelta, moveDelta);
+    position_.updateAngle(turnDelta);
+    Point nextPos = position_.nextPosition(moveDelta);
+    if (checkUnitsPosition(nextPos, allUnits)) {
+        //  position_.update(turnDelta, moveDelta);
+        moved_ = true;
+        position_.updatePoint(moveDelta);
+    } else {
+        moved_ = false;
+    }
+}
+
+void Unit::claimReward(Unit *killed_unit) {
+    // ??
+}
+
+bool Unit::checkUnitsPosition(const Point &position, std::vector<Unit *> &allUnits) const {
+    for (auto &unit : allUnits) {
+        if (unit != this) {
+            if (!Point::isEnoughDistance(position, heroRadius_,
+                                         unit->getPosition(), unit->heroRadius_)) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void Unit::refreshUnit() {
-    stats_ = startStats_;
-    position_ = startPosition_;
+    creator_->refreshCoolDown();
+    stats_.refreshStats();
+    moved_ = true;
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {
@@ -149,12 +177,19 @@ bool Unit::isDead() const { return stats_.getHealthPoints() == 0.0; }
 
 
 // setters and getters
+double Unit::getHeroRadius() const { return heroRadius_; }
+Team Unit::getTeam() const { return team_; }
+uint32_t Unit::getGoldKillReward() const { return goldKillReward_; }
+uint32_t Unit::getExpKillReward() const { return expKillReward_; }
+
+bool Unit::getMovedFlag() const { return moved_; }
+void Unit::setMovedFlag(bool status) { moved_ = status; }
 
 int32_t Unit::getDamage() const { return stats_.getDamage(); }
 void Unit::setDamage(int32_t damage) { stats_.setDamage(damage); }
 
-uint32_t Unit::getAttackRange() const { return stats_.getAttackRange();; }
-void Unit::setAttackRange(uint32_t attackRange) { stats_.setAttackRange(attackRange); }
+double Unit::getAttackRange() const { return stats_.getAttackRange();; }
+void Unit::setAttackRange(double attackRange) { stats_.setAttackRange(attackRange); }
 
 uint32_t Unit::getMoveSpeed() const { return stats_.getMoveSpeed(); }
 void Unit::setMoveSpeed(uint32_t moveSpeed) { stats_.setMoveSpeed(moveSpeed); }
@@ -198,6 +233,15 @@ void Unit::setDestination(const Point &destination) { position_.setDestination(d
 void Unit::setDestination(double x, double y) { position_.setDestination(x, y); }
 
 double Unit::getAngle() const { return position_.getAngle(); }
-void Unit::setAngle(double angle){
+void Unit::setAngle(double angle) {
     position_.setAngle(angle);
+}
+
+void Unit::giveId() {
+    if (team_ == Team::Neutral)
+        return; //TODO
+    if (team_ == Team::Dire)
+        unique_id_ = dire_counter_--;
+    if (team_ == Team::Radiant)
+        unique_id_ = radiant_counter_++;
 }

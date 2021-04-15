@@ -12,6 +12,7 @@ find_package(Magnum REQUIRED
         )
 find_package(Assimp)
 find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
+find_package(MagnumExtras REQUIRED)
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
@@ -28,6 +29,7 @@ endif()
 
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib -I/usr/local/opt/icu4c/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
 
 include_directories(".")
@@ -69,6 +71,7 @@ target_link_libraries(zxc PRIVATE
     Magnum::Trade
     Magnum::Primitives
     Magnum::Text
+	MagnumExtras::Ui
         )
 
 # Make the executable a default target to build & run in Visual Studio

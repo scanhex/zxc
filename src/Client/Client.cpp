@@ -41,7 +41,6 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 
 void Client::ConnectionToServer::runGame() {
     gameState_.refreshAllUnits();
-    gameState_.startGame();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -95,8 +94,10 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     }
     assert(bytes == MSG_WAIT_FROM_SERVER_SIZE);
     uint8_t status = reader_.readUInt8();
-    // clearEvents();
+    clearEvents();
     if (status) {
+        if (status == 2)
+            gameState_.reverseIndices();
         runGame();
     } else {
         waitForGameStart();
@@ -151,12 +152,17 @@ void Client::ConnectionToServer::parseGSFromBuffer() {
 
 void Client::ConnectionToServer::parseEventsFromBuffer() {
     size_t sz = reader_.readInt32();
-    assert(sz <= 5);
     Hero *hero = gameState_.getHero(Player::Second);
     for (size_t i = 0; i < sz; ++i) {
         uint8_t actionId = reader_.readUInt8();
         auto eventName = static_cast<SerializedEventName>(actionId);
         switch (eventName) {
+            case SerializedEventName::Attack: {
+                uint8_t attackerID = reader_.readUInt8();
+                uint8_t targetID = reader_.readUInt8();
+                othersEvents_.push(new FromServerAttackEvent(attackerID, targetID));
+                break;
+            }
             case SerializedEventName::FirstSkillUse: {
                 othersEvents_.push(new FromServerFirstSkillUseEvent(*hero));
                 break;
@@ -221,14 +227,11 @@ void Client::ConnectionToServer::clearEvents() {
 
 void Client::ConnectionToServer::fireOtherEvents() {
     Event *e;
+    if (othersEvents_.empty()) return;
     while (othersEvents_.pop(e)) {
         e->fire();
         delete e;
     }
-}
-
-bool Client::ConnectionToServer::gameIsStarted() const {
-    return gameState_.gameIsStarted();
 }
 
 void Client::checkServerResponse() {
@@ -248,31 +251,37 @@ bool Client::isNotFromServerEvent(T &t) {
 }
 
 void Client::handle(const MoveEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new MoveEvent(event));
     }
 }
 
 void Client::handle(const StopEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new StopEvent(event));
     }
 }
 
+void Client::handle(const AttackEvent &event) {
+    if (isNotFromServerEvent(event) && gameState_.findUnitByID(event.attackerID_)->isHero()) {
+        connection_->events_.push(new AttackEvent(event));
+    }
+}
+
 void Client::handle(const FirstSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new FirstSkillUseEvent(event));
     }
 }
 
 void Client::handle(const SecondSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new SecondSkillUseEvent(event));
     }
 }
 
 void Client::handle(const ThirdSkillUseEvent &event) {
-    if (connection_->gameIsStarted() && isNotFromServerEvent(event)) {
+    if (isNotFromServerEvent(event)) {
         connection_->events_.push(new ThirdSkillUseEvent(event));
     }
 }
@@ -291,9 +300,5 @@ void Client::run() {
     std::cout << "Disonnected " << std::endl;
 }
 
-Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)) {}
-
-void runClient(GameState &gameState) {
-    Client client(gameState);
-    client.run();
-}
+Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)),
+                                       gameState_{gameState} {}

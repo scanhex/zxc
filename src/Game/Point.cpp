@@ -1,5 +1,6 @@
 #include "Point.h"
 #include <cmath>
+#include <algorithm>
 
 Point::Point(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
@@ -57,7 +58,7 @@ bool Point::inRadius(double x, double y, double r) const {
     return ((x - x_) * (x - x_) + (y - y_) * (y - y_) <= r * r);
 }
 
-bool Point::inRadius(const Point& point, double r) const {
+bool Point::inRadius(const Point &point, double r) const {
     return inRadius(point.x_, point.y_, r);
 }
 
@@ -73,7 +74,7 @@ bool Point::normLessThan(double v) const {
     return (normSqr() < v * v);
 }
 
-void Point::serialize(BufferIO::BufferWriter &writer) {
+void Point::serialize(BufferIO::BufferWriter &writer) const {
     // z?
     writer.writeDouble(x_);
     writer.writeDouble(y_);
@@ -83,4 +84,20 @@ void Point::deserialize(BufferIO::BufferReader &reader) {
     // z?
     x_ = reader.readDouble();
     y_ = reader.readDouble();
+}
+
+bool Point::isEnoughDistance(const Point &first, double r1, const Point &second, double r2) {
+    return (r1 + r2) * (r1 + r2) <=
+           (first.x_ - second.x_) * (first.x_ - second.x_) +
+           (first.y_ - second.y_) * (first.y_ - second.y_);
+}
+
+double Point::getDistance(const Point &first, const Point &second) {
+    return (first.x_ - second.x_) * (first.x_ - second.x_) +
+           (first.y_ - second.y_) * (first.y_ - second.y_);
+}
+
+void Point::fitInMap() {
+    x_ = std::clamp(x_, -MAP_SIZE, MAP_SIZE);
+    y_ = std::clamp(y_, -MAP_SIZE, MAP_SIZE);
 }

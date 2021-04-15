@@ -5,19 +5,23 @@
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
+#include <Magnum/Primitives/Circle.h>
+#include <Magnum/Primitives/UVSphere.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/Math/Complex.h>
 #include <Magnum/Math/Matrix3.h>
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/Shaders/DistanceFieldVector.h>
 
+#include "PluginLibrary.h"
 
-PluginManager::Manager<Text::AbstractFont> manager;
+
 Containers::Pointer<Text::AbstractFont> font;
+
 UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Unit &unit)
         : SceneGraph::Drawable3D(object, &group), unit_(unit) {
     if (!font) {
-        font = manager.loadAndInstantiate("StbTrueTypeFont");
+        font = PluginLibrary::getFontManager().loadAndInstantiate("StbTrueTypeFont");
     }
     if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
         Fatal{} << "Cannot open font file";
@@ -28,15 +32,33 @@ UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group,
 }
 
 void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    hpShader_.setColor(0x00ff00_rgbf)
-            .setTransformationProjectionMatrix(
+    if(unit_.isDead())
+        return;
+    if (unit_.getTeam() == Team::Dire) {
+        hpShader_.setColor(0xe90000_rgbf);
+    } else {
+        hpShader_.setColor(0x1ac100_rgbf);
+    }
+    hpShader_.setTransformationProjectionMatrix(
                     camera.projectionMatrix() *
                     Matrix4::translation(transformationMatrix.translation()) *
                     Matrix4::translation({0.f, 1.f, 5.f}))
             .bindVectorTexture(cache.texture());
+
     int32_t myHP = ceil(unit_.getHealthPoints());
     hpRenderer_->render(std::to_string(myHP));
     hpRenderer_->mesh().draw(hpShader_);
+    // Debugging Circle under the character: 
+    /*
+    auto mesh = MeshTools::compile(Magnum::Primitives::circle3DSolid(100));
+    shader_.setDiffuseColor(0x1ac100_rgbf)
+        .setLightPosition(camera.cameraMatrix().translation())
+        .setLightColor(Color4(1.f, 1.f, 1.f))
+        .setTransformationMatrix(Matrix4::translation({ 0.f, 0.f, 0.01f }) * transformationMatrix * Matrix4::scaling({ 0.64f, 0.64f, 0.64f }))
+        .setNormalMatrix(transformationMatrix.normalMatrix())
+        .setProjectionMatrix(camera.projectionMatrix());
+    mesh.draw(shader_);
+    */
 }
 
 
@@ -49,7 +71,7 @@ void FlatDrawable::draw(const Matrix4 &transformation, SceneGraph::Camera3D &cam
 void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     shader_.setDiffuseColor(color_)
             .setLightPosition(camera.cameraMatrix().translation())
-            .setLightColor(Color4(255, 255, 255, 255))
+            .setLightColor(Color4(1.f, 1.f, 1.f))
             .setTransformationMatrix(transformationMatrix)
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
@@ -81,5 +103,23 @@ void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
             .setNormalMatrix(transformationMatrix.normalMatrix())
             .setProjectionMatrix(camera.projectionMatrix());
 
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
+}
+
+AttackDrawable::AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack) :
+        SceneGraph::Drawable3D(object, &group), attack_(attack) {
+    mesh_ = MeshTools::compile(Primitives::uvSphereSolid(100, 100));
+}
+void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
+   // if(attack_.getAttacker())
+   //     std::cout<<(int)attack_.getAttacker()->unique_id_<<" "<<(int)attack_.getTarget()->unique_id_<<attack_.getMovingFlag()<<std::endl;
+    if (!attack_.getMovingFlag())
+        return;
+    shader_.setDiffuseColor(0xa5c9ea_rgbf)
+            .setLightPosition(camera.cameraMatrix().transformPoint(
+                    { 5.0f, 5.0f, 7.0f }))
+        .setTransformationMatrix(transformationMatrix * Matrix4::scaling({ 0.4, 0.4, 0.4 }))
+            .setNormalMatrix(transformationMatrix.normalMatrix())
+            .setProjectionMatrix(camera.projectionMatrix());
+    shader_.draw(mesh_);
 }

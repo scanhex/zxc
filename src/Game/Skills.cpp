@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "Events/Events.h"
 #include "GameState.h"
 
 Skill::Skill(Hero &hero) : hero_{hero} {}
@@ -19,11 +20,14 @@ void Coil::use(GameState &gameState) {
      * иначе даже минимальную рассинхонизацию подсчета времени контролировать сложно,
      * и могут возникнуть проблемы с отрисовкой того, что не произошло.
      */
+    auto team = hero_.getTeam();
     Point coilCenter = hero_.shiftUnitPosition(len_);
-    for (Hero *hero : {gameState.getHero(Player::First), gameState.getHero(Player::Second)}) {
-        // TODO loop over all units
-        if (hero != &hero_ && hero->inRadius(coilCenter, radius_)) {
-            hero->applyDamage(damage_);
+    for (Unit *unit : gameState.units_) {
+        if (unit->getTeam() != team && !unit->isDead() && unit->inRadius(coilCenter, radius_)) {
+            unit->applyDamage(damage_);
+            if (unit->isDead()) {
+                hero_.claimReward(unit);
+            }
         }
     }
 

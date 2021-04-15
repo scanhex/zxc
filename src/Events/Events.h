@@ -3,6 +3,7 @@
 #include <vector>
 #include "Utils/BufferIO.h"
 #include "Game/Hero.h"
+#include "Game/Attack.h"
 
 enum class SerializedEventName : uint8_t {
     None = 0,
@@ -10,7 +11,8 @@ enum class SerializedEventName : uint8_t {
     SecondSkillUse = 2,
     ThirdSkillUse = 3,
     Move = 4,
-    Stop = 5
+    Stop = 5,
+    Attack = 6
 };
 
 template<class Event>
@@ -83,6 +85,18 @@ public:
     void fire() override;
 };
 
+class AttackEvent : public SerializedEvent {
+public:
+    static const SerializedEventName name_ = SerializedEventName::Attack;
+
+    uint8_t attackerID_;
+    uint8_t targetID_;
+
+    AttackEvent(uint8_t attackerID, uint8_t targetID);
+    void serialize(BufferIO::BufferWriter &writer) override;
+    void fire() override;
+};
+
 class SkillUseEvent : public SerializedEvent {
 public:
     Hero &hero_;
@@ -119,7 +133,15 @@ public:
     void fire() override;
 };
 
+class GoldChangedEvent : public Event {
+public:
+    int gold_;
+    void fire() override;
+    explicit GoldChangedEvent(int gold);
+};
+
 class DrawEvent : public Event {
 public:
     void fire() override;
 };
+

@@ -40,6 +40,9 @@ set(WITH_ASSIMPIMPORTER ON CACHE BOOL "" FORCE)
 set(WITH_STBTRUETYPEFONT ON CACHE BOOL "" FORCE)
 add_subdirectory(magnum-plugins EXCLUDE_FROM_ALL)
 
+set(WITH_UI ON CACHE BOOL "" FORCE)
+add_subdirectory(magnum-extras EXCLUDE_FROM_ALL)
+
 
 
 set(CMAKE_CXX_STANDARD 17)

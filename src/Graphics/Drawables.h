@@ -90,14 +90,14 @@ public:
                               GL::Texture2D &texture,
                               SceneGraph::DrawableGroup3D &group) :
             SceneGraph::Drawable3D{object, &group},
-            shader_(shader), mesh_(mesh), texture_(texture) {}
+            shader_(shader), mesh_(std::move(mesh)), texture_(std::move(texture)) {}
 
 private:
     void draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) override;
 
     Shaders::Phong &shader_;
-    GL::Mesh &mesh_;
-    GL::Texture2D &texture_;
+    GL::Mesh mesh_;
+    GL::Texture2D texture_;
 };
 
 constexpr float COIL_ANIMATION_DURATION = 0.4;
@@ -124,4 +124,16 @@ private:
     Magnum::Timeline &timeline_;
     float creationTime_;
     GL::Mesh mesh_ = MeshTools::compile(Primitives::circle3DSolid(100));
+};
+
+class AttackDrawable : public SceneGraph::Drawable3D {
+public:
+    explicit AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group, const Attack &attack);
+    ~AttackDrawable() override = default;
+
+private:
+    void draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) override;
+    GL::Mesh mesh_;
+    Shaders::Phong shader_;
+    const Attack &attack_;
 };

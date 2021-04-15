@@ -10,6 +10,13 @@
 #include <Magnum/SceneGraph/Scene.h>
 #include <Magnum/Timeline.h>
 #include <Magnum/Magnum.h>
+#include <Magnum/Ui/Anchor.h>
+#include <Magnum/Ui/Button.h>
+#include <Magnum/Ui/Input.h>
+#include <Magnum/Ui/Label.h>
+#include <Magnum/Ui/Modal.h>
+#include <Magnum/Ui/Plane.h>
+#include <Magnum/Ui/UserInterface.h>
 
 
 #include <boost/lockfree/queue.hpp>
@@ -19,6 +26,7 @@
 #include "Graphics/GraphicsHandler.h"
 #include "Client/Client.h"
 #include "Game/GameState.h"
+#include "Graphics/GoldPlane.h"
 
 using namespace Magnum;
 using namespace Corrade;
@@ -43,12 +51,13 @@ private:
     void exitEvent(ExitEvent &event) override;
 
     void keyPressEvent(KeyEvent &event) override;
-
-    Vector3 positionOnSphere(const Vector2i &position) const;
+    void keyReleaseEvent(KeyEvent &event) override;
 
     void updateGameState();
 
-    void addUnit(Unit &u);
+    void createAttackDrawables();
+
+    void addUnit(const Unit &u, std::string filename, bool wtf);
     void initCamera();
     void initRenderer();
     void initGrid();
@@ -56,6 +65,7 @@ private:
     void initGame();
     void initHandlers();
     void initNetwork();
+    void initUi();
 
     Float depthAt(const Vector2i &position) const;
     Vector3 unproject(const Vector2i &position, Float depth) const;
@@ -64,22 +74,33 @@ private:
     ShaderLibrary shaderLibrary_;
     ModelLoader modelLoader_;
 
-    Hero firstHero_;
-    Hero secondHero_;
+    std::vector<Unit *> units_;
+    std::vector<Hero *> heroes_;
+
+    Hero &myHero_; // just a ref to heroes[0]
+
     GameState gameState_;
 
     std::thread networkThread_;
 
     std::vector<Object3D *> unitObjects_;
 
+    std::vector<std::vector<Object3D *>> attackObjects_;
+
     Scene3D scene_;
     Object3D cameraObject_;
     SceneGraph::Camera3D *camera_ = nullptr;
+    bool cameraMoving_ = false;
     Object3D mapObject_;
     SceneGraph::DrawableGroup3D drawables_;
-    Vector3 previousPosition_;
+    Optional<Vector3> previousPosition_;
 
     GL::Mesh grid_;
     Magnum::Timeline timeline_;
     std::unique_ptr<GraphicsHandler> graphicsHandler_;
+
+    Optional<Ui::UserInterface> ui_;
+    Optional<GoldPlane> uiGoldPlane_;
+
+    Client client_;
 };

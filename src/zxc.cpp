@@ -23,10 +23,12 @@
 #include <Magnum/Magnum.h>
 #include <Magnum/Image.h>
 
+#include <Corrade/PluginManager/PluginManager.h>
+#include <Magnum/Text/Text.h>
+
+
 #include <iostream>
 #include <cassert>
-
-#include <boost/lockfree/queue.hpp>
 
 #include "Graphics/Types.h"
 #include "Graphics/Drawables.h"
@@ -36,12 +38,17 @@
 
 #include "zxc.h"
 
+#include "Graphics/PluginLibrary.h"
+
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
+    constexpr float camHeight = 25;
+    constexpr auto camAngle = Math::Deg<Float>{30};
     cameraObject_
             .setParent(&scene_)
-            .translate(Vector3::zAxis(30.0f));
+            .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(
+                    camAngle);
     (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
             .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
             .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
@@ -63,73 +70,110 @@ void ZxcApplication::initRenderer() {
 void ZxcApplication::initGrid() {
     grid_ = MeshTools::compile(Primitives::grid3DSolid({15, 15}));
     auto grid = new Object3D{&scene_};
-    (*grid).scale(Vector3{8});
+    (*grid).scale(Vector3{MAP_SIZE});
     new FlatDrawable{*grid, ShaderLibrary::flatShader(), grid_, drawables_};
 }
 
 void ZxcApplication::initScene() {
     initCamera();
     initRenderer();
-    /* Setup shaders */
-
     initGrid();
 }
 
 void ZxcApplication::initGame() {
-    addUnit(firstHero_);
-    addUnit(secondHero_);
+    addUnit(*heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*units_[2], RESOURCE_DIR "/yasher.fbx", true);
+    addUnit(*units_[3], RESOURCE_DIR "/crocodil.fbx", true);
 }
 
 void ZxcApplication::initHandlers() {
     graphicsHandler_ = std::make_unique<GraphicsHandler>(scene_, drawables_, timeline_);
 }
 
+
 void ZxcApplication::initNetwork() {
-    networkThread_ = std::thread(runClient, std::ref(gameState_));
+    Client client(gameState_);
+    networkThread_ = std::thread(&Client::run, client_);
+}
+
+void ZxcApplication::initUi() {
+    ui_.emplace(PluginLibrary::getFontManager(), Vector2{300, 300}, windowSize(), framebufferSize(),
+                Ui::defaultStyleConfiguration(), "»");
+    uiGoldPlane_.emplace(*ui_);
 }
 
 ZxcApplication::ZxcApplication(const Arguments &arguments) :
         Platform::Application{arguments, Configuration{}
                 .setTitle("ZXC")
                 .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        firstHero_{Hero(Player::First)},
-        secondHero_{Hero(Player::Second)},
-        gameState_(GameState(firstHero_, secondHero_)) {
+        units_{new Hero(Player::First),
+               new Hero(Player::Second),
+               new Creep(Team::Radiant),
+               new Creep(Team::Dire)},
+        heroes_{dynamic_cast<Hero *>(units_[0]),
+                dynamic_cast<Hero *>(units_[1])},
+        myHero_{*heroes_[0]},
+        gameState_{units_},
+        client_{gameState_} {
 
     setSwapInterval(1);
 
     initScene();
-    initGame();
     initHandlers();
+    initUi();
+    initGame();
     initNetwork();
+    createAttackDrawables();
+    GoldChangedEvent(239).fire();
 
     timeline_.start();
 }
 
-void ZxcApplication::addUnit(Unit &u) {
+void ZxcApplication::createAttackDrawables() {
+    for (Unit *unit: units_) {
+        std::vector<Object3D *> objects;
+        for (Attack *attack:unit->myAttacks_) {
+            auto *obj = new Object3D{&scene_};
+            new AttackDrawable(*obj, drawables_, *attack);
+            objects.push_back(obj);
+        }
+        attackObjects_.push_back(objects);
+    }
+}
+
+void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
     unitObjects_.push_back(
-            modelLoader_.loadModel(RESOURCE_DIR "/nevermore_blender_raw.fbx", scene_, drawables_).release());
+            modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
 
-    Point myPosition = gameState_.getPosition(Player::First);
-    Point otherPosition = gameState_.getPosition(Player::Second);
-    Vector3 myVectorPosition(myPosition.x_, myPosition.y_, myPosition.z_);
-    Vector3 otherVectorPosition(otherPosition.x_, otherPosition.y_, otherPosition.z_);
+    for (size_t i = 0; i < unitObjects_.size(); i++) {
+        const Point &position = units_[i]->getPosition();
 
-    unitObjects_[0]->translate(myVectorPosition - unitObjects_[0]->transformation().translation());
-    unitObjects_[1]->translate(otherVectorPosition - unitObjects_[1]->transformation().translation());
+        Vector3 vectorPosition(position.x_, position.y_, position.z_);
+        if (units_[i]->getMovedFlag())
+            unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
 
-    double myAngle = gameState_.getAngle(Player::First);
-    double otherAngle = gameState_.getAngle(Player::Second);
-    auto myPos = Matrix4::translation(unitObjects_[0]->transformationMatrix().translation());
-    auto otherPos = Matrix4::translation(unitObjects_[1]->transformationMatrix().translation());
+        double angle = units_[i]->getAngle();
+        auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
+        unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
+    }
 
-    unitObjects_[0]->setTransformation(myPos * Matrix4::rotationZ(Magnum::Rad(M_PI + myAngle)));
-    unitObjects_[1]->setTransformation(otherPos * Matrix4::rotationZ(Magnum::Rad(M_PI + otherAngle)));
+    for (size_t i = 0; i < attackObjects_.size(); i++) {
+        for (size_t j = 0; j < attackObjects_[i].size(); j++) {
+            Attack *attack = units_[i]->myAttacks_[j];
+            if (!attack->getMovingFlag())
+                continue;
+            const Point &position = attack->getPosition();
+
+            Vector3 vectorPosition(position.x_, position.y_, position.z_);
+            attackObjects_[i][j]->translate(vectorPosition - attackObjects_[i][j]->transformation().translation());
+        }
+    }
 }
 
 void ZxcApplication::drawEvent() {
@@ -142,6 +186,7 @@ void ZxcApplication::drawEvent() {
     //	Debug{} << 1 / timeline_.previousFrameDuration();
 
     camera_->draw(drawables_);
+    ui_->draw();
 
     swapBuffers();
     redraw();
@@ -154,23 +199,27 @@ void ZxcApplication::viewportEvent(ViewportEvent &event) {
 }
 
 void ZxcApplication::mousePressEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = positionOnSphere(event.position());
+    if (event.button() == MouseEvent::Button::Middle) {
+        previousPosition_ = intersectWithPlane(event.position(), {0, 0, 1});
+        cameraMoving_ = true;
+    }
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
+        // unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
 
         double x = newPosition.x(), y = newPosition.y();
 
-        EventHandler<MoveEvent>::fireEvent(MoveEvent(firstHero_, x, y));
+        EventHandler<MoveEvent>::fireEvent(MoveEvent(myHero_, x, y));
 
         redraw();
     }
 }
 
 void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
-    if (event.button() == MouseEvent::Button::Left)
-        previousPosition_ = Vector3();
+    if (event.button() == MouseEvent::Button::Middle) {
+        previousPosition_ = Containers::NullOpt;
+        cameraMoving_ = false;
+    }
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
@@ -180,8 +229,14 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     // const Float distance = cameraObject_.transformation().translation().z();
 
     /* Move 15% of the distance back or forward */
+    auto coords = cameraObject_.transformationMatrix().translation();
+    coords.x() = 0;
+    coords.y() = 0;
+    auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+    if (2 >= newc.z() || newc.z() >= 40)
+        return;
     cameraObject_.translate(
-            -cameraObject_.transformationMatrix().translation() * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+            -coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
 //	cameraObject_.translate(Vector3::zAxis(
 //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
 
@@ -234,58 +289,69 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
        */
 }
 
-Vector3 ZxcApplication::positionOnSphere(const Vector2i &position) const {
-    const Vector2 positionNormalized = Vector2{position} / Vector2{camera_->viewport()} - Vector2{0.5f};
-    const Float length = positionNormalized.length();
-    const Vector3 result(
-            length > 1.0f ? Vector3(positionNormalized, 0.0f) : Vector3(positionNormalized, 1.0f - length));
-    return (result * Vector3::yScale(-1.0f)).normalized();
-}
-
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
-    if (!(event.buttons() & MouseMoveEvent::Button::Left)) return;
-
-    const Vector3 currentPosition = positionOnSphere(event.position());
-    const Vector3 axis = Math::cross(previousPosition_, currentPosition);
-
-    if (previousPosition_.length() < 0.001f || axis.length() < 0.001f) return;
-
-    cameraObject_.rotate(Math::angle(previousPosition_, currentPosition), axis.normalized());
-    previousPosition_ = currentPosition;
-
-    redraw();
+    if (cameraMoving_ || (event.buttons() & MouseMoveEvent::Button::Middle)) {
+        const Vector3 currentPosition = intersectWithPlane(event.position(), {0, 0, 1});
+        if (!previousPosition_)
+            previousPosition_ = currentPosition;
+        else {
+            auto delta = currentPosition - *previousPosition_;
+            cameraObject_.translate(-delta);
+            redraw();
+        }
+    }
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Z) {
-        if (firstHero_.isSkillReady(SkillName::FirstSkill)) {
-            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(firstHero_));
-            redraw();
-        }
+    // QWERTY and Dvorak bindings
+    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
+        cameraMoving_ = true;
+        previousPosition_ = Containers::NullOpt;
     }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::X) {
-        if (firstHero_.isSkillReady(SkillName::SecondSkill)) {
-            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(firstHero_));
-            redraw();
+    if (myHero_.isDead())
+        return;
+    if (event.key() == KeyEvent::Key::A) {
+        Attack *attack = myHero_.attack(gameState_.getAllUnits());
+        if (attack) {
+            EventHandler<AttackEvent>::fireEvent(AttackEvent(attack->getAttacker()->unique_id_,
+                                                             attack->getTarget()->unique_id_));
         }
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::C) {
-        if (firstHero_.isSkillReady(SkillName::ThirdSkill)) {
-            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(firstHero_));
-            redraw();
-        }
-    }
-    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::S) {
-        EventHandler<StopEvent>::fireEvent(StopEvent(firstHero_));
         redraw();
+    }
+    if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
+        if (myHero_.isSkillReady(SkillName::FirstSkill)) {
+            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
+            redraw();
+        }
+    }
+    if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
+        if (myHero_.isSkillReady(SkillName::SecondSkill)) {
+            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
+            redraw();
+        }
+    }
+    if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
+        if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
+            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
+            redraw();
+        }
+    }
+    if (event.key() == KeyEvent::Key::S || event.key() == KeyEvent::Key::O) {
+        EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
+        redraw();
+    }
+}
+
+void ZxcApplication::keyReleaseEvent(KeyEvent &event) {
+    if (event.key() == Magnum::Platform::Sdl2Application::KeyEvent::Key::Space) {
+        cameraMoving_ = false;
+        previousPosition_ = Containers::NullOpt;
     }
 }
 
 void ZxcApplication::exitEvent(ExitEvent &event) {
     event.setAccepted();
     exit_flag = true;
-    std::cout << "Vi v adekvate?" << '\n';
-    std::cout << "net" << std::endl;
     networkThread_.join();
     exit(0);
 }
