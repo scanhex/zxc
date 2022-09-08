@@ -72,6 +72,7 @@ target_link_libraries(zxc PRIVATE
     Magnum::Primitives
     Magnum::Text
 	MagnumExtras::Ui
+	MagnumPlugins::StbTrueTypeFont
         )
 
 # Make the executable a default target to build & run in Visual Studio
