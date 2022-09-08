@@ -107,7 +107,7 @@ Pointer<Object3D> ModelLoader::loadModel(std::string filename, Scene3D &scene, S
             continue;
         }
 
-        materials[i] = std::move(dynamic_cast<Trade::PhongMaterialData &>(*materialData));
+        materials[i] = std::move(*materialData).as<Trade::PhongMaterialData>();
     }
 
     /* Load the scene */
