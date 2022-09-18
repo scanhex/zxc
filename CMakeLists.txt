@@ -7,13 +7,9 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules/" ${CMAKE_MODULE_PATH})
 # Remove these lines if you have installed SDL2 globally, make sure you have this directory otherwise
 if (MSVC)
     set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-MSVC ${CMAKE_PREFIX_PATH})
-else()
+else ()
     set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-2.0.10 ${CMAKE_PREFIX_PATH})
-endif()
-
-
-#option(BUILD_PLUGINS_STATIC ON)
-
+endif ()
 
 add_subdirectory(corrade EXCLUDE_FROM_ALL)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
@@ -42,7 +38,6 @@ add_subdirectory(magnum-plugins EXCLUDE_FROM_ALL)
 
 set(MAGNUM_WITH_UI ON CACHE BOOL "" FORCE)
 add_subdirectory(magnum-extras EXCLUDE_FROM_ALL)
-
 
 
 set(CMAKE_CXX_STANDARD 20)
