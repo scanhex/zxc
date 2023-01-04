@@ -39,7 +39,7 @@ file(GLOB zxc_sources "Game/*.cpp" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Ut
 
 file(GLOB server_sources "Server/main.cpp" "Server/Server.cpp" "Server/Server.h" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Game/*.cpp" "Game/*.h")
 
-add_executable(Server ${server_sources})
+add_executable(zxc-server ${server_sources})
 
 add_executable(zxc ${zxc_sources})
 
@@ -57,7 +57,7 @@ endif ()
 
 if (Boost_FOUND)
     message(STATUS "Linking boost libraries")
-    target_link_libraries(Server ${Boost_LIBRARIES})
+    target_link_libraries(zxc-server ${Boost_LIBRARIES})
 endif ()
 
 target_link_libraries(
