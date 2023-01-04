@@ -97,10 +97,9 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8080};
+        ip::tcp::endpoint ep_{ip::address::from_string("51.250.68.234"), 8080};
         // 127.0.0.1 to test locally
-        // 40.112.66.140 Ruslan's server
-        // 13.49.21.181 Maxim's server
+        // 51.250.68.234 artem minecraft
         ip::tcp::socket sock_;
         BufferIO::BufferReader reader_{};
         BufferIO::BufferWriter writer_{};
