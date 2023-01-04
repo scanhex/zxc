@@ -97,7 +97,7 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("13.49.21.181"), 8080};
+        ip::tcp::endpoint ep_{ip::address::from_string("127.0.0.1"), 8080};
         // 127.0.0.1 to test locally
         // 40.112.66.140 Ruslan's server
         // 13.49.21.181 Maxim's server
