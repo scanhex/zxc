@@ -32,15 +32,15 @@ endif ()
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 # Make zxc and zxc-server targets
-file(GLOB shared "shared/**/*.h" "shared/**/*.cpp")
+file(GLOB common "common/**/*.h" "common/**/*.cpp")
 file(GLOB zxc_sources "zxc/*.cpp" "zxc/*.h" "zxc/**/*.cpp" "zxc/**/*.h" ${shared})
 file(GLOB server_sources "zxc-server/*.cpp" "zxc-server/*.h" ${shared})
 
 add_executable(zxc ${zxc_sources})
 add_executable(zxc-server ${server_sources})
 
-target_include_directories(zxc PRIVATE zxc shared)
-target_include_directories(zxc-server PRIVATE zxc-server shared)
+target_include_directories(zxc PRIVATE zxc common)
+target_include_directories(zxc-server PRIVATE zxc-server common)
 
 # Zxc dependencies
 add_dependencies(
