@@ -3,7 +3,9 @@
 PluginLibrary* PluginLibrary::instance_ = nullptr;
 
 PluginLibrary& PluginLibrary::getInstance() {
-    if (!instance_) instance_ = new PluginLibrary;
+    if (!instance_) {
+        instance_ = new PluginLibrary;
+    }
     return *instance_;
 }
 

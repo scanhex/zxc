@@ -7,7 +7,10 @@
 #include "Hero.h"
 #include "Point.h"
 
-enum class Player : uint8_t { First = 0, Second = 1 };
+enum class Player : uint8_t {
+    First = 0,
+    Second = 1
+};
 
 class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<StopEvent>,

@@ -147,7 +147,9 @@ void ZxcApplication::updateGameState() {
     for (size_t i = 0; i < attackObjects_.size(); i++) {
         for (size_t j = 0; j < attackObjects_[i].size(); j++) {
             Attack *attack = units_[i]->myAttacks_[j];
-            if (!attack->getMovingFlag()) continue;
+            if (!attack->getMovingFlag()) {
+                continue;
+            }
             const Point &position = attack->getPosition();
 
             Vector3 vectorPosition(position.x_, position.y_, position.z_);
@@ -204,7 +206,9 @@ void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
-    if (!event.offset().y()) return;
+    if (!event.offset().y()) {
+        return;
+    }
 
     /* Distance to origin */
     // const Float distance = cameraObject_.transformation().translation().z();
@@ -214,7 +218,9 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     coords.x() = 0;
     coords.y() = 0;
     auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
-    if (2 >= newc.z() || newc.z() >= 40) return;
+    if (2 >= newc.z() || newc.z() >= 40) {
+        return;
+    }
     cameraObject_.translate(-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
     //	cameraObject_.translate(Vector3::zAxis(
     //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f :
@@ -272,9 +278,9 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
 void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
     if (cameraMoving_ || (event.buttons() & MouseMoveEvent::Button::Middle)) {
         const Vector3 currentPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        if (!previousPosition_)
+        if (!previousPosition_) {
             previousPosition_ = currentPosition;
-        else {
+        } else {
             auto delta = currentPosition - *previousPosition_;
             cameraObject_.translate(-delta);
             redraw();
@@ -288,7 +294,9 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         cameraMoving_ = true;
         previousPosition_ = Containers::NullOpt;
     }
-    if (myHero_.isDead()) return;
+    if (myHero_.isDead()) {
+        return;
+    }
     if (event.key() == KeyEvent::Key::A) {
         Attack *attack = myHero_.attack(gameState_.getAllUnits());
         if (attack) {

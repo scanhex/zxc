@@ -21,8 +21,9 @@ StatsBuilder Hero::defaultHeroStatsBuilder_ = StatsBuilder()
                                                   .setResist(0.25);
 
 Position Hero::heroSpawns_[] = {
-    Position(Point(-6, -6), 0),    // First
-    Position(Point(6, 6), M_PI)};  // Second
+    Position(Point(-6, -6), 0),   // First
+    Position(Point(6, 6), M_PI),  // Second
+};
 
 Hero::Hero(Player player)
     : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[static_cast<uint8_t>(player)]),
@@ -115,7 +116,9 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
     if (isDead()) {
         moved_ = true;
         position_.setPosition(1000, 1000);
-        if (deathCounter_ == 1) return;
+        if (deathCounter_ == 1) {
+            return;
+        }
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
             ++deathCounter_;

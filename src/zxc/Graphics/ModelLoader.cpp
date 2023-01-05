@@ -36,7 +36,9 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
     Debug{} << "Opening file" << filename;
 
     /* Load file */
-    if (!importer->openFile(filename)) std::exit(4);
+    if (!importer->openFile(filename)) {
+        std::exit(4);
+    }
 
     /* Load all textures. Textures that fail to load will be NullOpt. */
     /**/
@@ -55,11 +57,11 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
 
         Containers::Optional<Trade::ImageData2D> imageData = importer->image2D(textureData->image());
         GL::TextureFormat format;
-        if (imageData && imageData->format() == PixelFormat::RGB8Unorm)
+        if (imageData && imageData->format() == PixelFormat::RGB8Unorm) {
             format = GL::TextureFormat::RGB8;
-        else if (imageData && imageData->format() == PixelFormat::RGBA8Unorm)
+        } else if (imageData && imageData->format() == PixelFormat::RGBA8Unorm) {
             format = GL::TextureFormat::RGBA8;
-        else {
+        } else {
             Warning{} << "Cannot load texture image, skipping";
             continue;
         }
@@ -120,13 +122,15 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
         }
 
         /* Recursively add all children */
-        for (UnsignedInt objectId : sceneData->children3D())
+        for (UnsignedInt objectId : sceneData->children3D()) {
             addObject(*importer, materials, *manipulator, objectId, drawables, wtf);
+        }
 
         /* The format has no scene support, display just the first loaded mesh with
            a default material and be done with it */
-    } else if (!meshes_.empty() && meshes_[0])
+    } else if (!meshes_.empty() && meshes_[0]) {
         new ColoredDrawable{*manipulator, ShaderLibrary::coloredShader(), *meshes_[0], 0xffffff_rgbf, drawables};
+    }
     return manipulator;
 }
 
@@ -152,10 +156,11 @@ void ModelLoader::addObject(
     object->setTransformation(//Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) *
                 objectData->transformation() * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }));
         */
-    if (wtf)
+    if (wtf) {
         object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()) / 2);
-    else
+    } else {
         object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()));
+    }
     /* Add a drawable if the object has a mesh and the mesh is loaded */
     if (objectData->instanceType() == Trade::ObjectInstanceType3D::Mesh && objectData->instance() != -1 &&
         meshes_[objectData->instance()]) {
@@ -171,16 +176,17 @@ void ModelLoader::addObject(
         } else if (materials[materialId]->flags() & Trade::PhongMaterialData::Flag::DiffuseTexture) {
             Containers::Optional<GL::Texture2D> &texture = textures_[materials[materialId]->diffuseTexture()];
             std::cerr << materials[materialId]->diffuseTexture() << std::endl;
-            if (texture)
+            if (texture) {
                 new TexturedDrawable{
                     *object, ShaderLibrary::texturedShader(), *meshes_[objectData->instance()], *texture, drawables};
-            else
+            } else {
                 new ColoredDrawable{
                     *object,
                     ShaderLibrary::coloredShader(),
                     *meshes_[objectData->instance()],
                     0xfffffe_rgbf,
                     drawables};
+            }
 
             /* Color-only material */
         } else {

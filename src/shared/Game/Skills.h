@@ -5,7 +5,11 @@
 class GameState;
 class Hero;
 
-enum class SkillName : uint8_t { FirstSkill = 0, SecondSkill = 1, ThirdSkill = 2 };
+enum class SkillName : uint8_t {
+    FirstSkill = 0,
+    SecondSkill = 1,
+    ThirdSkill = 2
+};
 
 class Skill {
 public:

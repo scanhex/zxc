@@ -24,7 +24,8 @@ StatsBuilder Creep::defaultCreepStatsBuilder_ = StatsBuilder()
 Position Creep::creepSpawns_[] = {
     Position(Point(-3, -6), 0),   // Radiant
     Position(Point(3, 6), M_PI),  // Dire
-    Position(Point(0, 0), 0)};    // Neutral
+    Position(Point(0, 0), 0),     // Neutral
+};
 
 Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[static_cast<uint8_t>(team)]) {
     team_ = team;
@@ -76,7 +77,9 @@ Unit *Creep::findClosestUnit(std::vector<Unit *> &allUnits) {
     auto closest = DBL_MAX;  // ......nevazhno
     Unit *closestUnit = this;
     for (Unit *unit : allUnits) {
-        if (unit->getTeam() == team_ || unit->isDead()) continue;
+        if (unit->getTeam() == team_ || unit->isDead()) {
+            continue;
+        }
         double current = Point::getDistance(unit->getPosition(), myPosition);
         if (current < closest) {
             closest = current;
