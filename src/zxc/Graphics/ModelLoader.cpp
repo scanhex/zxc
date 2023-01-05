@@ -151,7 +151,6 @@ void ModelLoader::addObject(
 
     /* Add the object to the scene and set its transformation */
     auto *object = new Object3D{&parent};
-    //    Debug{} << objectData->transformation();
     /*
     object->setTransformation(//Matrix4::rotationX(Magnum::Rad(Math::Constants<float>::piHalf())) *
                 objectData->transformation() * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }));
@@ -199,7 +198,6 @@ void ModelLoader::addObject(
         }
     }
 
-    Debug{} << objectData->children().size();
     /* Recursively add children */
     for (std::size_t id : objectData->children()) {
         addObject(importer, materials, *object, id, drawables, wtf);
