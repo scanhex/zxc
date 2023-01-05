@@ -30,7 +30,6 @@ endif ()
 
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib -I/usr/local/opt/icu4c/include")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
 
 include_directories(".")
@@ -55,9 +54,14 @@ if (MSVC)
     target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter MagnumPlugins::StbTrueTypeFont)
 endif ()
 
+IF (APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib")
+ENDIF ()
+
 if (Boost_FOUND)
-    message(STATUS "Linking boost libraries")
+    message(STATUS "Linking boost libraries...")
     target_link_libraries(zxc-server ${Boost_LIBRARIES})
+    message(STATUS "Done.")
 endif ()
 
 target_link_libraries(
