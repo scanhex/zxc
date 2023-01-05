@@ -2,15 +2,12 @@
 
 #include <optional>
 
-#include "Hero.h"
-#include "Point.h"
 #include "Creep.h"
 #include "Events/Events.h"
+#include "Hero.h"
+#include "Point.h"
 
-enum class Player : uint8_t {
-    First = 0,
-    Second = 1
-};
+enum class Player : uint8_t { First = 0, Second = 1 };
 
 class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<StopEvent>,
@@ -22,7 +19,7 @@ public:
     GameState();
     explicit GameState(std::vector<Unit *> &units);
 
-    void update(double elapsedTime); // time in milliseconds
+    void update(double elapsedTime);  // time in milliseconds
 
     void refreshAllUnits();
     void reverseIndices();
@@ -65,7 +62,6 @@ public:
     std::vector<Unit *> &getAllUnits();
 
 private:
-
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
 

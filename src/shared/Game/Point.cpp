@@ -1,7 +1,7 @@
-#include <cmath>
-#include <algorithm>
-
 #include "Point.h"
+
+#include <algorithm>
+#include <cmath>
 
 Point::Point(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
@@ -89,13 +89,11 @@ void Point::deserialize(BufferIO::BufferReader &reader) {
 
 bool Point::isEnoughDistance(const Point &first, double r1, const Point &second, double r2) {
     return (r1 + r2) * (r1 + r2) <=
-           (first.x_ - second.x_) * (first.x_ - second.x_) +
-           (first.y_ - second.y_) * (first.y_ - second.y_);
+           (first.x_ - second.x_) * (first.x_ - second.x_) + (first.y_ - second.y_) * (first.y_ - second.y_);
 }
 
 double Point::getDistance(const Point &first, const Point &second) {
-    return (first.x_ - second.x_) * (first.x_ - second.x_) +
-           (first.y_ - second.y_) * (first.y_ - second.y_);
+    return (first.x_ - second.x_) * (first.x_ - second.x_) + (first.y_ - second.y_) * (first.y_ - second.y_);
 }
 
 void Point::fitInMap() {

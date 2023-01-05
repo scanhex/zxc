@@ -2,16 +2,23 @@
 
 #include <boost/lockfree/queue.hpp>
 
+#include "Client/Client.h"
 #include "Corrade/PluginManager/Manager.h"
-#include "Magnum/ImageView.h"
-#include "Magnum/Math/Math.h"
+#include "Game/GameState.h"
+#include "Graphics/GoldPlane.h"
+#include "Graphics/GraphicsHandler.h"
+#include "Graphics/ModelLoader.h"
+#include "Graphics/ShaderLibrary.h"
+#include "Graphics/Types.h"
 #include "Magnum/GL/Mesh.h"
+#include "Magnum/ImageView.h"
+#include "Magnum/Magnum.h"
+#include "Magnum/Math/Math.h"
 #include "Magnum/Platform/Sdl2Application.h"
 #include "Magnum/SceneGraph/Camera.h"
 #include "Magnum/SceneGraph/Drawable.h"
 #include "Magnum/SceneGraph/Scene.h"
 #include "Magnum/Timeline.h"
-#include "Magnum/Magnum.h"
 #include "Magnum/Ui/Anchor.h"
 #include "Magnum/Ui/Button.h"
 #include "Magnum/Ui/Input.h"
@@ -19,14 +26,6 @@
 #include "Magnum/Ui/Modal.h"
 #include "Magnum/Ui/Plane.h"
 #include "Magnum/Ui/UserInterface.h"
-
-#include "Game/GameState.h"
-#include "Graphics/ShaderLibrary.h"
-#include "Graphics/Types.h"
-#include "Graphics/ModelLoader.h"
-#include "Graphics/GraphicsHandler.h"
-#include "Client/Client.h"
-#include "Graphics/GoldPlane.h"
 
 using namespace Magnum;
 using namespace Corrade;
@@ -40,7 +39,6 @@ public:
     explicit ZxcApplication(const Arguments &arguments);
 
 private:
-
     void drawEvent() override;
     void viewportEvent(ViewportEvent &event) override;
     void mousePressEvent(MouseEvent &event) override;
@@ -76,7 +74,7 @@ private:
     std::vector<Unit *> units_;
     std::vector<Hero *> heroes_;
 
-    Hero &myHero_; // just a ref to heroes[0]
+    Hero &myHero_;  // just a ref to heroes[0]
 
     GameState gameState_;
 

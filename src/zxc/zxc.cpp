@@ -1,41 +1,40 @@
-#include "Corrade/Containers/Array.h"
-#include "Corrade/Containers/Optional.h"
-#include "Corrade/Utility/Arguments.h"
-#include "Magnum/ImageView.h"
-#include "Magnum/Math/Math.h"
-#include "Magnum/Math/FunctionsBatch.h"
-#include "Magnum/GL/DefaultFramebuffer.h"
-#include "Magnum/GL/Renderer.h"
-#include "Magnum/GL/PixelFormat.h"
-#include "Magnum/MeshTools/Compile.h"
-#include "Magnum/Platform/Sdl2Application.h"
-#include "Magnum/SceneGraph/Camera.h"
-#include "Magnum/Primitives/Grid.h"
-#include "Magnum/Trade/SceneData.h"
-#include "Magnum/Magnum.h"
-#include "Magnum/Image.h"
-
 #include "zxc.h"
-#include "Graphics/Drawables.h"
+
+#include <Corrade/Containers/Array.h>
+#include <Corrade/Containers/Optional.h>
+#include <Corrade/Utility/Arguments.h>
+#include <Magnum/GL/DefaultFramebuffer.h>
+#include <Magnum/GL/PixelFormat.h>
+#include <Magnum/GL/Renderer.h>
+#include <Magnum/Image.h>
+#include <Magnum/ImageView.h>
+#include <Magnum/Magnum.h>
+#include <Magnum/Math/FunctionsBatch.h>
+#include <Magnum/Math/Math.h>
+#include <Magnum/MeshTools/Compile.h>
+#include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/Primitives/Grid.h>
+#include <Magnum/SceneGraph/Camera.h>
+#include <Magnum/Trade/SceneData.h>
+
 #include "Client/Client.h"
-#include "Graphics/PluginLibrary.h"
 #include "Game/GameState.h"
+#include "Graphics/Drawables.h"
+#include "Graphics/PluginLibrary.h"
 
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */
     /* (c) Confucius */
     constexpr float camHeight = 25;
     constexpr auto camAngle = Math::Deg<Float>{30};
-    cameraObject_
-            .setParent(&scene_)
-            .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle))).rotateXLocal(
-                    camAngle);
+    cameraObject_.setParent(&scene_)
+        .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle)))
+        .rotateXLocal(camAngle);
     (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
-            .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
-            .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
-            .setViewport(GL::defaultFramebuffer.viewport().size());
+        .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
+        .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
+        .setViewport(GL::defaultFramebuffer.viewport().size());
 }
-
 
 void ZxcApplication::initRenderer() {
     /* Setup renderer and shader defaults */
@@ -44,8 +43,10 @@ void ZxcApplication::initRenderer() {
     /* Setup blending for transparent text background */
     GL::Renderer::enable(GL::Renderer::Feature::Blending);
     GL::Renderer::setBlendFunction(
-            GL::Renderer::BlendFunction::One, /* or SourceAlpha for non-premultiplied */
-            GL::Renderer::BlendFunction::OneMinusSourceAlpha);
+        GL::Renderer::BlendFunction::One, /* or SourceAlpha for
+                                             non-premultiplied */
+        GL::Renderer::BlendFunction::OneMinusSourceAlpha
+    );
 }
 
 void ZxcApplication::initGrid() {
@@ -72,32 +73,31 @@ void ZxcApplication::initHandlers() {
     graphicsHandler_ = std::make_unique<GraphicsHandler>(scene_, drawables_, timeline_);
 }
 
-
 void ZxcApplication::initNetwork() {
     Client client(gameState_);
     networkThread_ = std::thread(&Client::run, client_);
 }
 
 void ZxcApplication::initUi() {
-    ui_.emplace(PluginLibrary::getFontManager(), Vector2{300, 300}, windowSize(), framebufferSize(),
-                Ui::defaultStyleConfiguration(), "»");
+    ui_.emplace(
+        PluginLibrary::getFontManager(),
+        Vector2{300, 300},
+        windowSize(),
+        framebufferSize(),
+        Ui::defaultStyleConfiguration(),
+        "»"
+    );
     uiGoldPlane_.emplace(*ui_);
 }
 
-ZxcApplication::ZxcApplication(const Arguments &arguments) :
-        Platform::Application{arguments, Configuration{}
-                .setTitle("ZXC")
-                .setWindowFlags(Configuration::WindowFlag::Resizable)},
-        units_{new Hero(Player::First),
-               new Hero(Player::Second),
-               new Creep(Team::Radiant),
-               new Creep(Team::Dire)},
-        heroes_{dynamic_cast<Hero *>(units_[0]),
-                dynamic_cast<Hero *>(units_[1])},
-        myHero_{*heroes_[0]},
-        gameState_{units_},
-        client_{gameState_} {
-
+ZxcApplication::ZxcApplication(const Arguments &arguments)
+    : Platform::
+          Application{arguments, Configuration{}.setTitle("ZXC").setWindowFlags(Configuration::WindowFlag::Resizable)},
+      units_{new Hero(Player::First), new Hero(Player::Second), new Creep(Team::Radiant), new Creep(Team::Dire)},
+      heroes_{dynamic_cast<Hero *>(units_[0]), dynamic_cast<Hero *>(units_[1])},
+      myHero_{*heroes_[0]},
+      gameState_{units_},
+      client_{gameState_} {
     setSwapInterval(1);
 
     initScene();
@@ -112,9 +112,9 @@ ZxcApplication::ZxcApplication(const Arguments &arguments) :
 }
 
 void ZxcApplication::createAttackDrawables() {
-    for (Unit *unit: units_) {
+    for (Unit *unit : units_) {
         std::vector<Object3D *> objects;
-        for (Attack *attack: unit->myAttacks_) {
+        for (Attack *attack : unit->myAttacks_) {
             auto *obj = new Object3D{&scene_};
             new AttackDrawable(*obj, drawables_, *attack);
             objects.push_back(obj);
@@ -124,8 +124,7 @@ void ZxcApplication::createAttackDrawables() {
 }
 
 void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
-    unitObjects_.push_back(
-            modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
+    unitObjects_.push_back(modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
@@ -136,8 +135,9 @@ void ZxcApplication::updateGameState() {
         const Point &position = units_[i]->getPosition();
 
         Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        if (units_[i]->getMovedFlag())
+        if (units_[i]->getMovedFlag()) {
             unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
+        }
 
         double angle = units_[i]->getAngle();
         auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
@@ -147,8 +147,7 @@ void ZxcApplication::updateGameState() {
     for (size_t i = 0; i < attackObjects_.size(); i++) {
         for (size_t j = 0; j < attackObjects_[i].size(); j++) {
             Attack *attack = units_[i]->myAttacks_[j];
-            if (!attack->getMovingFlag())
-                continue;
+            if (!attack->getMovingFlag()) continue;
             const Point &position = attack->getPosition();
 
             Vector3 vectorPosition(position.x_, position.y_, position.z_);
@@ -186,7 +185,8 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
     }
     if (event.button() == MouseEvent::Button::Right) {
         auto newPosition = intersectWithPlane(event.position(), {0, 0, 1});
-        // unitObjects_[0]->translate(newPosition - unitObjects_[0]->transformation().translation());
+        // unitObjects_[0]->translate(newPosition -
+        // unitObjects_[0]->transformation().translation());
 
         double x = newPosition.x(), y = newPosition.y();
 
@@ -214,17 +214,16 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     coords.x() = 0;
     coords.y() = 0;
     auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
-    if (2 >= newc.z() || newc.z() >= 40)
-        return;
-    cameraObject_.translate(
-            -coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
-//	cameraObject_.translate(Vector3::zAxis(
-//		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f : 0.85f))));
+    if (2 >= newc.z() || newc.z() >= 40) return;
+    cameraObject_.translate(-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+    //	cameraObject_.translate(Vector3::zAxis(
+    //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f :
+    // 0.85f))));
 
     redraw();
 }
 
-//Assuming plane contains zero
+// Assuming plane contains zero
 Vector3 ZxcApplication::intersectWithPlane(const Vector2i &windowPosition, const Vector3 &planeNormal) const {
     /* We have to take window size, not framebuffer size, since the position is
        in window coordinates and the two can be different on HiDPI systems */
@@ -249,8 +248,9 @@ Float ZxcApplication::depthAt(const Vector2i &windowPosition) const {
 
     GL::defaultFramebuffer.mapForRead(GL::DefaultFramebuffer::ReadAttachment::Front);
     Image2D data = GL::defaultFramebuffer.read(
-            Range2Di::fromSize(fbPosition, Vector2i{1}).padded(Vector2i{2}),
-            {GL::PixelFormat::DepthComponent, GL::PixelType::Float});
+        Range2Di::fromSize(fbPosition, Vector2i{1}).padded(Vector2i{2}),
+        {GL::PixelFormat::DepthComponent, GL::PixelType::Float}
+    );
 
     return Math::min<Float>(Containers::arrayCast<const Float>(data.data()));
 }
@@ -261,7 +261,6 @@ Vector3 ZxcApplication::unproject(const Vector2i &windowPosition, Float depth) c
     const Vector2i viewSize = windowSize();
     const Vector2i viewPosition{windowPosition.x(), viewSize.y() - windowPosition.y() - 1};
     const Vector3 in{2 * Vector2{viewPosition} / Vector2{viewSize} - Vector2{1.0f}, depth * 2.0f - 1.0f};
-
 
     return (cameraObject_.absoluteTransformationMatrix() * camera_->projectionMatrix().inverted()).transformPoint(in);
     /*
@@ -285,17 +284,17 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
     // QWERTY and Dvorak bindings
-    if (event.key() == KeyEvent::Key::Space) { // If you are a Maksim without a mouse
+    if (event.key() == KeyEvent::Key::Space) {  // If you are a Maxim without a mouse
         cameraMoving_ = true;
         previousPosition_ = Containers::NullOpt;
     }
-    if (myHero_.isDead())
-        return;
+    if (myHero_.isDead()) return;
     if (event.key() == KeyEvent::Key::A) {
         Attack *attack = myHero_.attack(gameState_.getAllUnits());
         if (attack) {
-            EventHandler<AttackEvent>::fireEvent(AttackEvent(attack->getAttacker()->unique_id_,
-                                                             attack->getTarget()->unique_id_));
+            EventHandler<AttackEvent>::fireEvent(
+                AttackEvent(attack->getAttacker()->unique_id_, attack->getTarget()->unique_id_)
+            );
         }
         redraw();
     }

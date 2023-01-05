@@ -1,30 +1,30 @@
 #define _USE_MATH_DEFINES
 
-#include <cmath>
+#include "Creep.h"
+
 #include <algorithm>
 #include <cfloat>
+#include <cmath>
 
-#include "Creep.h"
 #include "Events/Events.h"
 
-StatsBuilder Creep::defaultCreepStatsBuilder_ =
-        StatsBuilder()
-                .setDamage(35)
-                .setAttackRange(0.1)
-                .setMoveSpeed(300)
-                .setTurnRate(0.2)
-                .setAttackSpeed(50)
-                .setMaxHp(300)
-                .setMaxMp(300)
-                .setHpRegen(1.5)
-                .setMpRegen(1)
-                .setArmor(3)
-                .setResist(0.25);
+StatsBuilder Creep::defaultCreepStatsBuilder_ = StatsBuilder()
+                                                    .setDamage(35)
+                                                    .setAttackRange(0.1)
+                                                    .setMoveSpeed(300)
+                                                    .setTurnRate(0.2)
+                                                    .setAttackSpeed(50)
+                                                    .setMaxHp(300)
+                                                    .setMaxMp(300)
+                                                    .setHpRegen(1.5)
+                                                    .setMpRegen(1)
+                                                    .setArmor(3)
+                                                    .setResist(0.25);
 
-
-Position Creep::creepSpawns_[] = {Position(Point(-3, -6), 0),  // Radiant
-                                  Position(Point(3, 6), M_PI), // Dire
-                                  Position(Point(0, 0), 0)};   // Neutral
+Position Creep::creepSpawns_[] = {
+    Position(Point(-3, -6), 0),   // Radiant
+    Position(Point(3, 6), M_PI),  // Dire
+    Position(Point(0, 0), 0)};    // Neutral
 
 Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[static_cast<uint8_t>(team)]) {
     team_ = team;
@@ -61,8 +61,9 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
         if (Point::getDistance(closest->getPosition(), getPosition()) <
             std::max(getHeroRadius() + closest->getHeroRadius(), getAttackRange())) {
             if (Attack *currentAttack = attack(closest)) {
-                EventHandler<AttackEvent>::fireEvent(AttackEvent(currentAttack->getAttacker()->unique_id_,
-                                                                 currentAttack->getTarget()->unique_id_));
+                EventHandler<AttackEvent>::fireEvent(
+                    AttackEvent(currentAttack->getAttacker()->unique_id_, currentAttack->getTarget()->unique_id_)
+                );
             }
         }
     }
@@ -72,7 +73,7 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
 Unit *Creep::findClosestUnit(std::vector<Unit *> &allUnits) {
     assert(!allUnits.empty());
     const Point &myPosition = position_.getPosition();
-    auto closest = DBL_MAX; // ......nevazhno
+    auto closest = DBL_MAX;  // ......nevazhno
     Unit *closestUnit = this;
     for (Unit *unit : allUnits) {
         if (unit->getTeam() == team_ || unit->isDead()) continue;

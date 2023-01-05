@@ -1,7 +1,8 @@
-#include <cstdint>
-#include <cstddef>
-#include <cassert>
 #include "BufferIO.h"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 void BufferIO::BufferWriter::writeUInt8(uint8_t d) {
     assert(idx_ + 1 <= MAX_BUF);
@@ -17,15 +18,13 @@ void BufferIO::BufferWriter::writeDouble(double d) {
 
 void BufferIO::BufferWriter::writeInt32(int32_t d) {
     assert(idx_ + 4 <= MAX_BUF);
-    for (size_t i = 0; i < 4; i++)
-        write_buffer_[idx_ + 3 - i] = (d >> (i * 8));
+    for (size_t i = 0; i < 4; i++) write_buffer_[idx_ + 3 - i] = (d >> (i * 8));
     idx_ += 4;
 }
 
 void BufferIO::BufferWriter::writeInt64(int64_t d) {
     assert(idx_ + 8 <= MAX_BUF);
-    for (size_t i = 0; i < 8; i++)
-        write_buffer_[idx_ + 7 - i] = (d >> (i * 8));
+    for (size_t i = 0; i < 8; i++) write_buffer_[idx_ + 7 - i] = (d >> (i * 8));
     idx_ += 8;
 }
 
@@ -47,8 +46,7 @@ double BufferIO::BufferReader::readDouble() {
 int32_t BufferIO::BufferReader::readInt32() {
     assert(idx_ + 4 <= 1024);
     int32_t result = 0;
-    for (size_t i = 0; i < 4; i++)
-        result = (result << 8) + read_buffer_[idx_ + i];
+    for (size_t i = 0; i < 4; i++) result = (result << 8) + read_buffer_[idx_ + i];
     idx_ += 4;
     return result;
 }
@@ -56,8 +54,7 @@ int32_t BufferIO::BufferReader::readInt32() {
 int64_t BufferIO::BufferReader::readInt64() {
     assert(idx_ + 4 <= 1024);
     int64_t result = 0;
-    for (size_t i = 0; i < 8; i++)
-        result = (result << 8) + read_buffer_[idx_ + i];
+    for (size_t i = 0; i < 8; i++) result = (result << 8) + read_buffer_[idx_ + i];
     idx_ += 8;
     return result;
 }

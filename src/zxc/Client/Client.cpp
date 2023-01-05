@@ -2,10 +2,8 @@
 
 extern bool exit_flag;
 
-Client::ConnectionToServer::ConnectionToServer(GameState &gameState) : sock_{service_},
-                                                                       timer_{service_},
-                                                                       stop_timer_{service_},
-                                                                       gameState_{gameState} {}
+Client::ConnectionToServer::ConnectionToServer(GameState &gameState)
+    : sock_{service_}, timer_{service_}, stop_timer_{service_}, gameState_{gameState} {}
 
 std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConnection(GameState &gameState) {
     std::shared_ptr<ConnectionToServer> new_(new ConnectionToServer(gameState));
@@ -15,7 +13,6 @@ std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConne
 void Client::ConnectionToServer::startConnection() {
     sock_.async_connect(ep_, BIND_FN1(handleConnection, std::placeholders::_1));
 }
-
 
 void Client::ConnectionToServer::stopConnection() {
     if (!connected_) return;
@@ -51,9 +48,12 @@ void Client::ConnectionToServer::waitForGameStart() {
         return;
     }
     reader_.flushBuffer();
-    async_read(sock_, buffer(reader_.read_buffer_),
-               BIND_FN2(checkWaitReadComplete, std::placeholders::_1, std::placeholders::_2),
-               BIND_FN2(handleWaitRead, std::placeholders::_1, std::placeholders::_2));
+    async_read(
+        sock_,
+        buffer(reader_.read_buffer_),
+        BIND_FN2(checkWaitReadComplete, std::placeholders::_1, std::placeholders::_2),
+        BIND_FN2(handleWaitRead, std::placeholders::_1, std::placeholders::_2)
+    );
 }
 
 void Client::ConnectionToServer::handleWriteToSocket(const boost::system::error_code &err, size_t bytes) {
@@ -73,8 +73,10 @@ void Client::ConnectionToServer::writeToSocket() {
     if (!isConnected()) return;
     writer_.flushBuffer();
     writeActionToBuffer();
-    sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_CLIENT_SIZE),
-                           BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2));
+    sock_.async_write_some(
+        buffer(writer_.write_buffer_, MSG_FROM_CLIENT_SIZE),
+        BIND_FN2(handleWriteToSocket, std::placeholders::_1, std::placeholders::_2)
+    );
 }
 
 size_t Client::ConnectionToServer::checkWaitReadComplete(const boost::system::error_code &err, size_t bytes) {
@@ -95,8 +97,7 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     uint8_t status = reader_.readUInt8();
     clearEvents();
     if (status) {
-        if (status == 2)
-            gameState_.reverseIndices();
+        if (status == 2) gameState_.reverseIndices();
         runGame();
     } else {
         waitForGameStart();
@@ -112,9 +113,9 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
     reader_.flushBuffer();
     char gameIsRunning = reader_.readUInt8();
     if (!gameIsRunning) {
-        //TODO handle game result
+        // TODO handle game result
         if (gameState_.getHealthPoints(Player::First) == 0)
-            std::cout << "I lost :(" << std::endl; //
+            std::cout << "I lost :(" << std::endl;  //
         else
             std::cout << "I won :)" << std::endl;
 
@@ -122,7 +123,7 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
         return;
     }
     parseEventsFromBuffer();
-    timer_.expires_from_now(boost::posix_time::millisec(1)); //TODO really needed?
+    timer_.expires_from_now(boost::posix_time::millisec(1));  // TODO really needed?
     timer_.wait();
     parseGSFromBuffer();
     readFromSocket();
@@ -131,9 +132,12 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
 void Client::ConnectionToServer::readFromSocket() {
     if (!isConnected()) return;
     reader_.flushBuffer();
-    async_read(sock_, buffer(reader_.read_buffer_),
-               BIND_FN2(checkReadComplete, std::placeholders::_1, std::placeholders::_2),
-               BIND_FN2(handleReadFromSocket, std::placeholders::_1, std::placeholders::_2));
+    async_read(
+        sock_,
+        buffer(reader_.read_buffer_),
+        BIND_FN2(checkReadComplete, std::placeholders::_1, std::placeholders::_2),
+        BIND_FN2(handleReadFromSocket, std::placeholders::_1, std::placeholders::_2)
+    );
 }
 
 size_t Client::ConnectionToServer::checkReadComplete(const boost::system::error_code &err, size_t bytes) {
@@ -299,5 +303,5 @@ void Client::run() {
     std::cout << "Disonnected " << std::endl;
 }
 
-Client::Client(GameState &gameState) : connection_(ConnectionToServer::newConnection(gameState)),
-                                       gameState_{gameState} {}
+Client::Client(GameState &gameState)
+    : connection_(ConnectionToServer::newConnection(gameState)), gameState_{gameState} {}

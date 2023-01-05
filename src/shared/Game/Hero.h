@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Unit.h"
 #include "Skills.h"
-#include "Utils/BufferIO.h"
 #include "StatsBuilder.h"
+#include "Unit.h"
+#include "Utils/BufferIO.h"
 
 enum class Player : uint8_t;
 
@@ -17,7 +17,6 @@ constexpr double HERO_RESPAWN_TIME = 0;
 class Hero : public Unit {
     // what does a Hero truly need?
 private:
-
     uint32_t gold_;
     uint32_t level_;
     uint32_t experience_;
@@ -48,12 +47,12 @@ public:
     void incrementLevel();
     void changeExperience(uint32_t delta);
 
-    void claimReward(Unit* killed_unit) override;
+    void claimReward(Unit *killed_unit) override;
 
     bool isSkillReady(SkillName skillName);
     void useSkill(SkillName skillName, GameState &gameState);
 
-    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit * >& allUnits) override;
+    void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) override;
 
     void refreshPosition();
     void refreshUnit() override;

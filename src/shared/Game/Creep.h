@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Unit.h"
 #include "StatsBuilder.h"
+#include "Unit.h"
 
 constexpr double CREEP_RESPAWN_TIME = 5.0;
 

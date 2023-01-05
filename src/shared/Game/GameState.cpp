@@ -1,7 +1,7 @@
+#include "GameState.h"
+
 #include <algorithm>
 #include <iostream>
-
-#include "GameState.h"
 
 GameState::GameState(std::vector<Unit *> &units) : units_{units} {
     heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
@@ -19,13 +19,13 @@ GameState::GameState() {
     heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
 }
 
-void GameState::update(double elapsedTime) { // time in milliseconds
+void GameState::update(double elapsedTime) {  // time in milliseconds
     assert(elapsedTime >= 0);
     double elapsedTimeInSeconds = elapsedTime / 1000.0;
 
     for (Unit *unit : units_) {
         unit->updateUnit(elapsedTimeInSeconds, units_);
-        for (Attack *attack: unit->myAttacks_) {
+        for (Attack *attack : unit->myAttacks_) {
             attack->update(elapsedTimeInSeconds);
         }
     }
@@ -38,7 +38,7 @@ void GameState::refreshAllUnits() {
 
     for (Unit *unit : units_) {
         unit->refreshUnit();
-        for (Attack *attack: unit->myAttacks_) {
+        for (Attack *attack : unit->myAttacks_) {
             attack->setMovingFlag(false);
         }
     }
@@ -46,7 +46,7 @@ void GameState::refreshAllUnits() {
 
 void GameState::reverseIndices() {
     for (Unit *unit : units_) {
-        unit->unique_id_ = 255 - unit->unique_id_; //TODO better way?
+        unit->unique_id_ = 255 - unit->unique_id_;  // TODO better way?
     }
 }
 
@@ -96,13 +96,11 @@ void GameState::handle(const AttackEvent &event) {
     Unit *target = findUnitByID(event.targetID_);
     // assert(attacker && target);
     if (!attacker) {
-        std::cerr << "GameState::handle(AttackEvent) -> Attacker was not found. attackerID_ = "
-                  << event.attackerID_
+        std::cerr << "GameState::handle(AttackEvent) -> Attacker was not found. attackerID_ = " << event.attackerID_
                   << std::endl;
     }
     if (!target) {
-        std::cerr << "GameState::handle(AttackEvent) -> Target was not found. targetID_ = "
-                  << event.targetID_
+        std::cerr << "GameState::handle(AttackEvent) -> Target was not found. targetID_ = " << event.targetID_
                   << std::endl;
     }
     for (auto &attack : attacker->myAttacks_) {
@@ -127,7 +125,6 @@ void GameState::handle(const SecondSkillUseEvent &event) {
 void GameState::handle(const ThirdSkillUseEvent &event) {
     event.hero_.useSkill(SkillName::ThirdSkill, *this);
 }
-
 
 // getters and setters
 

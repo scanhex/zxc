@@ -18,6 +18,7 @@ public:
     StatsBuilder &setMpRegen(double mpRegen);
     StatsBuilder &setArmor(int32_t armor);
     StatsBuilder &setResist(double resist);
+
 private:
     Stats stats_;
 };
