@@ -1,0 +1,23 @@
+name: CMake build
+
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Initialize submodules
+        run: git submodule update --init
+
+      - name: Install dependencies
+        run: |
+          brew install boost
+          brew install sdl2
+
+      - name: CMake
+        run: cmake .
+
+      - name: make
+        run: make
