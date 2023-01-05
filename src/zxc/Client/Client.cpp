@@ -258,7 +258,6 @@ void Client::checkServerResponse() {
         return;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    now_ = boost::posix_time::microsec_clock::local_time();
 }
 
 template<typename T>
@@ -308,12 +307,12 @@ void Client::handle(const DrawEvent &event) {
 
 void Client::run() {
     connection_->startConnection();
-    std::cout << "Connected " << std::endl;
+    std::cout << "Connecting to server..." << std::endl;
     last_update_ = boost::posix_time::microsec_clock::local_time();
     std::thread response_checker(&Client::checkServerResponse, this);
     connection_->runService();
     response_checker.join();
-    std::cout << "Disonnected " << std::endl;
+    std::cout << "Disonnected" << std::endl;
 }
 
 Client::Client(GameState &gameState)
