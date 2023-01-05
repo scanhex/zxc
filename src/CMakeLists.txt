@@ -33,8 +33,8 @@ set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 # Make zxc and zxc-server targets
 file(GLOB common "common/**/*.h" "common/**/*.cpp")
-file(GLOB zxc_sources "zxc/*.cpp" "zxc/*.h" "zxc/**/*.cpp" "zxc/**/*.h" ${shared})
-file(GLOB server_sources "zxc-server/*.cpp" "zxc-server/*.h" ${shared})
+file(GLOB zxc_sources "zxc/*.cpp" "zxc/*.h" "zxc/**/*.cpp" "zxc/**/*.h" ${common})
+file(GLOB server_sources "zxc-server/*.cpp" "zxc-server/*.h" ${common})
 
 add_executable(zxc ${zxc_sources})
 add_executable(zxc-server ${server_sources})
