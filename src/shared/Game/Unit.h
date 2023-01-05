@@ -14,7 +14,11 @@
 class AttackCreator;
 class Attack;
 
-enum class Team : uint8_t { Radiant = 0, Dire = 1, Neutral = 2 };
+enum class Team : uint8_t {
+    Radiant = 0,
+    Dire = 1,
+    Neutral = 2
+};
 
 constexpr size_t MAX_ITEMS = 6;
 constexpr uint32_t NUM_TEAMS = 3;

@@ -15,7 +15,9 @@ void Client::ConnectionToServer::startConnection() {
 }
 
 void Client::ConnectionToServer::stopConnection() {
-    if (!connected_) return;
+    if (!connected_) {
+        return;
+    }
     connected_ = false;
     std::cout << "stopping " << std::endl;
     sock_.close();
@@ -70,7 +72,9 @@ void Client::ConnectionToServer::writeToSocket() {
         stopConnection();
         return;
     }
-    if (!isConnected()) return;
+    if (!isConnected()) {
+        return;
+    }
     writer_.flushBuffer();
     writeActionToBuffer();
     sock_.async_write_some(
@@ -97,7 +101,9 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     uint8_t status = reader_.readUInt8();
     clearEvents();
     if (status) {
-        if (status == 2) gameState_.reverseIndices();
+        if (status == 2) {
+            gameState_.reverseIndices();
+        }
         runGame();
     } else {
         waitForGameStart();
@@ -114,10 +120,11 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
     char gameIsRunning = reader_.readUInt8();
     if (!gameIsRunning) {
         // TODO handle game result
-        if (gameState_.getHealthPoints(Player::First) == 0)
+        if (gameState_.getHealthPoints(Player::First) == 0) {
             std::cout << "I lost :(" << std::endl;  //
-        else
+        } else {
             std::cout << "I won :)" << std::endl;
+        }
 
         stopConnection();
         return;
@@ -130,7 +137,9 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
 }
 
 void Client::ConnectionToServer::readFromSocket() {
-    if (!isConnected()) return;
+    if (!isConnected()) {
+        return;
+    }
     reader_.flushBuffer();
     async_read(
         sock_,
@@ -230,7 +239,9 @@ void Client::ConnectionToServer::clearEvents() {
 
 void Client::ConnectionToServer::fireOtherEvents() {
     Event *e;
-    if (othersEvents_.empty()) return;
+    if (othersEvents_.empty()) {
+        return;
+    }
     while (othersEvents_.pop(e)) {
         e->fire();
         delete e;
@@ -238,7 +249,9 @@ void Client::ConnectionToServer::fireOtherEvents() {
 }
 
 void Client::checkServerResponse() {
-    if (!connection_->isConnected()) return;
+    if (!connection_->isConnected()) {
+        return;
+    }
     now_ = boost::posix_time::microsec_clock::local_time();
     if ((now_ - last_update_).total_milliseconds() > SERVER_RESPONSE_TIME) {
         connection_->stopConnection();

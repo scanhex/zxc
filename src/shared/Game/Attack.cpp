@@ -21,8 +21,12 @@ Attack::Attack(Unit *attacker, Unit *target)
 }
 
 void Attack::update(double elapsedTimeInSeconds) {
-    if (target_ && target_->isDead()) moving_ = false;
-    if (!moving_) return;
+    if (target_ && target_->isDead()) {
+        moving_ = false;
+    }
+    if (!moving_) {
+        return;
+    }
     position_.setDestination(target_->getPosition());
     double moveDelta = (moveSpeed_ / 100.0) * elapsedTimeInSeconds;
     position_.updatePointIgnoreAngle(moveDelta);
@@ -86,7 +90,9 @@ void Attack::setAttacker(Unit *attacker) {
 AttackCreator::AttackCreator(uint32_t attackSpeed) : defaultCoolDown{100.0 / attackSpeed} {}
 
 Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
-    if (coolDown_ != 0) return nullptr;
+    if (coolDown_ != 0) {
+        return nullptr;
+    }
     Unit *enemy = nullptr;
     double dist = attacker->getAttackRange();
     for (Unit *unit : allUnits) {
@@ -98,14 +104,18 @@ Attack *AttackCreator::attack(Unit *attacker, std::vector<Unit *> &allUnits) {
             }
         }
     }
-    if (!enemy) return nullptr;
+    if (!enemy) {
+        return nullptr;
+    }
     auto *attack = new Attack(attacker, enemy);  // TODO better way to choose target
     coolDown_ = defaultCoolDown;
     return attack;
 }
 
 Attack *AttackCreator::attack(Unit *attacker, Unit *enemy) {
-    if (coolDown_ != 0 || !enemy) return nullptr;
+    if (coolDown_ != 0 || !enemy) {
+        return nullptr;
+    }
     auto *attack = new Attack(attacker, enemy);  // TODO better way to choose target
     coolDown_ = defaultCoolDown;
     return attack;

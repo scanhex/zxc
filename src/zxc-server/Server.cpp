@@ -30,7 +30,9 @@ void Server::ConnectionToClient::startConnection() {
     is_connected_ = true;
     conn_checker_.join();
     std::cout << "Player conneceted" << std::endl;
-    if (stopped_) return;
+    if (stopped_) {
+        return;
+    }
     sock_.set_option(ip::tcp::no_delay(true));
     player_id_ = running_connections_;
     ++ConnectionToClient::running_connections_;
@@ -86,8 +88,12 @@ void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error
         return;
     }
     assert(bytes == MSG_FROM_CLIENT_SIZE);
-    if (!running_) return;
-    if (!running_connections_) return;
+    if (!running_) {
+        return;
+    }
+    if (!running_connections_) {
+        return;
+    }
     g_lock_.lock();
     updateGSbyPlayer();
     g_lock_.unlock();
@@ -95,7 +101,9 @@ void Server::ConnectionToClient::handleReadFromSocket(const boost::system::error
 }
 
 void Server::ConnectionToClient::readFromSocket() {
-    if (!running_connections_) return;
+    if (!running_connections_) {
+        return;
+    }
     reader_.flushBuffer();
     async_read(
         sock_,
@@ -111,7 +119,9 @@ size_t Server::ConnectionToClient::checkReadComplete(const boost::system::error_
         stopConnection();
         return 0;
     }
-    if (!running_) return 0;
+    if (!running_) {
+        return 0;
+    }
     bool done = (bytes >= MSG_FROM_CLIENT_SIZE);
     return done ? 0 : 1;
 }
@@ -123,7 +133,9 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
         return;
     }
     assert(bytes == MSG_FROM_SERVER_SIZE);
-    if (!running_connections_) return;
+    if (!running_connections_) {
+        return;
+    }
     if (gameState_.gameIsFinished()) {
         sendEndGameMessage();
         return;
@@ -236,7 +248,9 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
 
 void Server::ConnectionToClient::writeGStoBuffer() {
     Player current = Player::First, second = Player::Second;
-    if (player_id_ == 1) std::swap(current, second);
+    if (player_id_ == 1) {
+        std::swap(current, second);
+    }
 
     gameState_.serialize(writer_, current);
 }
@@ -297,7 +311,9 @@ void Server::updateGS() {
 
 void Server::runGameStateCycle() {
     while (!running_) {
-        if (stopped_) return;
+        if (stopped_) {
+            return;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     while (running_ && !stopped_) {

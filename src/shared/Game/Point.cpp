@@ -6,7 +6,9 @@
 Point::Point(double x, double y, double z) : x_{x}, y_{y}, z_{z} {}
 
 void Point::normalize() {
-    if (fabs(x_) < 1e-8 && fabs(y_) < 1e-8) return;
+    if (fabs(x_) < 1e-8 && fabs(y_) < 1e-8) {
+        return;
+    }
     double len = norm();
     x_ /= len;
     y_ /= len;

@@ -36,7 +36,9 @@ public:
         for (size_t i = 0; i < allHandlers.size(); i++) {
             if (allHandlers[i] == this) {
                 allHandlers[i] = allHandlers[allHandlers.size() - 1];
-                if (!allHandlers.empty()) allHandlers.pop_back();
+                if (!allHandlers.empty()) {
+                    allHandlers.pop_back();
+                }
             }
         }
     }

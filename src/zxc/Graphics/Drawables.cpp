@@ -17,17 +17,20 @@ UnitDrawable::UnitDrawable(Object3D &object, SceneGraph::DrawableGroup3D &group,
     if (!font) {
         font = PluginLibrary::getFontManager().loadAndInstantiate("StbTrueTypeFont");
     }
-    if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f))
+    if (!font || !font->openFile(RESOURCE_DIR "/arial.ttf", 180.0f)) {
         Fatal{} << "Cannot open font file";
-    else
+    } else {
         std::cout << "Font loaded" << std::endl;
+    }
     font->fillGlyphCache(cache, "0123456789.");
     hpRenderer_.reset(new Text::Renderer2D{*font, cache, 0.5f, Text::Alignment::LineCenter});
     hpRenderer_->reserve(50, GL::BufferUsage::DynamicDraw, GL::BufferUsage::StaticDraw);
 }
 
 void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    if (unit_.isDead()) return;
+    if (unit_.isDead()) {
+        return;
+    }
     if (unit_.getTeam() == Team::Dire) {
         hpShader_.setColor(0xe90000_rgbf);
     } else {
@@ -107,7 +110,9 @@ void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camer
     // if(attack_.getAttacker())
     //     std::cout<<(int)attack_.getAttacker()->unique_id_<<"
     //     "<<(int)attack_.getTarget()->unique_id_<<attack_.getMovingFlag()<<std::endl;
-    if (!attack_.getMovingFlag()) return;
+    if (!attack_.getMovingFlag()) {
+        return;
+    }
     shader_.setDiffuseColor(0xa5c9ea_rgbf)
         .setLightPosition(camera.cameraMatrix().transformPoint({5.0f, 5.0f, 7.0f}))
         .setTransformationMatrix(transformationMatrix * Matrix4::scaling({0.4, 0.4, 0.4}))

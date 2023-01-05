@@ -128,7 +128,9 @@ void Unit::changeResist(double delta) {
 }
 
 void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) {
-    if (isDead()) return;
+    if (isDead()) {
+        return;
+    }
     creator_->update(elapsedTimeInSeconds);
     applyHeal(getHpRegen() * elapsedTimeInSeconds);
     regenMana(getMpRegen() * elapsedTimeInSeconds);
@@ -183,8 +185,12 @@ Point Unit::shiftUnitPosition(double len) const {
     double angle = position_.getAngle();
     double xShift = std::abs(sin(angle) * len);
     double yShift = std::abs(cos(angle) * len);
-    if (angle < M_PI) xShift = -xShift;
-    if (angle > M_PI / 2 && angle < 3 * M_PI / 2) yShift = -yShift;
+    if (angle < M_PI) {
+        xShift = -xShift;
+    }
+    if (angle > M_PI / 2 && angle < 3 * M_PI / 2) {
+        yShift = -yShift;
+    }
     return position_.getPosition() + Point(xShift, yShift);
 }
 
@@ -341,7 +347,13 @@ void Unit::setAngle(double angle) {
 }
 
 void Unit::giveId() {
-    if (team_ == Team::Neutral) return;  // TODO
-    if (team_ == Team::Dire) unique_id_ = dire_counter_--;
-    if (team_ == Team::Radiant) unique_id_ = radiant_counter_++;
+    if (team_ == Team::Neutral) {
+        return;  // TODO
+    }
+    if (team_ == Team::Dire) {
+        unique_id_ = dire_counter_--;
+    }
+    if (team_ == Team::Radiant) {
+        unique_id_ = radiant_counter_++;
+    }
 }

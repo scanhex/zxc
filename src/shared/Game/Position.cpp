@@ -9,7 +9,9 @@ Position::Position(Point current, double angle)
     : current_{current}, destination_{current}, currentAngle_{angle}, destAngle_{angle} {}
 
 void Position::update(double deltaTurn, double deltaMove) {
-    if (current_ == destination_) return;
+    if (current_ == destination_) {
+        return;
+    }
     updatePoint(deltaMove);
     //  updateAngle(deltaTurn);
 }
@@ -31,9 +33,13 @@ void Position::updateAngle(double deltaTurn) {
 }
 
 void Position::updatePoint(double deltaMove) {
-    if (current_ == destination_) return;
+    if (current_ == destination_) {
+        return;
+    }
     double delta = std::abs(destAngle_ - currentAngle_);
-    if (std::min(delta, 2 * M_PI - delta) > 0) return;
+    if (std::min(delta, 2 * M_PI - delta) > 0) {
+        return;
+    }
 
     Point vector = destination_ - current_;
     if (vector.normLessThan(deltaMove)) {
@@ -58,7 +64,9 @@ void Position::updatePointIgnoreAngle(double deltaMove) {
 
 void Position::updateDestinationAngle() {
     Point vector = destination_ - current_;
-    if (vector == Point{0, 0}) return;
+    if (vector == Point{0, 0}) {
+        return;
+    }
     destAngle_ = std::acos(vector.y_ / vector.norm());
     if (vector.x_ > 0) {
         destAngle_ = 2 * M_PI - destAngle_;
@@ -120,8 +128,12 @@ void Position::setAngle(double angle) {
 
 void Position::changeAngle(double delta) {
     currentAngle_ += delta;
-    if (currentAngle_ >= 2 * M_PI) currentAngle_ -= 2 * M_PI;
-    if (currentAngle_ <= 0) currentAngle_ += 2 * M_PI;
+    if (currentAngle_ >= 2 * M_PI) {
+        currentAngle_ -= 2 * M_PI;
+    }
+    if (currentAngle_ <= 0) {
+        currentAngle_ += 2 * M_PI;
+    }
 }
 
 bool Position::inRadius(double x, double y, double r) const {
@@ -133,9 +145,13 @@ bool Position::inRadius(const Point &point, double r) const {
 }
 
 Point Position::nextPosition(double deltaMove) const {
-    if (current_ == destination_) return current_;
+    if (current_ == destination_) {
+        return current_;
+    }
     double delta = std::abs(destAngle_ - currentAngle_);
-    if (std::min(delta, 2 * M_PI - delta) > 0) return current_;
+    if (std::min(delta, 2 * M_PI - delta) > 0) {
+        return current_;
+    }
 
     Point vector = destination_ - current_;
     if (vector.normLessThan(deltaMove)) {
