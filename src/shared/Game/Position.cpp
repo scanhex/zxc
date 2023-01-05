@@ -1,14 +1,12 @@
 #define _USE_MATH_DEFINES
 
-#include <cmath>
-#include <algorithm>
-
 #include "Position.h"
 
-Position::Position(Point current, double angle) : current_{current},
-                                                  destination_{current},
-                                                  currentAngle_{angle},
-                                                  destAngle_{angle} {}
+#include <algorithm>
+#include <cmath>
+
+Position::Position(Point current, double angle)
+    : current_{current}, destination_{current}, currentAngle_{angle}, destAngle_{angle} {}
 
 void Position::update(double deltaTurn, double deltaMove) {
     if (current_ == destination_) return;
@@ -33,7 +31,7 @@ void Position::updateAngle(double deltaTurn) {
 }
 
 void Position::updatePoint(double deltaMove) {
-    if(current_ == destination_) return;
+    if (current_ == destination_) return;
     double delta = std::abs(destAngle_ - currentAngle_);
     if (std::min(delta, 2 * M_PI - delta) > 0) return;
 
@@ -81,10 +79,11 @@ void Position::deserialize(BufferIO::BufferReader &reader) {
     destAngle_ = reader.readDouble();
 }
 
-
 // setters and getters
 
-const Point &Position::getPosition() const { return current_; }
+const Point &Position::getPosition() const {
+    return current_;
+}
 
 void Position::setPosition(const Point &current) {
     current_ = current;
@@ -96,7 +95,9 @@ void Position::setPosition(double x, double y) {
     updateDestinationAngle();
 }
 
-const Point &Position::getDestination() const { return destination_; }
+const Point &Position::getDestination() const {
+    return destination_;
+}
 
 void Position::setDestination(const Point &destination) {
     destination_ = destination;
@@ -108,7 +109,9 @@ void Position::setDestination(double x, double y) {
     updateDestinationAngle();
 }
 
-double Position::getAngle() const { return currentAngle_; }
+double Position::getAngle() const {
+    return currentAngle_;
+}
 
 void Position::setAngle(double angle) {
     currentAngle_ = angle;

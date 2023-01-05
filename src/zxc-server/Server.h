@@ -4,13 +4,13 @@
 #include <algorithm>
 #endif
 
-#include <cstdio>
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
+#include <cstdio>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 #include "Game/GameState.h"
 #include "Utils/BufferIO.h"
@@ -25,10 +25,10 @@ static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 
 using namespace boost::asio;
 
-#define BIND_FN(x)         std::bind(&ConnectionToClient::x, shared_from_this())
-#define BIND_FN1(x, y)      std::bind(&ConnectionToClient ::x, shared_from_this(),y)
-#define BIND_FN2(x, y, z)    std::bind(&ConnectionToClient ::x, shared_from_this(),y,z)
-#define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToClient ::x, shared_from_this(),y,z,w)
+#define BIND_FN(x) std::bind(&ConnectionToClient::x, shared_from_this())
+#define BIND_FN1(x, y) std::bind(&ConnectionToClient ::x, shared_from_this(), y)
+#define BIND_FN2(x, y, z) std::bind(&ConnectionToClient ::x, shared_from_this(), y, z)
+#define BIND_FN3(x, y, z, w) std::bind(&ConnectionToClient ::x, shared_from_this(), y, z, w)
 
 class Server final {
 public:
@@ -37,14 +37,18 @@ public:
     void run();
 
 private:
-
     class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
-
     public:
-
-        ConnectionToClient(io_service &service, GameState &gs, bool &running, bool &stopped, ip::tcp::acceptor &ac,
-                           std::mutex &lock, boost::lockfree::queue<Event *> &myEvents,
-                           boost::lockfree::queue<Event *> &othersEvents);
+        ConnectionToClient(
+            io_service &service,
+            GameState &gs,
+            bool &running,
+            bool &stopped,
+            ip::tcp::acceptor &ac,
+            std::mutex &lock,
+            boost::lockfree::queue<Event *> &myEvents,
+            boost::lockfree::queue<Event *> &othersEvents
+        );
 
         void startConnection();
 
@@ -83,11 +87,9 @@ private:
         void writeEventsToBuffer();
 
     private:
-
         void connectionChecker();
 
     public:
-
         void startChecker();
 
     private:
@@ -112,7 +114,6 @@ private:
     };
 
 private:
-
     void updateGS();
 
     void handleNewConnection(const std::shared_ptr<ConnectionToClient> &client, const boost::system::error_code &err);
@@ -122,7 +123,6 @@ private:
     std::shared_ptr<ConnectionToClient> newClient();
 
 private:
-
     GameState gameState{};
     bool running_{false};
     bool stopped_{false};

@@ -1,39 +1,39 @@
 #define _USE_MATH_DEFINES
 
+#include "Hero.h"
+
 #include <algorithm>
 #include <cmath>
 
-#include "Hero.h"
 #include "GameState.h"
 
-StatsBuilder Hero::defaultHeroStatsBuilder_ =
-        StatsBuilder()
-                .setDamage(100)
-                .setAttackRange(75)
-                .setMoveSpeed(340)
-                .setTurnRate(0.5)
-                .setAttackSpeed(100)
-                .setMaxHp(1000)
-                .setMaxMp(300)
-                .setHpRegen(3)
-                .setMpRegen(1)
-                .setArmor(3)
-                .setResist(0.25);
+StatsBuilder Hero::defaultHeroStatsBuilder_ = StatsBuilder()
+                                                  .setDamage(100)
+                                                  .setAttackRange(75)
+                                                  .setMoveSpeed(340)
+                                                  .setTurnRate(0.5)
+                                                  .setAttackSpeed(100)
+                                                  .setMaxHp(1000)
+                                                  .setMaxMp(300)
+                                                  .setHpRegen(3)
+                                                  .setMpRegen(1)
+                                                  .setArmor(3)
+                                                  .setResist(0.25);
 
-Position Hero::heroSpawns_[] = {Position(Point(-6, -6), 0), // First
-                                Position(Point(6, 6), M_PI)};     // Second
+Position Hero::heroSpawns_[] = {
+    Position(Point(-6, -6), 0),    // First
+    Position(Point(6, 6), M_PI)};  // Second
 
-Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[static_cast<uint8_t>(player)]),
-                            gold_{START_GOLD},
-                            level_{1},
-                            experience_{0},
-                            hpIncreasePerLevel_{50},
-                            mpIncreasePerLevel_{50},
-                            damageIncreasePerLevel_{20},
-                            deathCounter_{0},
-                            skills_{ShortCoil(*this),
-                                    MidCoil(*this),
-                                    LongCoil(*this)} {
+Hero::Hero(Player player)
+    : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[static_cast<uint8_t>(player)]),
+      gold_{START_GOLD},
+      level_{1},
+      experience_{0},
+      hpIncreasePerLevel_{50},
+      mpIncreasePerLevel_{50},
+      damageIncreasePerLevel_{20},
+      deathCounter_{0},
+      skills_{ShortCoil(*this), MidCoil(*this), LongCoil(*this)} {
     team_ = static_cast<Team>(player);
     goldKillReward_ = 100;
     expKillReward_ = 1000;
@@ -41,17 +41,16 @@ Hero::Hero(Player player) : Unit(defaultHeroStatsBuilder_.create(), heroSpawns_[
     giveId();
 }
 
-Hero::Hero(Player player, Position position) : Unit(defaultHeroStatsBuilder_.create(), position),
-                                               gold_{START_GOLD},
-                                               level_{1},
-                                               experience_{0},
-                                               hpIncreasePerLevel_{50},
-                                               mpIncreasePerLevel_{50},
-                                               damageIncreasePerLevel_{20},
-                                               deathCounter_{0},
-                                               skills_{ShortCoil(*this),
-                                                       MidCoil(*this),
-                                                       LongCoil(*this)} {
+Hero::Hero(Player player, Position position)
+    : Unit(defaultHeroStatsBuilder_.create(), position),
+      gold_{START_GOLD},
+      level_{1},
+      experience_{0},
+      hpIncreasePerLevel_{50},
+      mpIncreasePerLevel_{50},
+      damageIncreasePerLevel_{20},
+      deathCounter_{0},
+      skills_{ShortCoil(*this), MidCoil(*this), LongCoil(*this)} {
     team_ = static_cast<Team>(player);
     respawnTime_ = HERO_RESPAWN_TIME;
     giveId();
@@ -78,7 +77,9 @@ void Hero::spendGold(uint32_t amount) {
     gold_ -= amount;
 }
 
-void Hero::levelUp(uint32_t delta) { level_ = std::min(level_ + delta, MAX_LEVEL); }
+void Hero::levelUp(uint32_t delta) {
+    level_ = std::min(level_ + delta, MAX_LEVEL);
+}
 
 void Hero::incrementLevel() {
     levelUp(1);
@@ -98,7 +99,7 @@ void Hero::changeExperience(uint32_t delta) {
 void Hero::claimReward(Unit *killed_unit) {
     addGold(killed_unit->getGoldKillReward());
     changeExperience(killed_unit->getExpKillReward());
-    GoldChangedEvent ev{static_cast<int>( getGold())};
+    GoldChangedEvent ev{static_cast<int>(getGold())};
     EventHandler<GoldChangedEvent>::fireEvent(ev);
 }
 
@@ -114,8 +115,7 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
     if (isDead()) {
         moved_ = true;
         position_.setPosition(1000, 1000);
-        if (deathCounter_ == 1)
-            return;
+        if (deathCounter_ == 1) return;
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
             ++deathCounter_;
@@ -165,7 +165,6 @@ void Hero::serialize(BufferIO::BufferWriter &writer) {
     writer.writeInt32(gold_);
     writer.writeInt32(experience_);
     writer.writeInt32(level_);
-
 }
 
 void Hero::deserialize(BufferIO::BufferReader &reader) {
@@ -178,18 +177,26 @@ void Hero::deserialize(BufferIO::BufferReader &reader) {
 
 // setters and getters
 
-uint32_t Hero::getGold() const { return gold_; }
+uint32_t Hero::getGold() const {
+    return gold_;
+}
 
-void Hero::setGold(uint32_t gold) { gold_ = gold; }
+void Hero::setGold(uint32_t gold) {
+    gold_ = gold;
+}
 
-uint32_t Hero::getLevel() const { return level_; }
+uint32_t Hero::getLevel() const {
+    return level_;
+}
 
 void Hero::setLevel(uint32_t level) {
     assert(level >= 1 && level <= MAX_LEVEL && "Wrong new level!");
     level_ = level;
 }
 
-uint32_t Hero::getExperience() const { return experience_; }
+uint32_t Hero::getExperience() const {
+    return experience_;
+}
 
 void Hero::setExperience(uint32_t experience) {
     assert(experience < EXP_PER_LEVEL && "Wrong new experience!");

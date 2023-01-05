@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Utils/BufferIO.h"
-#include "Game/Hero.h"
 #include "Game/Attack.h"
+#include "Game/Hero.h"
+#include "Utils/BufferIO.h"
 
 enum class SerializedEventName : uint8_t {
     None = 0,
@@ -20,9 +20,10 @@ template<class Event>
 class EventHandler {
 private:
     static std::vector<EventHandler<Event> *> allHandlers;
+
 public:
     static void fireEvent(const Event &event) {
-        for (auto &h: allHandlers) {
+        for (auto &h : allHandlers) {
             h->handle(event);
         }
     }
@@ -162,4 +163,3 @@ class DrawEvent : public Event {
 public:
     void fire() override;
 };
-

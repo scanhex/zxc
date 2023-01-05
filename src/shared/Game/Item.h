@@ -2,7 +2,7 @@
 
 class Item {
 private:
-    int index_; // 0 <-> empty item
+    int index_;  // 0 <-> empty item
 public:
     Item();
 

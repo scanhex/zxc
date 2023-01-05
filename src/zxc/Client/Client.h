@@ -1,29 +1,28 @@
 #pragma once
 
-#include <iostream>
-#include <thread>
-#include <utility>
-#include <string>
-
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <utility>
 
-#include "Utils/BufferIO.h"
-#include "Game/GameState.h"
 #include "Events/Events.h"
+#include "Game/GameState.h"
+#include "Utils/BufferIO.h"
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 512;
-static constexpr int MSG_FROM_CLIENT_SIZE = 32; //TODO change when add
+static constexpr int MSG_FROM_CLIENT_SIZE = 32;  // TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
-static constexpr int SERVER_RESPONSE_TIME = 1000; //max time we wait for next server response
+static constexpr int SERVER_RESPONSE_TIME = 1000;  // max time we wait for next server response
 
 using namespace boost::asio;
 
-#define BIND_FN(x)         std::bind(&ConnectionToServer ::x, shared_from_this())
-#define BIND_FN1(x, y)      std::bind(&ConnectionToServer ::x, shared_from_this(),y)
-#define BIND_FN2(x, y, z)    std::bind(&ConnectionToServer ::x, shared_from_this(),y,z)
-#define BIND_FN3(x, y, z, w)  std::bind(&ConnectionToServer ::x, shared_from_this(),y,z,w)
+#define BIND_FN(x) std::bind(&ConnectionToServer ::x, shared_from_this())
+#define BIND_FN1(x, y) std::bind(&ConnectionToServer ::x, shared_from_this(), y)
+#define BIND_FN2(x, y, z) std::bind(&ConnectionToServer ::x, shared_from_this(), y, z)
+#define BIND_FN3(x, y, z, w) std::bind(&ConnectionToServer ::x, shared_from_this(), y, z, w)
 
 class Client final : EventHandler<MoveEvent>,
                      EventHandler<StopEvent>,
@@ -33,7 +32,6 @@ class Client final : EventHandler<MoveEvent>,
                      EventHandler<ThirdSkillUseEvent>,
                      EventHandler<DrawEvent> {
 public:
-
     explicit Client(GameState &gameState);
 
     void run();
@@ -41,7 +39,6 @@ public:
 private:
     class ConnectionToServer : public std::enable_shared_from_this<ConnectionToServer> {
     public:
-
         explicit ConnectionToServer(GameState &gameState);
 
         static std::shared_ptr<ConnectionToServer> newConnection(GameState &gameState);
@@ -93,7 +90,6 @@ private:
         void clearEvents();
 
     public:
-
         void runService();
 
     private:
@@ -108,6 +104,7 @@ private:
         deadline_timer timer_;
         deadline_timer stop_timer_;
         GameState &gameState_;
+
     public:
         boost::lockfree::queue<SerializedEvent *> othersEvents_{100};
         boost::lockfree::queue<SerializedEvent *> events_{100};
@@ -139,8 +136,7 @@ private:
     template<typename T>
     static bool isNotFromServerEvent(T &t);
 
-    class FromServerEvent {
-    };
+    class FromServerEvent {};
 
     class FromServerMoveEvent : public MoveEvent, public FromServerEvent {
     public:

@@ -1,24 +1,20 @@
 #pragma once
 
-#include <vector>
 #include <cassert>
+#include <vector>
 
-#include "Stats.h"
-#include "Point.h"
-#include "Item.h"
-#include "Buff.h"
-#include "Position.h"
 #include "Attack.h"
+#include "Buff.h"
+#include "Item.h"
+#include "Point.h"
+#include "Position.h"
+#include "Stats.h"
 #include "Utils/BufferIO.h"
 
 class AttackCreator;
 class Attack;
 
-enum class Team : uint8_t {
-    Radiant = 0,
-    Dire = 1,
-    Neutral = 2
-};
+enum class Team : uint8_t { Radiant = 0, Dire = 1, Neutral = 2 };
 
 constexpr size_t MAX_ITEMS = 6;
 constexpr uint32_t NUM_TEAMS = 3;
@@ -50,19 +46,19 @@ protected:
     double respawnTime_;
 
 public:
-    std::vector<Attack*>myAttacks_;
+    std::vector<Attack *> myAttacks_;
 
 public:
     Unit(Stats stats, Position position);
 
     void addItem(Item &item, size_t slot = -1);
 
-    void deleteItem(size_t indexToDelete); // 0..MAX_ITEMS-1 in inventory TODO
+    void deleteItem(size_t indexToDelete);  // 0..MAX_ITEMS-1 in inventory TODO
     void clearItems();
 
     void addBuff(Buff &buff);
 
-    void deleteBuff(size_t indexToDelete); // deletes 1 buff matching buff.index TODO
+    void deleteBuff(size_t indexToDelete);  // deletes 1 buff matching buff.index TODO
     void clearBuffs();
 
     Attack *attack(std::vector<Unit *> &allUnits);
@@ -109,7 +105,6 @@ public:
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
     [[nodiscard]] bool inRadius(const Point &point, double r) const;
     [[nodiscard]] bool isDead() const;
-
 
     // getters and setters
 

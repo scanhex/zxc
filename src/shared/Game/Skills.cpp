@@ -1,19 +1,17 @@
+#include "Skills.h"
+
 #include <algorithm>
 
-#include "Skills.h"
 #include "Events/Events.h"
 #include "GameState.h"
 
 Skill::Skill(Hero &hero) : hero_{hero} {}
 
-Coil::Coil(Hero &hero, double len, double radius, double damage) : Skill(hero),
-                                                                   coolDown_{0},
-                                                                   len_{len},
-                                                                   radius_{radius},
-                                                                   damage_{damage} {}
+Coil::Coil(Hero &hero, double len, double radius, double damage)
+    : Skill(hero), coolDown_{0}, len_{len}, radius_{radius}, damage_{damage} {}
 
 void Coil::use(GameState &gameState) {
-    //assert(coolDown_ == 0.0);
+    // assert(coolDown_ == 0.0);
     /*
      * Мы решили пока что доверять клиенту, что кд прошел,
      * иначе даже минимальную рассинхонизацию подсчета времени контролировать сложно,

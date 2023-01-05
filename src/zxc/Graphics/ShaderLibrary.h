@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Magnum/Shaders/Phong.h"
 #include "Magnum/Shaders/Flat.h"
+#include "Magnum/Shaders/Phong.h"
 
 class ShaderLibrary {
 private:
     static ShaderLibrary *instance_;
     Magnum::Shaders::Phong coloredShader_{Magnum::NoCreate}, texturedShader_{Magnum::NoCreate};
     Magnum::Shaders::Flat3D flatShader_{Magnum::NoCreate};
+
 public:
     ShaderLibrary();
 

@@ -20,11 +20,11 @@ private:
     uint32_t default_maxMP_;
     double healthPoints_;
     double manaPoints_;
-    double hpRegen_; // per second
-    double mpRegen_; // per second
+    double hpRegen_;  // per second
+    double mpRegen_;  // per second
 
-    int32_t armor_; // adjust formula(see applyDamagePhys)?
-    double resist_; // percent
+    int32_t armor_;  // adjust formula(see applyDamagePhys)?
+    double resist_;  // percent
 public:
     Stats() = default;
     Stats(const Stats &) = default;

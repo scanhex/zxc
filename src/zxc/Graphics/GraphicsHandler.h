@@ -21,4 +21,3 @@ private:
     void handle(const SecondSkillUseEvent &event) override;
     void handle(const ThirdSkillUseEvent &event) override;
 };
-

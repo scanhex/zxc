@@ -12,7 +12,7 @@ public:
 
     void update(double elapsedTimeInSeconds);
 
-    //getters and setters
+    // getters and setters
     [[nodiscard]] bool getMovingFlag() const;
     void setMovingFlag(bool flag);
 

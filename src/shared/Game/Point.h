@@ -26,8 +26,7 @@ public:
 
     [[nodiscard]] bool inRadius(double x, double y, double r) const;
     [[nodiscard]] bool inRadius(const Point &point, double r) const;
-    [[nodiscard]] static bool isEnoughDistance(const Point &first, double r1,
-                                               const Point &second, double r2);
+    [[nodiscard]] static bool isEnoughDistance(const Point &first, double r1, const Point &second, double r2);
     [[nodiscard]] static double getDistance(const Point &first, const Point &second);
 
     void fitInMap();

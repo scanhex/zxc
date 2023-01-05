@@ -27,9 +27,7 @@ void StopEvent::fire() {
     Event::fire(this);
 }
 
-AttackEvent::AttackEvent(uint8_t attackerID, uint8_t targetID) : attackerID_{attackerID},
-                                                                 targetID_{targetID}{
-}
+AttackEvent::AttackEvent(uint8_t attackerID, uint8_t targetID) : attackerID_{attackerID}, targetID_{targetID} {}
 
 void AttackEvent::serialize(BufferIO::BufferWriter &writer) {
     writer.writeUInt8(static_cast<uint8_t>(name_));
@@ -75,8 +73,7 @@ void GoldChangedEvent::fire() {
     Event::fire(this);
 }
 
-GoldChangedEvent::GoldChangedEvent(int gold) : gold_(gold) {
-}
+GoldChangedEvent::GoldChangedEvent(int gold) : gold_(gold) {}
 
 void DrawEvent::fire() {
     Event::fire(this);

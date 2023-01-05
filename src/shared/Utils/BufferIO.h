@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 namespace BufferIO {
 
@@ -13,8 +13,8 @@ union binaryDouble {
 };
 
 /*
-*  Classes to parse args to bytes and back
-*/
+ *  Classes to parse args to bytes and back
+ */
 
 /*
  * Считывания и запись int32 и int64 работают также и с беззнаковыми типами.
@@ -41,7 +41,6 @@ private:
 
 class BufferReader final {
 public:
-
     uint8_t readUInt8();
 
     double readDouble();
@@ -59,4 +58,4 @@ private:
     size_t idx_{0};
 };
 
-}
+}  // namespace BufferIO
