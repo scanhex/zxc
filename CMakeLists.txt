@@ -19,6 +19,7 @@ set(ASSIMP_LIBRARY_DEBUG assimp CACHE STRING "" FORCE)
 set(ASSIMP_LIBRARY_RELEASE assimp CACHE STRING "" FORCE)
 # The following is important to avoid Assimp renaming Magnum plugin binaries
 set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 add_subdirectory(assimp EXCLUDE_FROM_ALL)
 add_library(Assimp::Assimp ALIAS assimp)
