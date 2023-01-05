@@ -1,3 +1,5 @@
+# Find Assimp and Magnum
+find_package(Assimp)
 find_package(
         Magnum REQUIRED
         GL
@@ -10,14 +12,12 @@ find_package(
         MeshTools
         Text
 )
-
-find_package(Assimp)
 find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
 find_package(MagnumExtras REQUIRED)
 
+# Find Boost
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-
 find_package(Boost COMPONENTS system thread regex REQUIRED)
 
 if (Boost_FOUND)
@@ -28,20 +28,18 @@ if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif ()
 
+# Set Corrade flags
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
-
+# Make zxc and zxc-server targets
 include_directories(".")
-
-file(GLOB zxc_sources "Game/*.cpp" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Client/*.cpp" "Client/*.h" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h" "Game/*.h")
-
-file(GLOB server_sources "Server/main.cpp" "Server/Server.cpp" "Server/Server.h" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Game/*.cpp" "Game/*.h")
+file(GLOB zxc_sources "Game/*" "Events/*" "Utils/*" "Client/*" "Graphics/*" "*.cpp" "*.h")
+file(GLOB server_sources "Server/*" "Events/*" "Utils/*" "Game/*")
 
 add_executable(zxc-server ${server_sources})
-
 add_executable(zxc ${zxc_sources})
 
+# Zxc dependencies
 add_dependencies(
         zxc
         Magnum::AnyImageImporter
@@ -50,6 +48,7 @@ add_dependencies(
         MagnumPlugins::StbTrueTypeFont
 )
 
+# Platform-specific libraries
 if (MSVC)
     target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter MagnumPlugins::StbTrueTypeFont)
 endif ()
@@ -58,12 +57,7 @@ IF (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib")
 ENDIF ()
 
-if (Boost_FOUND)
-    message(STATUS "Linking boost libraries...")
-    target_link_libraries(zxc-server ${Boost_LIBRARIES})
-    message(STATUS "Done.")
-endif ()
-
+# Link libraries
 target_link_libraries(
         zxc PRIVATE
         ${Boost_LIBRARIES}
