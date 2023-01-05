@@ -107,9 +107,6 @@ AttackDrawable::AttackDrawable(Object3D &object, SceneGraph::DrawableGroup3D &gr
     mesh_ = MeshTools::compile(Primitives::uvSphereSolid(100, 100));
 }
 void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    // if(attack_.getAttacker())
-    //     std::cout<<(int)attack_.getAttacker()->unique_id_<<"
-    //     "<<(int)attack_.getTarget()->unique_id_<<attack_.getMovingFlag()<<std::endl;
     if (!attack_.getMovingFlag()) {
         return;
     }

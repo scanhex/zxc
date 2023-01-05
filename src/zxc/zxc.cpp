@@ -164,9 +164,6 @@ void ZxcApplication::drawEvent() {
     updateGameState();
     EventHandler<DrawEvent>::fireEvent(DrawEvent());
 
-    //  Fps counter in console
-    //	Debug{} << 1 / timeline_.previousFrameDuration();
-
     camera_->draw(drawables_);
     ui_->draw();
 

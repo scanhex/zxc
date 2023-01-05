@@ -29,7 +29,7 @@ Server::ConnectionToClient::ConnectionToClient(
 void Server::ConnectionToClient::startConnection() {
     is_connected_ = true;
     conn_checker_.join();
-    std::cout << "Player conneceted" << std::endl;
+    std::cout << "Player connected" << std::endl;
     if (stopped_) {
         return;
     }
