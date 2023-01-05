@@ -8,6 +8,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Initialize submodules
+        run: git submodule update --init
+
       - name: Install dependencies
         run: |
           sudo apt-get install libboost-all-dev
