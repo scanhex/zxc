@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Point.h"
+#include "Position.h"
 #include "Unit.h"
 
 class Unit;
