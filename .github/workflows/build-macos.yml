@@ -3,7 +3,7 @@ name: CMake build
 on: [ push ]
 
 jobs:
-  build:
+  build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
