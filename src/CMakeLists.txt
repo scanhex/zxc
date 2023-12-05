@@ -58,6 +58,7 @@ endif ()
 
 IF (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/opt/homebrew/opt/icu4c/lib")
 ENDIF ()
 
 # Link libraries
