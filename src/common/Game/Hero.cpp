@@ -53,6 +53,8 @@ Hero::Hero(Player player, Position position)
       deathCounter_{0},
       skills_{ShortCoil(*this), MidCoil(*this), LongCoil(*this)} {
     team_ = static_cast<Team>(player);
+    goldKillReward_ = 100;
+    expKillReward_ = 1000;
     respawnTime_ = HERO_RESPAWN_TIME;
     giveId();
 }
@@ -116,12 +118,17 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
     if (isDead()) {
         moved_ = true;
         position_.setPosition(1000, 1000);
-        if (deathCounter_ == 1) {
+
+        if (deathCounter_ == 2) {
             return;
         }
+
+        if (respawnTime_ == HERO_RESPAWN_TIME) {
+            ++deathCounter_;
+        }
+
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
-            ++deathCounter_;
             refreshUnit();
             respawnTime_ = HERO_RESPAWN_TIME;
         }

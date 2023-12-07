@@ -12,7 +12,7 @@ constexpr uint32_t NUM_SKILLS = 3;
 constexpr uint32_t START_GOLD = 239;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
-constexpr double HERO_RESPAWN_TIME = 0;
+constexpr double HERO_RESPAWN_TIME = 1;
 
 class Hero : public Unit {
     // what does a Hero truly need?
@@ -25,7 +25,7 @@ private:
     uint32_t mpIncreasePerLevel_;
     int32_t damageIncreasePerLevel_;
 
-    int32_t deathCounter_;
+    uint32_t deathCounter_;
 
     Coil skills_[NUM_SKILLS];
 
