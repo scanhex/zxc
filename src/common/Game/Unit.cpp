@@ -98,7 +98,7 @@ void Unit::applyDamage(double amount) {
 
 void Unit::applyDamagePhys(double amount) {
     int32_t armor = stats_.getArmor();
-    double multiplier = 1 - ((0.052 * armor) / (0.9 + 0.048 * std::abs(armor)));
+    double multiplier = 1 - ((0.06 * armor) / (1 + 0.06 * std::abs(armor)));
     applyDamage(amount * multiplier);
 }
 
