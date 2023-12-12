@@ -54,7 +54,9 @@ private:
 
     void createAttackDrawables();
 
-    void addUnit(const Unit &u, std::string filename, bool wtf);
+    [[nodiscard]] Hero &myHero() const;
+    void addUnit(const Unit &u, const std::string &filename, bool wtf);
+
     void initCamera();
     void initRenderer();
     void initGrid();
@@ -64,17 +66,12 @@ private:
     void initNetwork();
     void initUi();
 
-    Float depthAt(const Vector2i &position) const;
-    Vector3 unproject(const Vector2i &position, Float depth) const;
-    Vector3 intersectWithPlane(const Vector2i &windowPosition, const Vector3 &planeNormal) const;
+    [[nodiscard]] Float depthAt(const Vector2i &position) const;
+    [[nodiscard]] Vector3 unproject(const Vector2i &position, Float depth) const;
+    [[nodiscard]] Vector3 intersectWithPlane(const Vector2i &windowPosition, const Vector3 &planeNormal) const;
 
     ShaderLibrary shaderLibrary_;
     ModelLoader modelLoader_;
-
-    std::vector<Unit *> units_;
-    std::vector<Hero *> heroes_;
-
-    Hero &myHero_;  // just a ref to heroes[0]
 
     GameState gameState_;
 

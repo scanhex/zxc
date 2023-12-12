@@ -57,8 +57,17 @@ if (MSVC)
 endif ()
 
 IF (APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/opt/homebrew/opt/icu4c/lib")
+    execute_process(
+            COMMAND brew --prefix icu4c
+            RESULT_VARIABLE BREW_ICU4C
+            OUTPUT_VARIABLE BREW_ICU4C_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if (BREW_ICU4C EQUAL 0 AND EXISTS "${BREW_ICU4C_PREFIX}")
+        message(STATUS "Found icu4c keg installed by Homebrew at ${BREW_ICU4C_PREFIX}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${BREW_ICU4C_PREFIX}/lib")
+    endif ()
 ENDIF ()
 
 # Link libraries

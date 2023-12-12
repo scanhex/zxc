@@ -136,7 +136,7 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
     if (!running_connections_) {
         return;
     }
-    if (gameState_.gameIsFinished()) {
+    if (gameState_.gameStatus() != GameStatus::InProgress) {
         sendEndGameMessage();
         return;
     }
@@ -145,16 +145,17 @@ void Server::ConnectionToClient::handleWriteToSocket(const boost::system::error_
 }
 
 void Server::ConnectionToClient::sendEndGameMessage() {
-    assert(gameState_.gameIsFinished());
+    GameStatus status = gameState_.gameStatus();
+    assert(status == GameStatus::FirstPlayerWon || status == GameStatus::SecondPlayerWon);
     writer_.flushBuffer();
-    writer_.writeUInt8(!gameState_.gameIsFinished());
+    writer_.writeUInt8(static_cast<uint8_t>(status));
     sock_.async_write_some(buffer(writer_.write_buffer_, MSG_FROM_SERVER_SIZE), BIND_FN(stopConnection));
 }
 
 void Server::ConnectionToClient::writeToSocket() {
     g_lock_.lock();
     writer_.flushBuffer();
-    writer_.writeUInt8(!gameState_.gameIsFinished());  // Game is running flag
+    writer_.writeUInt8(static_cast<uint8_t>(gameState_.gameStatus()));
     writeEventsToBuffer();
     writeGStoBuffer();
     g_lock_.unlock();

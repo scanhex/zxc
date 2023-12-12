@@ -1,13 +1,26 @@
 #include "Client.h"
 
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 extern bool exit_flag;
 
 Client::ConnectionToServer::ConnectionToServer(GameState &gameState)
-    : sock_{service_}, timer_{service_}, stop_timer_{service_}, gameState_{gameState} {}
+    : sock_{service_}, timer_{service_}, stop_timer_{service_}, gameState_{gameState} {
+    boost::property_tree::ptree pt;
+
+    try {
+        boost::property_tree::ini_parser::read_ini(RESOURCE_DIR "/config.ini", pt);
+    } catch (const boost::property_tree::ini_parser_error &e) {
+        std::cout << std::string("No configuration file found: ") + e.what() << std::endl;
+    }
+
+    std::string serverIP = pt.get<std::string>("SERVER_IP", "51.250.68.234");
+    ep_ = {ip::address::from_string(serverIP), 8080};
+}
 
 std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConnection(GameState &gameState) {
-    std::shared_ptr<ConnectionToServer> new_(new ConnectionToServer(gameState));
-    return new_;
+    return std::make_shared<ConnectionToServer>(gameState);
 }
 
 void Client::ConnectionToServer::startConnection() {
@@ -19,7 +32,7 @@ void Client::ConnectionToServer::stopConnection() {
         return;
     }
     connected_ = false;
-    std::cout << "stopping " << std::endl;
+    std::cout << "stopping..." << std::endl;
     sock_.close();
 }
 
@@ -38,7 +51,7 @@ void Client::ConnectionToServer::handleConnection(const boost::system::error_cod
 }
 
 void Client::ConnectionToServer::runGame() {
-    gameState_.refreshAllUnits();
+    gameState_.startNewGame();
     std::cout << "Game start!" << std::endl;
     readFromSocket();
     waitForAction();
@@ -100,8 +113,9 @@ void Client::ConnectionToServer::handleWaitRead(const boost::system::error_code 
     assert(bytes == MSG_WAIT_FROM_SERVER_SIZE);
     uint8_t status = reader_.readUInt8();
     clearEvents();
-    if (status) {
-        if (status == 2) {
+    if (status > 0) {
+        current_ = Player(status - 1);
+        if (current_ == Player::Second) {
             gameState_.reverseIndices();
         }
         runGame();
@@ -117,13 +131,14 @@ void Client::ConnectionToServer::handleReadFromSocket(const boost::system::error
     }
     assert(bytes == MSG_FROM_SERVER_SIZE);
     reader_.flushBuffer();
-    char gameIsRunning = reader_.readUInt8();
-    if (!gameIsRunning) {
-        // TODO handle game result
-        if (gameState_.getHealthPoints(Player::First) == 0) {
-            std::cout << "I lost :(" << std::endl;  //
-        } else {
+    auto status = GameStatus(reader_.readUInt8());
+    if (status != GameStatus::InProgress) {
+        bool won1 = status == GameStatus::FirstPlayerWon && current_ == Player::First;
+        bool won2 = status == GameStatus::SecondPlayerWon && current_ == Player::Second;
+        if (won1 || won2) {
             std::cout << "I won :)" << std::endl;
+        } else {
+            std::cout << "I lost :(" << std::endl;
         }
 
         stopConnection();
@@ -248,21 +263,9 @@ void Client::ConnectionToServer::fireOtherEvents() {
     }
 }
 
-void Client::checkServerResponse() {
-    if (!connection_->isConnected()) {
-        return;
-    }
-    now_ = boost::posix_time::microsec_clock::local_time();
-    if ((now_ - last_update_).total_milliseconds() > SERVER_RESPONSE_TIME) {
-        connection_->stopConnection();
-        return;
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-}
-
-template<typename T>
-bool Client::isNotFromServerEvent(T &t) {
-    return dynamic_cast<const FromServerEvent *>(&t) == nullptr;
+template<typename E, typename>
+bool Client::isNotFromServerEvent(E &e) {
+    return dynamic_cast<const FromServerEvent *>(&e) == nullptr;
 }
 
 void Client::handle(const MoveEvent &event) {
@@ -302,18 +305,20 @@ void Client::handle(const ThirdSkillUseEvent &event) {
 }
 
 void Client::handle(const DrawEvent &event) {
-    connection_->fireOtherEvents();
+    if (connection_) {
+        connection_->fireOtherEvents();
+    }
 }
 
 void Client::run() {
-    connection_->startConnection();
-    std::cout << "Connecting to server..." << std::endl;
-    last_update_ = boost::posix_time::microsec_clock::local_time();
-    std::thread response_checker(&Client::checkServerResponse, this);
-    connection_->runService();
-    response_checker.join();
-    std::cout << "Disonnected" << std::endl;
+    while (true) {
+        connection_ = ConnectionToServer::newConnection(gameState_);
+        std::cout << "Connecting to server..." << std::endl;
+        connection_->startConnection();
+        connection_->runService();
+        std::cout << "Disconnected" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
 }
 
-Client::Client(GameState &gameState)
-    : connection_(ConnectionToServer::newConnection(gameState)), gameState_{gameState} {}
+Client::Client(GameState &gameState) : gameState_{gameState} {}

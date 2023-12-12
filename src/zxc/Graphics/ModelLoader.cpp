@@ -156,7 +156,7 @@ void ModelLoader::addObject(
                 objectData->transformation() * Matrix4::scaling({ 0.01f, 0.01f, 0.01f }));
         */
     if (wtf) {
-        object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()) / 2);
+        object->rotateX(Magnum::Rad(Math::Constants<float>::piQuarter()));
     } else {
         object->rotateX(Magnum::Rad(Math::Constants<float>::piHalf()));
     }
@@ -168,7 +168,8 @@ void ModelLoader::addObject(
         /* Material not available / not loaded, use a default material */
         if (materialId == -1 || !materials[materialId]) {
             new ColoredDrawable{
-                *object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], 0xfffffe_rgbf, drawables};
+                *object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], 0xfffffe_rgbf, drawables
+            };
 
             /* Textured material. If the texture failed to load, again just use a
                default colored material. */
@@ -177,14 +178,12 @@ void ModelLoader::addObject(
             std::cerr << materials[materialId]->diffuseTexture() << std::endl;
             if (texture) {
                 new TexturedDrawable{
-                    *object, ShaderLibrary::texturedShader(), *meshes_[objectData->instance()], *texture, drawables};
+                    *object, ShaderLibrary::texturedShader(), *meshes_[objectData->instance()], *texture, drawables
+                };
             } else {
                 new ColoredDrawable{
-                    *object,
-                    ShaderLibrary::coloredShader(),
-                    *meshes_[objectData->instance()],
-                    0xfffffe_rgbf,
-                    drawables};
+                    *object, ShaderLibrary::coloredShader(), *meshes_[objectData->instance()], 0xfffffe_rgbf, drawables
+                };
             }
 
             /* Color-only material */
@@ -194,7 +193,8 @@ void ModelLoader::addObject(
                 ShaderLibrary::coloredShader(),
                 *meshes_[objectData->instance()],
                 materials[materialId]->diffuseColor(),
-                drawables};
+                drawables
+            };
         }
     }
 

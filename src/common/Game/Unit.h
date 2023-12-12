@@ -98,7 +98,9 @@ public:
 
     virtual void claimReward(Unit *killed_unit);
 
-    virtual void refreshUnit();
+    void refreshPosition();
+    virtual void respawn();
+    virtual void refresh();
 
     [[nodiscard]] bool checkUnitsPosition(const Point &position, std::vector<Unit *> &allUnits) const;
 

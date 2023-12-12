@@ -9,6 +9,8 @@ public:
 
     Position &operator=(const Position &) = default;
 
+    void refresh();
+
     void update(double deltaTurn, double deltaMove);
     void updateAngle(double deltaTurn);
     void updatePoint(double deltaMove);
@@ -41,7 +43,9 @@ private:
     void changeAngle(double delta);
 
     Point current_;
+    Point initial_;
     Point destination_;
     double currentAngle_;
+    double initialAngle_;
     double destAngle_;
 };

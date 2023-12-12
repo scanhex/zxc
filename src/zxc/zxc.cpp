@@ -30,8 +30,8 @@ void ZxcApplication::initCamera() {
     cameraObject_.setParent(&scene_)
         .translate(Vector3::zAxis(camHeight) - Vector3::yAxis(camHeight * Math::tan(camAngle)))
         .rotateXLocal(camAngle);
-    (*(camera_ = new SceneGraph::Camera3D{cameraObject_}))
-        .setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
+    camera_ = new SceneGraph::Camera3D{cameraObject_};
+    camera_->setAspectRatioPolicy(SceneGraph::AspectRatioPolicy::Extend)
         .setProjectionMatrix(Matrix4::perspectiveProjection(35.0_degf, 1.0f, 0.01f, 1000.0f))
         .setViewport(GL::defaultFramebuffer.viewport().size());
 }
@@ -63,10 +63,11 @@ void ZxcApplication::initScene() {
 }
 
 void ZxcApplication::initGame() {
-    addUnit(*heroes_[0], RESOURCE_DIR "/nevermore.fbx", false);
-    addUnit(*heroes_[1], RESOURCE_DIR "/nevermore.fbx", false);
-    addUnit(*units_[2], RESOURCE_DIR "/yasher.fbx", true);
-    addUnit(*units_[3], RESOURCE_DIR "/crocodil.fbx", true);
+    const std::vector<Unit *> &units = gameState_.getAllUnits();
+    addUnit(*units[0], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*units[1], RESOURCE_DIR "/nevermore.fbx", false);
+    addUnit(*units[2], RESOURCE_DIR "/yasher.fbx", true);
+    addUnit(*units[3], RESOURCE_DIR "/crocodil.fbx", true);
 }
 
 void ZxcApplication::initHandlers() {
@@ -74,8 +75,7 @@ void ZxcApplication::initHandlers() {
 }
 
 void ZxcApplication::initNetwork() {
-    Client client(gameState_);
-    networkThread_ = std::thread(&Client::run, client_);
+    networkThread_ = std::thread(&Client::run, &client_);
 }
 
 void ZxcApplication::initUi() {
@@ -92,11 +92,7 @@ void ZxcApplication::initUi() {
 
 ZxcApplication::ZxcApplication(const Arguments &arguments)
     : Platform::
-          Application{arguments, Configuration{}.setTitle("ZXC").setWindowFlags(Configuration::WindowFlag::Resizable)},
-      units_{new Hero(Player::First), new Hero(Player::Second), new Creep(Team::Radiant), new Creep(Team::Dire)},
-      heroes_{dynamic_cast<Hero *>(units_[0]), dynamic_cast<Hero *>(units_[1])},
-      myHero_{*heroes_[0]},
-      gameState_{units_},
+          Application{arguments, Configuration{}.setTitle("zxc").setWindowFlags(Configuration::WindowFlag::Resizable)},
       client_{gameState_} {
     setSwapInterval(1);
 
@@ -106,15 +102,15 @@ ZxcApplication::ZxcApplication(const Arguments &arguments)
     initGame();
     initNetwork();
     createAttackDrawables();
-    GoldChangedEvent(239).fire();
 
+    gameState_.startNewGame();
     timeline_.start();
 }
 
 void ZxcApplication::createAttackDrawables() {
-    for (Unit *unit : units_) {
+    for (const Unit *unit : gameState_.getAllUnits()) {
         std::vector<Object3D *> objects;
-        for (Attack *attack : unit->myAttacks_) {
+        for (const Attack *attack : unit->myAttacks_) {
             auto *obj = new Object3D{&scene_};
             new AttackDrawable(*obj, drawables_, *attack);
             objects.push_back(obj);
@@ -123,30 +119,35 @@ void ZxcApplication::createAttackDrawables() {
     }
 }
 
-void ZxcApplication::addUnit(const Unit &u, std::string filename, bool wtf) {
+Hero &ZxcApplication::myHero() const {
+    return *gameState_.getHero(Player::First);
+}
+
+void ZxcApplication::addUnit(const Unit &u, const std::string &filename, bool wtf) {
     unitObjects_.push_back(modelLoader_.loadModel(filename, scene_, drawables_, wtf).release());
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
+    const std::vector<Unit *> &units = gameState_.getAllUnits();
 
     for (size_t i = 0; i < unitObjects_.size(); i++) {
-        const Point &position = units_[i]->getPosition();
+        const Point &position = units[i]->getPosition();
 
         Vector3 vectorPosition(position.x_, position.y_, position.z_);
-        if (units_[i]->getMovedFlag()) {
+        if (units[i]->getMovedFlag()) {
             unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
         }
 
-        double angle = units_[i]->getAngle();
+        double angle = units[i]->getAngle();
         auto matrixPosition = Matrix4::translation(unitObjects_[i]->transformationMatrix().translation());
         unitObjects_[i]->setTransformation(matrixPosition * Matrix4::rotationZ(Magnum::Rad(M_PI + angle)));
     }
 
     for (size_t i = 0; i < attackObjects_.size(); i++) {
         for (size_t j = 0; j < attackObjects_[i].size(); j++) {
-            Attack *attack = units_[i]->myAttacks_[j];
+            Attack *attack = units[i]->myAttacks_[j];
             if (!attack->getMovingFlag()) {
                 continue;
             }
@@ -189,7 +190,7 @@ void ZxcApplication::mousePressEvent(MouseEvent &event) {
 
         double x = newPosition.x(), y = newPosition.y();
 
-        EventHandler<MoveEvent>::fireEvent(MoveEvent(myHero_, x, y));
+        EventHandler<MoveEvent>::fireEvent(MoveEvent(myHero(), x, y));
 
         redraw();
     }
@@ -286,16 +287,24 @@ void ZxcApplication::mouseMoveEvent(MouseMoveEvent &event) {
 }
 
 void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
+    Hero &hero = myHero();
+
     // QWERTY and Dvorak bindings
     if (event.key() == KeyEvent::Key::Space) {  // If you are a Maxim without a mouse
         cameraMoving_ = true;
         previousPosition_ = Containers::NullOpt;
     }
-    if (myHero_.isDead()) {
+    if (event.key() == KeyEvent::Key::N || event.key() == KeyEvent::Key::B) {
+        gameState_.startNewGame();
+        redraw();
+    }
+
+    if (hero.isDead()) {
         return;
     }
+
     if (event.key() == KeyEvent::Key::A) {
-        Attack *attack = myHero_.attack(gameState_.getAllUnits());
+        Attack *attack = hero.attack(gameState_.getAllUnits());
         if (attack) {
             EventHandler<AttackEvent>::fireEvent(
                 AttackEvent(attack->getAttacker()->unique_id_, attack->getTarget()->unique_id_)
@@ -304,25 +313,25 @@ void ZxcApplication::keyPressEvent(Platform::Sdl2Application::KeyEvent &event) {
         redraw();
     }
     if (event.key() == KeyEvent::Key::Z || event.key() == KeyEvent::Key::Semicolon) {
-        if (myHero_.isSkillReady(SkillName::FirstSkill)) {
-            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(myHero_));
+        if (hero.isSkillReady(SkillName::FirstSkill)) {
+            EventHandler<FirstSkillUseEvent>::fireEvent(FirstSkillUseEvent(hero));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::X || event.key() == KeyEvent::Key::Q) {
-        if (myHero_.isSkillReady(SkillName::SecondSkill)) {
-            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(myHero_));
+        if (hero.isSkillReady(SkillName::SecondSkill)) {
+            EventHandler<SecondSkillUseEvent>::fireEvent(SecondSkillUseEvent(hero));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::C || event.key() == KeyEvent::Key::J) {
-        if (myHero_.isSkillReady(SkillName::ThirdSkill)) {
-            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(myHero_));
+        if (hero.isSkillReady(SkillName::ThirdSkill)) {
+            EventHandler<ThirdSkillUseEvent>::fireEvent(ThirdSkillUseEvent(hero));
             redraw();
         }
     }
     if (event.key() == KeyEvent::Key::S || event.key() == KeyEvent::Key::O) {
-        EventHandler<StopEvent>::fireEvent(StopEvent(myHero_));
+        EventHandler<StopEvent>::fireEvent(StopEvent(hero));
         redraw();
     }
 }

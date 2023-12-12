@@ -89,7 +89,7 @@ void Hero::incrementLevel() {
     updateStats();
 }
 
-void Hero::changeExperience(uint32_t delta) {
+void Hero::addExperience(uint32_t delta) {
     experience_ += delta;
     if (level_ == MAX_LEVEL) {
         experience_ = std::min(experience_, EXP_PER_LEVEL);
@@ -101,9 +101,8 @@ void Hero::changeExperience(uint32_t delta) {
 
 void Hero::claimReward(Unit *killed_unit) {
     addGold(killed_unit->getGoldKillReward());
-    changeExperience(killed_unit->getExpKillReward());
-    GoldChangedEvent ev{static_cast<int>(getGold())};
-    EventHandler<GoldChangedEvent>::fireEvent(ev);
+    addExperience(killed_unit->getExpKillReward());
+    GoldChangedEvent(getGold()).fire();
 }
 
 bool Hero::isSkillReady(SkillName skillName) {
@@ -129,7 +128,7 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
 
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
-            refreshUnit();
+            respawn();
             respawnTime_ = HERO_RESPAWN_TIME;
         }
     } else {
@@ -140,13 +139,15 @@ void Hero::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
     }
 }
 
-void Hero::refreshPosition() {
-    position_ = heroSpawns_[static_cast<uint8_t>(team_)];
-}
+void Hero::refresh() {
+    Unit::refresh();
 
-void Hero::refreshUnit() {
-    Unit::refreshUnit();
-    refreshPosition();
+    setLevel(1);
+    setExperience(0);
+    setGold(0);
+    setDeathCounter(0);
+    updateStats();
+
     for (Coil &coil : skills_) {
         coil.refreshCoolDown();
     }

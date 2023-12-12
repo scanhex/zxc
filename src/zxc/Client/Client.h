@@ -15,7 +15,6 @@ static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 512;
 static constexpr int MSG_FROM_CLIENT_SIZE = 32;  // TODO change when add
 static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
-static constexpr int SERVER_RESPONSE_TIME = 1000;  // max time we wait for next server response
 
 using namespace boost::asio;
 
@@ -94,7 +93,7 @@ private:
 
     private:
         io_service service_;
-        ip::tcp::endpoint ep_{ip::address::from_string("51.250.68.234"), 8080};
+        ip::tcp::endpoint ep_;
         // 127.0.0.1 to test locally
         // 51.250.68.234 artem minecraft
         ip::tcp::socket sock_;
@@ -104,6 +103,7 @@ private:
         deadline_timer timer_;
         deadline_timer stop_timer_;
         GameState &gameState_;
+        Player current_ = Player::First;
 
     public:
         boost::lockfree::queue<SerializedEvent *> othersEvents_{100};
@@ -111,8 +111,6 @@ private:
     };
 
 private:
-    void checkServerResponse();
-
     void handle(const MoveEvent &event) override;
 
     void handle(const StopEvent &event) override;
@@ -129,12 +127,11 @@ private:
 
 private:
     std::shared_ptr<ConnectionToServer> connection_;
-    boost::posix_time::ptime last_update_, now_;
     GameState &gameState_;
 
 private:
-    template<typename T>
-    static bool isNotFromServerEvent(T &t);
+    template<typename E, typename = std::enable_if_t<std::is_base_of_v<Event, E>>>
+    static bool isNotFromServerEvent(E &e);
 
     class FromServerEvent {};
 

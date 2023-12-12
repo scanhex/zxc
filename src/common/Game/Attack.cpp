@@ -7,7 +7,7 @@ Attack::Attack()
       attacker_{nullptr},
       target_{nullptr},
       damage_{0},
-      moveSpeed_{800},  // TODO 1200 originally
+      moveSpeed_{1200},
       position_{Point(1000, 1000), 0} {}
 
 Attack::Attack(Unit *attacker, Unit *target)
@@ -15,7 +15,7 @@ Attack::Attack(Unit *attacker, Unit *target)
       attacker_{attacker},
       target_{target},
       damage_{attacker->getDamage()},
-      moveSpeed_{1600},  // TODO 1200 originally
+      moveSpeed_{1200},
       position_{attacker->getPosition(), 0} {
     position_.setDestination(target->getPosition());
 }
