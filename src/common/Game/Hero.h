@@ -9,7 +9,7 @@ enum class Player : uint8_t;
 
 constexpr uint32_t NUM_PLAYERS = 2;
 constexpr uint32_t NUM_SKILLS = 3;
-constexpr uint32_t START_GOLD = 239;
+constexpr uint32_t START_GOLD = 0;
 constexpr uint32_t MAX_LEVEL = 25;
 constexpr uint32_t EXP_PER_LEVEL = 1000;
 constexpr double HERO_RESPAWN_TIME = 1;
@@ -45,7 +45,7 @@ public:
 
     void levelUp(uint32_t delta);
     void incrementLevel();
-    void changeExperience(uint32_t delta);
+    void addExperience(uint32_t delta);
 
     void claimReward(Unit *killed_unit) override;
 
@@ -54,8 +54,7 @@ public:
 
     void updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits) override;
 
-    void refreshPosition();
-    void refreshUnit() override;
+    void refresh() override;
 
     void updateStats();
     void updateDamage();

@@ -163,10 +163,22 @@ bool Unit::checkUnitsPosition(const Point &position, std::vector<Unit *> &allUni
     return true;
 }
 
-void Unit::refreshUnit() {
+void Unit::refreshPosition() {
+    position_.refresh();
+}
+
+void Unit::respawn() {
+    refreshPosition();
+    moved_ = true;
     creator_->refreshCoolDown();
     stats_.refreshStats();
-    moved_ = true;
+}
+
+void Unit::refresh() {
+    respawn();
+    for (Attack *attack : myAttacks_) {
+        attack->setMovingFlag(false);
+    }
 }
 
 void Unit::serialize(BufferIO::BufferWriter &writer) {

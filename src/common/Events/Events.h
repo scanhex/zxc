@@ -154,11 +154,11 @@ public:
 
 class GoldChangedEvent : public Event {
 public:
-    int gold_;
+    uint32_t gold_;
 
     void fire() override;
 
-    explicit GoldChangedEvent(int gold);
+    explicit GoldChangedEvent(uint32_t gold);
 };
 
 class DrawEvent : public Event {

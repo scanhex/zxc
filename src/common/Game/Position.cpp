@@ -6,7 +6,17 @@
 #include <cmath>
 
 Position::Position(Point current, double angle)
-    : current_{current}, destination_{current}, currentAngle_{angle}, destAngle_{angle} {}
+    : current_{current},
+      initial_{current},
+      destination_{current},
+      currentAngle_{angle},
+      initialAngle_{angle},
+      destAngle_{angle} {}
+
+void Position::refresh() {
+    current_ = destination_ = initial_;
+    currentAngle_ = destAngle_ = initialAngle_;
+}
 
 void Position::update(double deltaTurn, double deltaMove) {
     if (current_ == destination_) {

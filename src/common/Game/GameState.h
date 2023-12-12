@@ -12,6 +12,12 @@ enum class Player : uint8_t {
     Second = 1
 };
 
+enum class GameStatus : uint8_t {
+    InProgress = 0,
+    FirstPlayerWon = 1,
+    SecondPlayerWon = 2
+};
+
 class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<StopEvent>,
                   public EventHandler<AttackEvent>,
@@ -20,10 +26,10 @@ class GameState : public EventHandler<MoveEvent>,
                   public EventHandler<ThirdSkillUseEvent> {
 public:
     GameState();
-    explicit GameState(std::vector<Unit *> &units);
 
     void update(double elapsedTime);  // time in milliseconds
 
+    void startNewGame();
     void refreshAllUnits();
     void reverseIndices();
 
@@ -59,7 +65,7 @@ public:
     void spendMana(double amount, Player player) const;
     [[nodiscard]] bool canSpendMana(double amount, Player player) const;
 
-    [[nodiscard]] bool gameIsFinished() const;
+    [[nodiscard]] GameStatus gameStatus() const;
 
     Unit *findUnitByID(uint8_t id);
     std::vector<Unit *> &getAllUnits();

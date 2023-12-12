@@ -20,7 +20,8 @@ void GraphicsHandler::handleCoil(const SkillUseEvent &event, double dist) {
     obj->transform(Matrix4::translation(
         shift +
         Vector3{
-            static_cast<float>(event.hero_.getPosition().x_), static_cast<float>(event.hero_.getPosition().y_), 0.1f}
+            static_cast<float>(event.hero_.getPosition().x_), static_cast<float>(event.hero_.getPosition().y_), 0.1f
+        }
     ));
     Debug{} << "skill use" << shift;
     new CoilDrawable(*obj, drawables_, timeline_);

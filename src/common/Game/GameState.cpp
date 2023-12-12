@@ -3,20 +3,15 @@
 #include <algorithm>
 #include <iostream>
 
-GameState::GameState(std::vector<Unit *> &units) : units_{units} {
-    heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
-    heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
-}
-
 GameState::GameState() {
     // create 2 default heroes and 2 default creeps
-    units_.push_back(new Hero(Player::First));
-    units_.push_back(new Hero(Player::Second));
+    heroes_.push_back(new Hero(Player::First));
+    heroes_.push_back(new Hero(Player::Second));
+
+    units_.push_back(heroes_[0]);
+    units_.push_back(heroes_[1]);
     units_.push_back(new Creep(Team::Radiant));
     units_.push_back(new Creep(Team::Dire));
-
-    heroes_.push_back(dynamic_cast<Hero *>(units_[0]));
-    heroes_.push_back(dynamic_cast<Hero *>(units_[1]));
 }
 
 void GameState::update(double elapsedTime) {  // time in milliseconds
@@ -31,16 +26,14 @@ void GameState::update(double elapsedTime) {  // time in milliseconds
     }
 }
 
-void GameState::refreshAllUnits() {
-    for (Hero *hero : heroes_) {
-        hero->setDeathCounter(0);
-    }
+void GameState::startNewGame() {
+    refreshAllUnits();
+    GoldChangedEvent(START_GOLD).fire();
+}
 
+void GameState::refreshAllUnits() {
     for (Unit *unit : units_) {
-        unit->refreshUnit();
-        for (Attack *attack : unit->myAttacks_) {
-            attack->setMovingFlag(false);
-        }
+        unit->refresh();
     }
 }
 
@@ -103,7 +96,7 @@ void GameState::handle(const AttackEvent &event) {
         std::cerr << "GameState::handle(AttackEvent) -> Target was not found. targetID_ = " << event.targetID_
                   << std::endl;
     }
-    for (auto &attack : attacker->myAttacks_) {
+    for (auto attack : attacker->myAttacks_) {
         if (!attack->getMovingFlag()) {
             attack->setAttacker(attacker);
             attack->setTarget(target);
@@ -196,8 +189,14 @@ bool GameState::canSpendMana(double amount, Player player) const {
     return getHero(player)->canSpendMana(amount);
 }
 
-bool GameState::gameIsFinished() const {
-    return heroes_[0]->getDeathCounter() >= 2 || heroes_[1]->getDeathCounter() >= 2;
+GameStatus GameState::gameStatus() const {
+    if (heroes_[0]->getDeathCounter() >= 2) {
+        return GameStatus::SecondPlayerWon;
+    } else if (heroes_[1]->getDeathCounter() >= 2) {
+        return GameStatus::FirstPlayerWon;
+    }
+
+    return GameStatus::InProgress;
 }
 
 Unit *GameState::findUnitByID(uint8_t id) {

@@ -35,10 +35,6 @@ Creep::Creep(Team team) : Unit(defaultCreepStatsBuilder_.create(), creepSpawns_[
     giveId();
 }
 
-void Creep::refreshPosition() {
-    position_ = creepSpawns_[static_cast<uint8_t>(team_)];
-}
-
 bool Creep::isHero() {
     return false;
 }
@@ -50,8 +46,7 @@ void Creep::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnit
         position_.setDestination(1000, 1000);
         respawnTime_ = std::max(0.0, respawnTime_ - elapsedTimeInSeconds);
         if (respawnTime_ == 0) {
-            refreshUnit();
-            refreshPosition();
+            respawn();
             respawnTime_ = CREEP_RESPAWN_TIME;
         }
         return;
