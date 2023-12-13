@@ -51,6 +51,7 @@ private:
     void keyPressEvent(KeyEvent &event) override;
     void keyReleaseEvent(KeyEvent &event) override;
 
+    static Vector3 toVector3(Point point);
     void updateGameState();
 
     void createAttackDrawables();
@@ -59,7 +60,7 @@ private:
     void addUnit(const Unit &u, const std::string &filename, bool wtf);
 
     void initCamera();
-    void initRenderer();
+    static void initRenderer();
     void initGrid();
     void initScene();
     void initGame();

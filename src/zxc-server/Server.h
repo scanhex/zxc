@@ -6,9 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/lockfree/queue.hpp>
 
-#ifdef _MSC_VER
 #include <algorithm>
-#endif
 #include <cstdio>
 #include <iostream>
 #include <mutex>
@@ -26,8 +24,8 @@ static constexpr int MSG_WAIT_FROM_SERVER_SIZE = 8;
 using namespace boost::asio;
 
 #define BIND_FN(x) std::bind(&ConnectionToClient::x, shared_from_this())
-#define BIND_FN1(x, y) std::bind(&ConnectionToClient ::x, shared_from_this(), y)
-#define BIND_FN2(x, y, z) std::bind(&ConnectionToClient ::x, shared_from_this(), y, z)
+#define BIND_FN1(x, y) std::bind(&ConnectionToClient::x, shared_from_this(), y)
+#define BIND_FN2(x, y, z) std::bind(&ConnectionToClient::x, shared_from_this(), y, z)
 #define BIND_FN3(x, y, z, w) std::bind(&ConnectionToClient ::x, shared_from_this(), y, z, w)
 
 class Server final {

@@ -2,10 +2,10 @@
 
 Item::Item() : index_{0} {}
 
-int Item::getIndex() {
+int Item::getIndex() const {
     return index_;
 }
 
-bool Item::isEmpty() {
+bool Item::isEmpty() const {
     return index_ == 0;
 }

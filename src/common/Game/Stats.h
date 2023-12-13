@@ -78,14 +78,14 @@ public:
     [[nodiscard]] double getHealthPoints() const;
     void setHealthPoints(double healthPoints);
 
-    [[nodiscard]] int32_t getDefaultHealthPoints() const;
-    void setDefaultHealthPoints(int32_t healthPoints);
+    [[nodiscard]] uint32_t getDefaultHealthPoints() const;
+    void setDefaultHealthPoints(uint32_t healthPoints);
 
     [[nodiscard]] double getManaPoints() const;
     void setManaPoints(double manaPoints);
 
-    [[nodiscard]] int32_t getDefaultManaPoints() const;
-    void setDefaultManaPoints(int32_t manaPoints);
+    [[nodiscard]] uint32_t getDefaultManaPoints() const;
+    void setDefaultManaPoints(uint32_t manaPoints);
 
     [[nodiscard]] double getHpRegen() const;
     void setHpRegen(double hpRegen);

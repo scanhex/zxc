@@ -45,7 +45,7 @@ void Unit::addBuff(Buff &buff) {
 
 void Unit::deleteBuff(size_t indexToDelete) {
     // TODO add buffs??
-    unused_parameter(indexToDelete);
+    unused(indexToDelete);
 }
 
 void Unit::clearBuffs() {
@@ -69,7 +69,7 @@ void Unit::changeAttackRange(double delta) {
 void Unit::changeMoveSpeed(int32_t delta) {
     stats_.changeMoveSpeed(delta);
 }
-void Unit::changeTurnRate(double delta) {
+void Unit::changeTurnRate(int32_t delta) {
     stats_.changeTurnRate(delta);
 }
 void Unit::changeAttackSpeed(int32_t delta) {
@@ -149,7 +149,7 @@ void Unit::updateUnit(double elapsedTimeInSeconds, std::vector<Unit *> &allUnits
 }
 
 void Unit::claimReward(Unit *killed_unit) {
-    // ??
+    unused(killed_unit);
 }
 
 bool Unit::checkUnitsPosition(const Point &position, std::vector<Unit *> &allUnits) const {
@@ -248,7 +248,6 @@ void Unit::setDamage(int32_t damage) {
 
 double Unit::getAttackRange() const {
     return stats_.getAttackRange();
-    ;
 }
 void Unit::setAttackRange(double attackRange) {
     stats_.setAttackRange(attackRange);

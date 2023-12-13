@@ -17,7 +17,7 @@ union binaryDouble {
  */
 
 /*
- * Считывания и запись int32 и int64 работают также и с беззнаковыми типами.
+ * Считывания и запись int32 и int64 работают также и со знаковыми типами.
  */
 
 class BufferWriter final {
@@ -26,9 +26,9 @@ public:
 
     void writeDouble(double d);
 
-    void writeInt32(int32_t d);
+    void writeUInt32(uint32_t d);
 
-    void writeInt64(int64_t d);
+    void writeUInt64(uint64_t d);
 
     void flushBuffer();
 

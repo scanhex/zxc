@@ -26,7 +26,7 @@ constexpr size_t MAX_ATTACK_NUM = 2;
 
 class Unit {
 public:
-    uint8_t unique_id_;
+    uint8_t unique_id_ = 0;
 
     static uint8_t radiant_counter_;
     static uint8_t dire_counter_;
@@ -47,7 +47,7 @@ protected:
 
     AttackCreator *creator_;
 
-    double respawnTime_;
+    double respawnTime_ = 0;
 
 public:
     std::vector<Attack *> myAttacks_;
@@ -75,7 +75,7 @@ public:
     void changeDamage(int32_t delta);
     void changeAttackRange(double delta);
     void changeMoveSpeed(int32_t delta);
-    void changeTurnRate(double delta);
+    void changeTurnRate(int32_t delta);
     void changeAttackSpeed(int32_t delta);
     void changeMaxHP(int32_t delta);
     void changeMaxMP(int32_t delta);

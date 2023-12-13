@@ -160,7 +160,7 @@ void Hero::updateStats() {
 }
 
 void Hero::updateDamage() {
-    stats_.setDamage(stats_.getDefaultDamage() + damageIncreasePerLevel_ * (level_ - 1));
+    stats_.setDamage(stats_.getDefaultDamage() + damageIncreasePerLevel_ * static_cast<int>(level_ - 1));
 }
 
 void Hero::updateMaxHP() {
@@ -173,9 +173,9 @@ void Hero::updateMaxMP() {
 
 void Hero::serialize(BufferIO::BufferWriter &writer) {
     Unit::serialize(writer);
-    writer.writeInt32(gold_);
-    writer.writeInt32(experience_);
-    writer.writeInt32(level_);
+    writer.writeUInt32(gold_);
+    writer.writeUInt32(experience_);
+    writer.writeUInt32(level_);
 }
 
 void Hero::deserialize(BufferIO::BufferReader &reader) {

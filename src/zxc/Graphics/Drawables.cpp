@@ -45,7 +45,7 @@ void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
 
     int32_t myHP = ceil(unit_.getHealthPoints());
     hpRenderer_->render(std::to_string(myHP));
-    hpRenderer_->mesh().draw(hpShader_);
+    hpShader_.draw(hpRenderer_->mesh());
     // Debugging Circle under the character:
     /*
     auto mesh = MeshTools::compile(Magnum::Primitives::circle3DSolid(100));
@@ -61,40 +61,40 @@ void UnitDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3
 
 void FlatDrawable::draw(const Matrix4 &transformation, SceneGraph::Camera3D &camera) {
     shader_.setColor(0x747474_rgbf).setTransformationProjectionMatrix(camera.projectionMatrix() * transformation);
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
 }
 
 void ColoredDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     shader_.setDiffuseColor(color_)
-        .setLightPosition(camera.cameraMatrix().translation())
-        .setLightColor(Color4(1.f, 1.f, 1.f))
+        .setLightPositions({{camera.cameraMatrix().translation(), 0.0f}})
+        .setLightColors({Color3(1.f, 1.f, 1.f)})
         .setTransformationMatrix(transformationMatrix)
         .setNormalMatrix(transformationMatrix.normalMatrix())
         .setProjectionMatrix(camera.projectionMatrix());
 
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
 }
 
 void TexturedDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
-    shader_.setLightPosition({0, 0, 10})
-        .setLightColor(Color4(1.f, 1.f, 1.f))
+    shader_.setLightPositions({{0.0f, 0.0f, 10.0f, 0.0f}})
+        .setLightColors({Color3(1.f, 1.f, 1.f)})
         .setTransformationMatrix(transformationMatrix)
         .setNormalMatrix(transformationMatrix.normalMatrix())
         .setProjectionMatrix(camera.projectionMatrix())
         .bindDiffuseTexture(texture_);
 
-    mesh_.draw(shader_);
+    shader_.draw(mesh_);
 }
 
 void CoilDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camera3D &camera) {
     if (timeline_.previousFrameTime() >= creationTime_ + COIL_ANIMATION_DURATION) {
-        // We can't delete self, because Magnum is currently iterating over the DrawableGroup and it can cause RE
+        // We can't delete self, because Magnum is currently iterating over the DrawableGroup, and it can cause RE
         //        delete &object_;
         return;
     }
     shader_.setDiffuseColor(Color4(0.8f, 0.273f, 0.191f))
-        .setLightPosition({0, 0, 10})
-        .setLightColor(Color4(1.f, 1.f, 1.f))
+        .setLightPositions({{0.0f, 0.0f, 10.0f, 0.0f}})
+        .setLightColors({Color3(1.f, 1.f, 1.f)})
         .setTransformationMatrix(transformationMatrix)
         .setNormalMatrix(transformationMatrix.normalMatrix())
         .setProjectionMatrix(camera.projectionMatrix());
@@ -111,7 +111,7 @@ void AttackDrawable::draw(const Matrix4 &transformationMatrix, SceneGraph::Camer
         return;
     }
     shader_.setDiffuseColor(0xa5c9ea_rgbf)
-        .setLightPosition(camera.cameraMatrix().transformPoint({5.0f, 5.0f, 7.0f}))
+        .setLightPositions({{camera.cameraMatrix().transformPoint({5.0f, 5.0f, 7.0f}), 0.0f}})
         .setTransformationMatrix(transformationMatrix * Matrix4::scaling({0.4, 0.4, 0.4}))
         .setNormalMatrix(transformationMatrix.normalMatrix())
         .setProjectionMatrix(camera.projectionMatrix());

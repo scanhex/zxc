@@ -11,9 +11,11 @@ ShaderLibrary *ShaderLibrary::instance_ = nullptr;
 ShaderLibrary::ShaderLibrary() {
     assert(!instance_);
     instance_ = this;
-    coloredShader_ = Magnum::Shaders::Phong{};
-    texturedShader_ = Magnum::Shaders::Phong{Magnum::Shaders::Phong::Flag::DiffuseTexture};
-    flatShader_ = Magnum::Shaders::Flat3D{};
+    coloredShader_ = Magnum::Shaders::PhongGL{};
+    texturedShader_ = Magnum::Shaders::PhongGL{
+        Magnum::Shaders::PhongGL::Configuration{}.setFlags(Magnum::Shaders::PhongGL::Flag::DiffuseTexture)
+    };
+    flatShader_ = Magnum::Shaders::FlatGL3D{};
     coloredShader_.setAmbientColor(0x111111_rgbf).setSpecularColor(0xffffff_rgbf).setShininess(8.0f);
     texturedShader_.setAmbientColor(0x111111_rgbf).setSpecularColor(0x111111_rgbf).setShininess(8.0f);
 }
