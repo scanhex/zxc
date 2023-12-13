@@ -2,8 +2,6 @@
 
 #include "Game/Hero.h"
 
-#include <iostream>
-
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/MeshTools/Compile.h>
@@ -21,6 +19,8 @@
 #include <Magnum/Text/Renderer.h>
 #include <Magnum/Timeline.h>
 #include <Magnum/Trade/MeshData3D.h>
+
+#include <iostream>
 
 using namespace Magnum;
 using namespace Math::Literals;

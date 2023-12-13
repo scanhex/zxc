@@ -3,8 +3,6 @@
 #include "Drawables.h"
 #include "ShaderLibrary.h"
 
-#include <cassert>
-
 #include <Magnum/GL/Texture.h>
 #include <Magnum/GL/TextureFormat.h>
 #include <Magnum/ImageView.h>
@@ -20,6 +18,8 @@
 #include <Magnum/Trade/PhongMaterialData.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/Trade/TextureData.h>
+
+#include <cassert>
 
 Pointer<Object3D>
 ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::DrawableGroup3D &drawables, bool wtf) {

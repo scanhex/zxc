@@ -1,8 +1,8 @@
 #include "ShaderLibrary.h"
 
-#include <cassert>
-
 #include <Magnum/Math/Color.h>
+
+#include <cassert>
 
 using namespace Magnum::Math::Literals;
 

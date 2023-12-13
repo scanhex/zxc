@@ -3,6 +3,9 @@
 #include "Game/GameState.h"
 #include "Utils/BufferIO.h"
 
+#include <boost/asio.hpp>
+#include <boost/lockfree/queue.hpp>
+
 #ifdef _MSC_VER
 #include <algorithm>
 #endif
@@ -11,9 +14,6 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-
-#include <boost/asio.hpp>
-#include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int TICK_TIME_GS_UPDATE = 10;
