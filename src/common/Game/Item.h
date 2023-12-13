@@ -6,7 +6,7 @@ private:
 public:
     Item();
 
-    int getIndex();
+    [[nodiscard]] int getIndex() const;
 
-    bool isEmpty();
+    [[nodiscard]] bool isEmpty() const;
 };

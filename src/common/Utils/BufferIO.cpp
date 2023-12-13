@@ -11,12 +11,12 @@ void BufferIO::BufferWriter::writeUInt8(uint8_t d) {
 }
 
 void BufferIO::BufferWriter::writeDouble(double d) {
-    binaryDouble u;
+    binaryDouble u{};
     u.dValue = d;
-    writeInt64(u.iValue);
+    writeUInt64(u.iValue);
 }
 
-void BufferIO::BufferWriter::writeInt32(int32_t d) {
+void BufferIO::BufferWriter::writeUInt32(uint32_t d) {
     assert(idx_ + 4 <= MAX_BUF);
     for (size_t i = 0; i < 4; i++) {
         write_buffer_[idx_ + 3 - i] = (d >> (i * 8));
@@ -24,7 +24,7 @@ void BufferIO::BufferWriter::writeInt32(int32_t d) {
     idx_ += 4;
 }
 
-void BufferIO::BufferWriter::writeInt64(int64_t d) {
+void BufferIO::BufferWriter::writeUInt64(uint64_t d) {
     assert(idx_ + 8 <= MAX_BUF);
     for (size_t i = 0; i < 8; i++) {
         write_buffer_[idx_ + 7 - i] = (d >> (i * 8));
@@ -42,7 +42,7 @@ uint8_t BufferIO::BufferReader::readUInt8() {
 }
 
 double BufferIO::BufferReader::readDouble() {
-    binaryDouble u;
+    binaryDouble u{};
     u.iValue = BufferIO::BufferReader::readInt64();
     return u.dValue;
 }

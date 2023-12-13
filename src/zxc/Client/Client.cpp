@@ -1,5 +1,7 @@
 #include "Client.h"
 
+#include "Utils/Utils.h"
+
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
@@ -306,6 +308,7 @@ void Client::handle(const ThirdSkillUseEvent &event) {
 }
 
 void Client::handle(const DrawEvent &event) {
+    unused(event);
     if (connection_) {
         connection_->fireOtherEvents();
     }

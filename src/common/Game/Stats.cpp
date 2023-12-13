@@ -143,17 +143,17 @@ void Stats::setManaPoints(double manaPoints) {
     manaPoints_ = manaPoints;
 }
 
-int32_t Stats::getDefaultHealthPoints() const {
+uint32_t Stats::getDefaultHealthPoints() const {
     return default_maxHP_;
 }
-void Stats::setDefaultHealthPoints(int32_t healthPoints) {
+void Stats::setDefaultHealthPoints(uint32_t healthPoints) {
     default_maxHP_ = healthPoints;
 }
 
-int32_t Stats::getDefaultManaPoints() const {
+uint32_t Stats::getDefaultManaPoints() const {
     return default_maxMP_;
 }
-void Stats::setDefaultManaPoints(int32_t manaPoints) {
+void Stats::setDefaultManaPoints(uint32_t manaPoints) {
     default_maxMP_ = manaPoints;
 }
 

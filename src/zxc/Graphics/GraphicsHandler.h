@@ -3,9 +3,9 @@
 #include "Drawables.h"
 #include "Events/Events.h"
 
-struct GraphicsHandler : EventHandler<FirstSkillUseEvent>,
-                         EventHandler<SecondSkillUseEvent>,
-                         EventHandler<ThirdSkillUseEvent> {
+struct GraphicsHandler final : EventHandler<FirstSkillUseEvent>,
+                               EventHandler<SecondSkillUseEvent>,
+                               EventHandler<ThirdSkillUseEvent> {
 public:
     GraphicsHandler(Scene3D &scene, SceneGraph::DrawableGroup3D &drawables, Timeline &timeline);
 

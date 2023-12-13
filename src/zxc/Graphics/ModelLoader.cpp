@@ -48,7 +48,7 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
         Debug{} << "Importing texture" << i << importer->textureName(i);
 
         Containers::Optional<Trade::TextureData> textureData = importer->texture(i);
-        if (!textureData || textureData->type() != Trade::TextureData::Type::Texture2D) {
+        if (!textureData || textureData->type() != Trade::TextureType::Texture2D) {
             Warning{} << "Cannot load texture properties, skipping";
             continue;
         }
@@ -71,7 +71,7 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
         texture.setMagnificationFilter(textureData->magnificationFilter())
             .setMinificationFilter(textureData->minificationFilter(), textureData->mipmapFilter())
             .setWrapping(textureData->wrapping().xy())
-            .setStorage(Math::log2(imageData->size().max()) + 1, format, imageData->size())
+            .setStorage(static_cast<int>(Math::log2(imageData->size().max())) + 1, format, imageData->size())
             .setSubImage(0, {}, *imageData)
             .generateMipmap();
 
@@ -79,13 +79,13 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
     }
 
     /* Load all meshes. Meshes that fail to load will be NullOpt. */
-    meshes_ = Containers::Array<Containers::Optional<GL::Mesh>>{importer->mesh3DCount()};
-    for (UnsignedInt i = 0; i != importer->mesh3DCount(); ++i) {
-        Debug{} << "Importing mesh" << i << importer->mesh3DName(i);
+    meshes_ = Containers::Array<Containers::Optional<GL::Mesh>>{importer->meshCount()};
+    for (UnsignedInt i = 0; i != importer->meshCount(); ++i) {
+        Debug{} << "Importing mesh" << i << importer->meshName(i);
 
-        Containers::Optional<Trade::MeshData3D> meshData = importer->mesh3D(i);
+        Containers::Optional<Trade::MeshData> meshData = importer->mesh(i);
 
-        if (!meshData || !meshData->hasNormals() || meshData->primitive() != MeshPrimitive::Triangles) {
+        if (!meshData || meshData->normalsAsArray().isEmpty() || meshData->primitive() != MeshPrimitive::Triangles) {
             Warning{} << "Cannot load the mesh, skipping";
             continue;
         }
@@ -102,8 +102,8 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
     for (UnsignedInt i = 0; i != importer->materialCount(); ++i) {
         Debug{} << "Importing material" << i << importer->materialName(i);
 
-        Containers::Pointer<Trade::AbstractMaterialData> materialData = importer->material(i);
-        if (!materialData || materialData->type() != Trade::MaterialType::Phong) {
+        Containers::Optional<Trade::MaterialData> materialData = importer->material(i);
+        if (!materialData || materialData->types() != Trade::MaterialType::Phong) {
             Warning{} << "Cannot load material, skipping";
             continue;
         }
@@ -128,7 +128,7 @@ ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::Drawabl
 
         /* The format has no scene support, display just the first loaded mesh with
            a default material and be done with it */
-    } else if (!meshes_.empty() && meshes_[0]) {
+    } else if (!meshes_.isEmpty() && meshes_[0]) {
         new ColoredDrawable{*manipulator, ShaderLibrary::coloredShader(), *meshes_[0], 0xffffff_rgbf, drawables};
     }
     return manipulator;

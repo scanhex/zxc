@@ -6,12 +6,11 @@
 class Position {
 public:
     Position(Point current, double angle);
-
+    Position(const Position &) = default;
     Position &operator=(const Position &) = default;
 
     void refresh();
 
-    void update(double deltaTurn, double deltaMove);
     void updateAngle(double deltaTurn);
     void updatePoint(double deltaMove);
     void updatePointIgnoreAngle(double deltaMove);

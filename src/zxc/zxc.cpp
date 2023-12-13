@@ -126,6 +126,10 @@ void ZxcApplication::addUnit(const Unit &u, const std::string &filename, bool wt
     new UnitDrawable(*unitObjects_.back(), drawables_, u);
 }
 
+Vector3 ZxcApplication::toVector3(Point point) {
+    return {static_cast<float>(point.x_), static_cast<float>(point.y_), static_cast<float>(point.z_)};
+}
+
 void ZxcApplication::updateGameState() {
     gameState_.update(static_cast<double>(timeline_.previousFrameDuration()) * 1000);
     const std::vector<Unit *> &units = gameState_.getAllUnits();
@@ -133,7 +137,7 @@ void ZxcApplication::updateGameState() {
     for (size_t i = 0; i < unitObjects_.size(); i++) {
         const Point &position = units[i]->getPosition();
 
-        Vector3 vectorPosition(position.x_, position.y_, position.z_);
+        Vector3 vectorPosition = toVector3(position);
         if (units[i]->getMovedFlag()) {
             unitObjects_[i]->translate(vectorPosition - unitObjects_[i]->transformation().translation());
         }
@@ -151,7 +155,7 @@ void ZxcApplication::updateGameState() {
             }
             const Point &position = attack->getPosition();
 
-            Vector3 vectorPosition(position.x_, position.y_, position.z_);
+            Vector3 vectorPosition = toVector3(position);
             attackObjects_[i][j]->translate(vectorPosition - attackObjects_[i][j]->transformation().translation());
         }
     }
@@ -202,7 +206,7 @@ void ZxcApplication::mouseReleaseEvent(MouseEvent &event) {
 }
 
 void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
-    if (!event.offset().y()) {
+    if (event.offset().y() == 0.0f) {
         return;
     }
 
@@ -213,11 +217,11 @@ void ZxcApplication::mouseScrollEvent(MouseScrollEvent &event) {
     auto coords = cameraObject_.transformationMatrix().translation();
     coords.x() = 0;
     coords.y() = 0;
-    auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+    auto newc = coords + (-coords * 0.15f * (event.offset().y() > 0.0f ? 1.0f : -1.0f));
     if (2 >= newc.z() || newc.z() >= 40) {
         return;
     }
-    cameraObject_.translate(-coords * 0.15f * (event.offset().y() > 0 ? 1 : -1));
+    cameraObject_.translate(-coords * 0.15f * (event.offset().y() > 0.0f ? 1.0f : -1.0f));
     //	cameraObject_.translate(Vector3::zAxis(
     //		distance * (1.0f - (event.offset().y() > 0 ? 1 / 0.85f :
     // 0.85f))));

@@ -18,14 +18,6 @@ void Position::refresh() {
     currentAngle_ = destAngle_ = initialAngle_;
 }
 
-void Position::update(double deltaTurn, double deltaMove) {
-    if (current_ == destination_) {
-        return;
-    }
-    updatePoint(deltaMove);
-    //  updateAngle(deltaTurn);
-}
-
 void Position::updateAngle(double deltaTurn) {
     if (std::abs(destAngle_ - currentAngle_) <= M_PI) {
         if (std::abs(destAngle_ - currentAngle_) < deltaTurn) {

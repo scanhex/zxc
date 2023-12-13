@@ -73,7 +73,7 @@ void Server::ConnectionToClient::stopConnection() {
         acceptor_.cancel();
         acceptor_.close();
     }
-    sock_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    sock_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec).clear();
     sock_.close();
 }
 
@@ -242,7 +242,6 @@ void Server::ConnectionToClient::updateGSbyPlayer() {
             break;
         }
         case SerializedEventName::None: {
-            break;
         }
     }
 }
@@ -258,14 +257,14 @@ void Server::ConnectionToClient::writeGStoBuffer() {
 
 void Server::ConnectionToClient::writeEventsToBuffer() {
     std::vector<SerializedEvent *> events;
-    size_t cnt = 0;
+    uint32_t cnt = 0;
     while (!othersEvents_.empty()) {
         ++cnt;
         SerializedEvent *e;
         othersEvents_.pop(e);
         events.push_back(e);
     }
-    writer_.writeInt32(cnt);
+    writer_.writeUInt32(cnt);
     for (auto e : events) {
         e->serialize(writer_);
     }
