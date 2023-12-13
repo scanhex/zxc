@@ -17,14 +17,14 @@ InsertBraces: true
 SortIncludes: CaseInsensitive
 IncludeBlocks: Regroup
 IncludeCategories:
-  # Headers in <> from specific external libraries.
-  - Regex: '<(boost)\/([A-Za-z0-9.\Q/-_\E])+>'
-    Priority: 4
-  # Headers in <> with extension.
-  - Regex: '<([A-Za-z0-9\Q/-_\E])+\..+>'
-    Priority: 3
   # Headers in <> without extension.
   - Regex: '<([A-Za-z0-9\Q/-_\E])+>'
+    Priority: 4
+  # Headers in <> from specific external libraries.
+  - Regex: '<(boost)\/([A-Za-z0-9.\Q/-_\E])+>'
+    Priority: 3
+  # Headers in <> with extension.
+  - Regex: '<([A-Za-z0-9\Q/-_\E])+\..+>'
     Priority: 2
   # Headers in "" with extension.
   - Regex: '"([A-Za-z0-9.\Q/-_\E])+"'
