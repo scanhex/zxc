@@ -2,11 +2,11 @@
 
 #include "Creep.h"
 
+#include "Events/Events.h"
+
 #include <algorithm>
 #include <cfloat>
 #include <cmath>
-
-#include "Events/Events.h"
 
 StatsBuilder Creep::defaultCreepStatsBuilder_ = StatsBuilder()
                                                     .setDamage(35)

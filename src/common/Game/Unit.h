@@ -1,8 +1,5 @@
 #pragma once
 
-#include <cassert>
-#include <vector>
-
 #include "Attack.h"
 #include "Buff.h"
 #include "Item.h"
@@ -10,6 +7,9 @@
 #include "Position.h"
 #include "Stats.h"
 #include "Utils/BufferIO.h"
+
+#include <cassert>
+#include <vector>
 
 class AttackCreator;
 class Attack;

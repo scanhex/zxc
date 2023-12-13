@@ -2,10 +2,10 @@
 
 #include "Hero.h"
 
+#include "GameState.h"
+
 #include <algorithm>
 #include <cmath>
-
-#include "GameState.h"
 
 StatsBuilder Hero::defaultHeroStatsBuilder_ = StatsBuilder()
                                                   .setDamage(100)

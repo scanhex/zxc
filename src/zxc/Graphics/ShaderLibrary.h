@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Magnum/Shaders/Flat.h"
-#include "Magnum/Shaders/Phong.h"
+#include <Magnum/Shaders/Flat.h>
+#include <Magnum/Shaders/Phong.h>
 
 class ShaderLibrary {
 private:

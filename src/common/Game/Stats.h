@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-
 #include "Utils/BufferIO.h"
+
+#include <cstdint>
 
 class Stats {
 private:

@@ -1,5 +1,10 @@
 #include "zxc.h"
 
+#include "Client/Client.h"
+#include "Game/GameState.h"
+#include "Graphics/Drawables.h"
+#include "Graphics/PluginLibrary.h"
+
 #include <Corrade/Containers/Array.h>
 #include <Corrade/Containers/Optional.h>
 #include <Corrade/Utility/Arguments.h>
@@ -8,19 +13,12 @@
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/Image.h>
 #include <Magnum/ImageView.h>
-#include <Magnum/Magnum.h>
 #include <Magnum/Math/FunctionsBatch.h>
-#include <Magnum/Math/Math.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/Primitives/Grid.h>
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/Trade/SceneData.h>
-
-#include "Client/Client.h"
-#include "Game/GameState.h"
-#include "Graphics/Drawables.h"
-#include "Graphics/PluginLibrary.h"
 
 void ZxcApplication::initCamera() {
     /* Every scene needs a camera */

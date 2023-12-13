@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include "Game/Attack.h"
 #include "Game/Hero.h"
 #include "Utils/BufferIO.h"
+
+#include <vector>
 
 enum class SerializedEventName : uint8_t {
     None = 0,

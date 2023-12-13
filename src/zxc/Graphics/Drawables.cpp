@@ -1,14 +1,14 @@
 #include "Drawables.h"
 
-#include "Corrade/Utility/FormatStl.h"
-#include "Magnum/GL/DefaultFramebuffer.h"
-#include "Magnum/GL/Mesh.h"
-#include "Magnum/Math/Color.h"
-#include "Magnum/Math/Complex.h"
-#include "Magnum/Platform/Sdl2Application.h"
-#include "Magnum/Primitives/Circle.h"
-#include "Magnum/Primitives/UVSphere.h"
 #include "PluginLibrary.h"
+
+#include <Corrade/Utility/FormatStl.h>
+#include <Magnum/GL/DefaultFramebuffer.h>
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Math/Color.h>
+#include <Magnum/Math/Complex.h>
+#include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/Primitives/UVSphere.h>
 
 Containers::Pointer<Text::AbstractFont> font;
 

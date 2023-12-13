@@ -1,11 +1,11 @@
 #pragma once
 
-#include <optional>
-
 #include "Creep.h"
 #include "Events/Events.h"
 #include "Hero.h"
 #include "Point.h"
+
+#include <optional>
 
 enum class Player : uint8_t {
     First = 0,

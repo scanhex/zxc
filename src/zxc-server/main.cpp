@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "Server.h"
+
+#include <iostream>
 
 int main() {
     std::cout << "Running server on port 8080" << std::endl;

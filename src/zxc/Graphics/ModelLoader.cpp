@@ -1,25 +1,25 @@
 #include "ModelLoader.h"
 
+#include "Drawables.h"
+#include "ShaderLibrary.h"
+
 #include <cassert>
 
-#include "Drawables.h"
-#include "Magnum/GL/Texture.h"
-#include "Magnum/GL/TextureFormat.h"
-#include "Magnum/ImageView.h"
-#include "Magnum/Math/Math.h"
-#include "Magnum/Mesh.h"
-#include "Magnum/MeshTools/Compile.h"
-#include "Magnum/PixelFormat.h"
-#include "Magnum/Trade/AbstractImporter.h"
-#include "Magnum/Trade/AbstractMaterialData.h"
-#include "Magnum/Trade/ImageData.h"
-#include "Magnum/Trade/MeshData3D.h"
-#include "Magnum/Trade/MeshObjectData3D.h"
-#include "Magnum/Trade/ObjectData3D.h"
-#include "Magnum/Trade/PhongMaterialData.h"
-#include "Magnum/Trade/SceneData.h"
-#include "Magnum/Trade/TextureData.h"
-#include "ShaderLibrary.h"
+#include <Magnum/GL/Texture.h>
+#include <Magnum/GL/TextureFormat.h>
+#include <Magnum/ImageView.h>
+#include <Magnum/Mesh.h>
+#include <Magnum/MeshTools/Compile.h>
+#include <Magnum/PixelFormat.h>
+#include <Magnum/Trade/AbstractImporter.h>
+#include <Magnum/Trade/AbstractMaterialData.h>
+#include <Magnum/Trade/ImageData.h>
+#include <Magnum/Trade/MeshData3D.h>
+#include <Magnum/Trade/MeshObjectData3D.h>
+#include <Magnum/Trade/ObjectData3D.h>
+#include <Magnum/Trade/PhongMaterialData.h>
+#include <Magnum/Trade/SceneData.h>
+#include <Magnum/Trade/TextureData.h>
 
 Pointer<Object3D>
 ModelLoader::loadModel(std::string filename, Scene3D &scene, SceneGraph::DrawableGroup3D &drawables, bool wtf) {

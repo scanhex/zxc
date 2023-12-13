@@ -1,7 +1,6 @@
 #include "GraphicsHandler.h"
 
 #include "Game/Unit.h"
-#include "Magnum/SceneGraph/Drawable.h"
 
 GraphicsHandler::GraphicsHandler(Scene3D &scene, SceneGraph::DrawableGroup3D &drawables, Timeline &timeline)
     : scene_(scene), drawables_(drawables), timeline_(timeline) {}
