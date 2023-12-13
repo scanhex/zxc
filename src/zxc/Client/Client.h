@@ -1,15 +1,16 @@
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/lockfree/queue.hpp>
+#include "Events/Events.h"
+#include "Game/GameState.h"
+#include "Utils/BufferIO.h"
+
 #include <iostream>
 #include <string>
 #include <thread>
 #include <utility>
 
-#include "Events/Events.h"
-#include "Game/GameState.h"
-#include "Utils/BufferIO.h"
+#include <boost/asio.hpp>
+#include <boost/lockfree/queue.hpp>
 
 static constexpr int MAX_MSG = 1024;
 static constexpr int MSG_FROM_SERVER_SIZE = 512;

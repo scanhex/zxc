@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Corrade/PluginManager/Manager.h"
-#include "Magnum/Text/AbstractFont.h"
 #include "Types.h"
+
+#include <Corrade/PluginManager/Manager.h>
+#include <Magnum/Text/AbstractFont.h>
 
 using Corrade::PluginManager::Manager;
 

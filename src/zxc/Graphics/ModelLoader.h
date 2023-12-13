@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Types.h"
+
 #include <string>
 
-#include "Corrade/Containers/Array.h"
-#include "Magnum/GL/Mesh.h"
-#include "Magnum/Shaders/Phong.h"
-#include "Magnum/Trade/AbstractImporter.h"
-#include "Types.h"
+#include <Corrade/Containers/Array.h>
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Shaders/Phong.h>
+#include <Magnum/Trade/AbstractImporter.h>
 
 using namespace Magnum;
 using namespace Corrade;

@@ -2,10 +2,10 @@
 
 #include "Unit.h"
 
+#include "Utils/Utils.h"
+
 #include <algorithm>
 #include <cmath>
-
-#include "Utils/Utils.h"
 
 uint8_t Unit::radiant_counter_ = 0;
 uint8_t Unit::dire_counter_ = 255;

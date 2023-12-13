@@ -1,25 +1,26 @@
 #pragma once
 
+#include "Game/Hero.h"
+
 #include <iostream>
 
-#include "Game/Hero.h"
-#include "Magnum/GL/Mesh.h"
-#include "Magnum/Math/Color.h"
-#include "Magnum/MeshTools/Compile.h"
-#include "Magnum/Primitives/Circle.h"
-#include "Magnum/Primitives/Cube.h"
-#include "Magnum/SceneGraph/Camera.h"
-#include "Magnum/SceneGraph/Drawable.h"
-#include "Magnum/SceneGraph/MatrixTransformation3D.h"
-#include "Magnum/SceneGraph/Scene.h"
-#include "Magnum/Shaders/Flat.h"
-#include "Magnum/Shaders/Phong.h"
-#include "Magnum/Shaders/Vector.h"
-#include "Magnum/Text/AbstractFont.h"
-#include "Magnum/Text/DistanceFieldGlyphCache.h"
-#include "Magnum/Text/Renderer.h"
-#include "Magnum/Timeline.h"
-#include "Magnum/Trade/MeshData3D.h"
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Math/Color.h>
+#include <Magnum/MeshTools/Compile.h>
+#include <Magnum/Primitives/Circle.h>
+#include <Magnum/Primitives/Cube.h>
+#include <Magnum/SceneGraph/Camera.h>
+#include <Magnum/SceneGraph/Drawable.h>
+#include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/Shaders/Flat.h>
+#include <Magnum/Shaders/Phong.h>
+#include <Magnum/Shaders/Vector.h>
+#include <Magnum/Text/AbstractFont.h>
+#include <Magnum/Text/DistanceFieldGlyphCache.h>
+#include <Magnum/Text/Renderer.h>
+#include <Magnum/Timeline.h>
+#include <Magnum/Trade/MeshData3D.h>
 
 using namespace Magnum;
 using namespace Math::Literals;

@@ -1,9 +1,9 @@
 #include "Skills.h"
 
-#include <algorithm>
-
 #include "Events/Events.h"
 #include "GameState.h"
+
+#include <algorithm>
 
 Skill::Skill(Hero &hero) : hero_{hero} {}
 

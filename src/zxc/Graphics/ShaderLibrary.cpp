@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "Magnum/Math/Color.h"
+#include <Magnum/Math/Color.h>
 
 using namespace Magnum::Math::Literals;
 

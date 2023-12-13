@@ -24,6 +24,7 @@ std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConne
 }
 
 void Client::ConnectionToServer::startConnection() {
+    std::cout << "Connecting to server at " + ep_.address().to_string() + "..." << std::endl;
     sock_.async_connect(ep_, BIND_FN1(handleConnection, std::placeholders::_1));
 }
 
@@ -313,7 +314,6 @@ void Client::handle(const DrawEvent &event) {
 void Client::run() {
     while (true) {
         connection_ = ConnectionToServer::newConnection(gameState_);
-        std::cout << "Connecting to server..." << std::endl;
         connection_->startConnection();
         connection_->runService();
         std::cout << "Disconnected" << std::endl;

@@ -4,6 +4,8 @@
 #include "Position.h"
 #include "Unit.h"
 
+#include <vector>
+
 class Unit;
 
 class Attack {
