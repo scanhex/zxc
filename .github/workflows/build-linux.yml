@@ -1,0 +1,24 @@
+name: CMake build
+
+on: [ push ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize submodules
+        run: git submodule update --init
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libboost-all-dev
+          sudo apt-get install libgl1-mesa-dev
+          sudo apt-get install libsdl2-dev
+
+      - name: CMake
+        run: cmake .
+
+      - name: make
+        run: make
