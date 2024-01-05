@@ -11,36 +11,40 @@ else ()
     set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/SDL2-2.0.10 ${CMAKE_PREFIX_PATH})
 endif ()
 
-add_subdirectory(corrade EXCLUDE_FROM_ALL)
+# Assimp flags
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/assimp/include CACHE STRING "" FORCE)
 set(ASSIMP_LIBRARY_DEBUG assimp CACHE STRING "" FORCE)
 set(ASSIMP_LIBRARY_RELEASE assimp CACHE STRING "" FORCE)
-# The following is important to avoid Assimp renaming Magnum plugin binaries
-set(INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/assimp/include CACHE STRING "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-add_subdirectory(assimp EXCLUDE_FROM_ALL)
-add_library(Assimp::Assimp ALIAS assimp)
 
+# Magnum flags
 set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 set(MAGNUM_WITH_ANYIMAGEIMPORTER ON CACHE BOOL "" FORCE)
-
 set(MAGNUM_WITH_ANYSCENEIMPORTER ON CACHE BOOL "" FORCE)
 set(MAGNUM_WITH_TGAIMPORTER ON CACHE BOOL "" FORCE)
 set(MAGNUM_WITH_OBJIMPORTER ON CACHE BOOL "" FORCE)
-
 set(MAGNUM_WITH_TEXT ON CACHE BOOL "" FORCE)
-add_subdirectory(magnum EXCLUDE_FROM_ALL)
 set(MAGNUM_WITH_ASSIMPIMPORTER ON CACHE BOOL "" FORCE)
 set(MAGNUM_WITH_STBTRUETYPEFONT ON CACHE BOOL "" FORCE)
-add_subdirectory(magnum-plugins EXCLUDE_FROM_ALL)
-
 set(MAGNUM_WITH_UI ON CACHE BOOL "" FORCE)
+
+# Submodules
+add_subdirectory(assimp EXCLUDE_FROM_ALL)
+add_subdirectory(corrade EXCLUDE_FROM_ALL)
+add_subdirectory(magnum EXCLUDE_FROM_ALL)
+add_subdirectory(magnum-plugins EXCLUDE_FROM_ALL)
 add_subdirectory(magnum-extras EXCLUDE_FROM_ALL)
 
+# Add Assimp
+add_library(Assimp::Assimp ALIAS assimp)
 
+# General CMake flags
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
 
 add_subdirectory(src)

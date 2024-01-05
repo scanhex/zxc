@@ -1,3 +1,5 @@
+# Find Assimp and Magnum
+find_package(Assimp)
 find_package(
         Magnum REQUIRED
         GL
@@ -10,14 +12,12 @@ find_package(
         MeshTools
         Text
 )
-
-find_package(Assimp)
 find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
 find_package(MagnumExtras REQUIRED)
 
+# Find Boost
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-
 find_package(Boost COMPONENTS system thread regex REQUIRED)
 
 if (Boost_FOUND)
@@ -28,21 +28,21 @@ if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif ()
 
+# Set Corrade flags
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/opt/icu4c/lib -I/usr/local/opt/icu4c/include")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRESOURCE_DIR=\\\"${CMAKE_HOME_DIRECTORY}/resources\\\"")
-
-include_directories(".")
-
-file(GLOB zxc_sources "Game/*.cpp" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Client/*.cpp" "Client/*.h" "Graphics/*.cpp" "*.cpp" "*.h" "Graphics/*.h" "Game/*.h")
-
-file(GLOB server_sources "Server/main.cpp" "Server/Server.cpp" "Server/Server.h" "Events/*.cpp" "Events/*.h" "Utils/*.cpp" "Utils/*.h" "Game/*.cpp" "Game/*.h")
-
-add_executable(Server ${server_sources})
+# Make zxc and zxc-server targets
+file(GLOB common "common/**/*.h" "common/**/*.cpp")
+file(GLOB zxc_sources "zxc/*.cpp" "zxc/*.h" "zxc/**/*.cpp" "zxc/**/*.h" ${common})
+file(GLOB server_sources "zxc-server/*.cpp" "zxc-server/*.h" ${common})
 
 add_executable(zxc ${zxc_sources})
+add_executable(zxc-server ${server_sources})
 
+target_include_directories(zxc PRIVATE zxc common)
+target_include_directories(zxc-server PRIVATE zxc-server common)
+
+# Zxc dependencies
 add_dependencies(
         zxc
         Magnum::AnyImageImporter
@@ -51,15 +51,26 @@ add_dependencies(
         MagnumPlugins::StbTrueTypeFont
 )
 
+# Platform-specific libraries
 if (MSVC)
     target_link_libraries(zxc PRIVATE Magnum::AnyImageImporter MagnumPlugins::AssimpImporter MagnumPlugins::StbTrueTypeFont)
 endif ()
 
-if (Boost_FOUND)
-    message(STATUS "Linking boost libraries")
-    target_link_libraries(Server ${Boost_LIBRARIES})
-endif ()
+IF (APPLE)
+    execute_process(
+            COMMAND brew --prefix icu4c
+            RESULT_VARIABLE BREW_ICU4C
+            OUTPUT_VARIABLE BREW_ICU4C_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 
+    if (BREW_ICU4C EQUAL 0 AND EXISTS "${BREW_ICU4C_PREFIX}")
+        message(STATUS "Found icu4c keg installed by Homebrew at ${BREW_ICU4C_PREFIX}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${BREW_ICU4C_PREFIX}/lib")
+    endif ()
+ENDIF ()
+
+# Link libraries
 target_link_libraries(
         zxc PRIVATE
         ${Boost_LIBRARIES}

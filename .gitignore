@@ -12,3 +12,5 @@ build*/
 /.gitattributes
 /resources/materials_compressed
 /resources_local
+**/.DS_Store
+/resources/config.ini
