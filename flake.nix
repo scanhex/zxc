@@ -12,17 +12,18 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
+        boost = pkgs.boost187;
+
         # List of dependencies based on the README
         # We'll use the versions available in nixpkgs.
         # If specific old versions are strictly required, more work would be needed.
         projectDeps = [
           # Boost components (or just pkgs.boost which includes common ones)
-          pkgs.boost178
+          boost
           # Graphics and Windowing
-          pkgs.libglvnd # Modern GL dispatch
+          pkgs.libGL 
           pkgs.SDL2
-          pkgs.gcc
-          # Magnum Engine and Corrade Utility Library
+          pkgs.clang_19
           # Dear ImGui (Magnum also has ImGui integration, but zxc lists it separately)
           pkgs.imgui
           pkgs.xorg.libX11 
@@ -50,10 +51,13 @@
           # BOOST_ROOT is often helpful for CMake's FindBoost module.
           # Nix normally sets up paths so these explicit settings are often not strictly needed,
           # but they don't hurt if CMake looks for them.
-           BOOST_INCLUDEDIR = "${pkgs.boost.out}/include";
-           BOOST_LIBRARYDIR = "${pkgs.boost.out}/lib"; # Check actual path with `ls ${pkgs.boost.lib}`
+           BOOST_ROOT = "${boost.out}";
+           BOOST_INCLUDEDIR = "${boost.out}/include";
+           BOOST_LIBRARYDIR = "${boost.out}/lib"; # Check actual path with `ls ${pkgs.boost.lib}`
 
           shellHook = ''
+            export CC=${pkgs.clang_16}/bin/clang
+            export CXX=${pkgs.clang_16}/bin/clang++
             echo ">>> Welcome to the zxc development environment!"
             echo ">>> Submodules should be initialized if this flake is in the project root."
             echo ">>> Otherwise, run: git submodule update --init --recursive"
@@ -69,7 +73,7 @@
             echo ">>> And ensure 'resources/config.ini' has:"
             echo "  SERVER_IP = 127.0.0.1"
             echo ""
-            echo ">>> Using Boost from nixpkgs: ${pkgs.boost.version}"
+            echo ">>> Using Boost from nixpkgs: ${boost.out}"
             echo ">>> Using SDL2 from nixpkgs: ${pkgs.SDL2.version}"
           '';
         };

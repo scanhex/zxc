@@ -129,7 +129,7 @@ private:
     boost::lockfree::queue<Event *> firstPlayerEvents_{20};
     boost::lockfree::queue<Event *> secondPlayerEvents_{20};
     io_context service_{};
-    ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8080)};
+    ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 23923)};
     std::mutex gs_lock_{};
 };
 
