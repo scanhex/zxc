@@ -18,7 +18,7 @@ Client::ConnectionToServer::ConnectionToServer(GameState &gameState)
     }
 
     std::string serverIP = pt.get<std::string>("SERVER_IP", "51.250.68.234");
-    ep_ = {ip::address::from_string(serverIP), 8080};
+    ep_ = {ip::make_address(serverIP), 8080};
 }
 
 std::shared_ptr<Client::ConnectionToServer> Client::ConnectionToServer::newConnection(GameState &gameState) {

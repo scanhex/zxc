@@ -93,7 +93,7 @@ private:
         void runService();
 
     private:
-        io_service service_;
+        io_context service_;
         ip::tcp::endpoint ep_;
         // 127.0.0.1 to test locally
         // 51.250.68.234 artem minecraft

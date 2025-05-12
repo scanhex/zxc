@@ -5,7 +5,7 @@
 int32_t Server::ConnectionToClient::running_connections_ = 0;
 
 Server::ConnectionToClient::ConnectionToClient(
-    io_service &service,
+    io_context &service,
     GameState &gs,
     bool &running,
     bool &stopped,

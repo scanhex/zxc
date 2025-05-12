@@ -38,7 +38,7 @@ private:
     class ConnectionToClient : public std::enable_shared_from_this<ConnectionToClient> {
     public:
         ConnectionToClient(
-            io_service &service,
+            io_context &service,
             GameState &gs,
             bool &running,
             bool &stopped,
@@ -128,7 +128,7 @@ private:
     boost::posix_time::ptime now{};
     boost::lockfree::queue<Event *> firstPlayerEvents_{20};
     boost::lockfree::queue<Event *> secondPlayerEvents_{20};
-    io_service service_{};
+    io_context service_{};
     ip::tcp::acceptor acceptor_{service_, ip::tcp::endpoint(ip::tcp::v4(), 8080)};
     std::mutex gs_lock_{};
 };

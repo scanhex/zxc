@@ -16,7 +16,7 @@ find_package(MagnumPlugins REQUIRED AssimpImporter StbTrueTypeFont)
 find_package(MagnumExtras REQUIRED)
 
 # Find Boost
-set(Boost_USE_STATIC_LIBS ON)
+#set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system thread regex REQUIRED)
 
